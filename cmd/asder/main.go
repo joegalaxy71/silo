@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"syscall"
@@ -43,6 +44,9 @@ func child() {
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
+
+	log.Println("args")
+	log.Println(os.Args[2])
 
 	if err := cmd.Run(); err != nil {
 		fmt.Println("ERROR", err)
