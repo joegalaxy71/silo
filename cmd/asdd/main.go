@@ -60,7 +60,37 @@ func child(command ...string) {
 	// Mount a temporary filesystem
 	must(syscall.Mount("something", "mytemp", "tmpfs", 0, ""))
 
-	must(cmd.Run())
+	//var files []string
+	//root := "/"
+	//err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+	//	files = append(files, path)
+	//	return nil
+	//})
+	//if err != nil {
+	//	panic(err)
+	//}
+	//for _, file := range files {
+	//	fmt.Println(file)
+	//}
+	cmd2 := exec.Command("/bin/bash", "")
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	//path, err := exec.LookPath("/bin/bash")
+	//if err != nil {
+	//	log.Println("LookPath error:")
+	//	log.Println(err)
+	//} else {
+	//	log.Println("PATH=")
+	//	log.Println(path)
+	//}
+	//
+	//
+	//finfo, err := os.Stat("/bin/bash")
+	//fmt.Println("FINFO")
+	//fmt.Printf("%+v\n",finfo)
+	must(cmd2.Run())
 
 	// Cleanup mount
 	must(syscall.Unmount("proc", 0))
