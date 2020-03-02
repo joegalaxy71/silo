@@ -23,10 +23,19 @@ func main() {
 	}
 
 	log.Println("preparing command")
-	cmd := exec.Command("/bin/echo", "echo")
+	cmd := exec.Command("/bin/uname", "-a")
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
+
+	cmd.SysProcAttr = &syscall.SysProcAttr{
+		Cloneflags: syscall.CLONE_NEWUTS | syscall.CLONE_NEWPID | syscall.CLONE_NEWNS,
+	}
+
+	err = syscall.Sethostname([]byte("container"))
+	if err != nil {
+		log.Println("error setting hostname")
+	}
 
 	err = cmd.Run()
 	if err != nil {
@@ -44,10 +53,18 @@ func run(command ...string) {
 	if err != nil {
 		log.Println("error getting current executable")
 	}
+
 	cmd := exec.Command(executable, append([]string{"child"}, command[0:]...)...)
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
+
+	err = syscall.Sethostname([]byte("container"))
+	if err != nil {
+		log.Println("error setting hostname")
+	}
+
+	must(syscall.Chroot("./ubuntu_fs"))
 
 	// Cloneflags is only available in Linux
 	// CLONE_NEWUTS namespace isolates hostname
