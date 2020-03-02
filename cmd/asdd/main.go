@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/mitchellh/go-ps"
+	"log"
 	"os"
 	"os/exec"
 	"syscall"
@@ -52,8 +53,13 @@ func run() {
 func child() {
 	fmt.Printf("running %v as PID %d\n", os.Args[2:], os.Getpid())
 
-	var err error
-	err = syscall.Chroot("/home/joegalaxy/go/bin/ubuntu_fs")
+	dir, err := os.Getwd()
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(dir)
+
+	err = syscall.Chroot("/root/go/bin/cross/ubuntu_fs")
 	if err != nil {
 		fmt.Println("error executing chroot")
 		fmt.Println(err)
@@ -64,6 +70,11 @@ func child() {
 		fmt.Println("error executing chdir")
 		fmt.Println(err)
 	}
+	dir, err = os.Getwd()
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(dir)
 
 	err = syscall.Mount("proc", "proc", "proc", 0, "")
 	if err != nil {
