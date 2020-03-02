@@ -126,7 +126,7 @@ func child() {
 		fmt.Println(err)
 	}
 
-	os.StartProcess()
+	//os.StartProcess()
 
 	err = syscall.Unmount("proc", 0)
 	if err != nil {
