@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -11,19 +12,39 @@ import (
 )
 
 func main() {
-	switch os.Args[1] {
-	case "run":
-		run(os.Args[2:]...)
-	case "child":
-		child(os.Args[2:]...)
-	default:
-		log.Fatal("Unknown command. Use run <command_name>, like `run /bin/bash` or `run echo hello`")
+	log.Println("main called")
+
+	log.Println("getting executable path")
+	executable, err := os.Executable()
+	if err != nil {
+		log.Println("error getting current executable")
+	} else {
+		log.Printf("executable name is %s\n", executable)
 	}
+
+	log.Println("preparing command")
+	cmd := exec.Command("/bin/echo", "echo")
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	err = cmd.Run()
+	if err != nil {
+		log.Println("error runnig command")
+		log.Println(err)
+	} else {
+		log.Printf("command run succesfully")
+	}
+
 }
 
 func run(command ...string) {
 	log.Println("Executing", command, "from run")
-	cmd := exec.Command("/proc/self/exe", append([]string{"child"}, command[0:]...)...)
+	executable, err := os.Executable()
+	if err != nil {
+		log.Println("error getting current executable")
+	}
+	cmd := exec.Command(executable, append([]string{"child"}, command[0:]...)...)
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -60,18 +81,19 @@ func child(command ...string) {
 	// Mount a temporary filesystem
 	must(syscall.Mount("something", "mytemp", "tmpfs", 0, ""))
 
-	//var files []string
-	//root := "/"
-	//err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
-	//	files = append(files, path)
-	//	return nil
-	//})
-	//if err != nil {
-	//	panic(err)
-	//}
-	//for _, file := range files {
-	//	fmt.Println(file)
-	//}
+	var files []string
+	root := "/"
+	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		files = append(files, path)
+		return nil
+	})
+	if err != nil {
+		panic(err)
+	}
+	for _, file := range files {
+		fmt.Println(file)
+	}
+	os.Exit(0)
 
 	path, err := exec.LookPath("/bin/bash")
 	if err != nil {
