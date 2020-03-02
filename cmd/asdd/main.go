@@ -14,12 +14,39 @@ import (
 func main() {
 	log.Println("main called")
 
-	log.Println("getting executable path")
-	executable, err := os.Executable()
+	var err error
+
+	err = syscall.Chroot("./ubuntu_fs")
 	if err != nil {
-		log.Println("error getting current executable")
+		log.Println("error chrooting")
+		log.Println(err)
+		os.Exit(-1)
+	}
+
+	os.Chdir("./ubuntu_fs")
+	if err != nil {
+		log.Println("error chrooting")
+		log.Println(err)
+		os.Exit(-1)
+	}
+
+	cg()
+
+	// Mount /proc inside container so that `ps` command works
+	err = syscall.Mount("proc", "proc", "proc", 0, "")
+	if err != nil {
+		log.Println("error mounting proc")
+		log.Println(err)
+		os.Exit(-1)
+	}
+
+	path, err := exec.LookPath("/bin/uname")
+	if err != nil {
+		log.Println("LookPath error:")
+		log.Println(err)
 	} else {
-		log.Printf("executable name is %s\n", executable)
+		log.Println("PATH=")
+		log.Println(path)
 	}
 
 	log.Println("preparing command")
@@ -27,14 +54,8 @@ func main() {
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-
 	cmd.SysProcAttr = &syscall.SysProcAttr{
 		Cloneflags: syscall.CLONE_NEWUTS | syscall.CLONE_NEWPID | syscall.CLONE_NEWNS,
-	}
-
-	err = syscall.Sethostname([]byte("container"))
-	if err != nil {
-		log.Println("error setting hostname")
 	}
 
 	err = cmd.Run()
@@ -65,6 +86,15 @@ func run(command ...string) {
 	}
 
 	must(syscall.Chroot("./ubuntu_fs"))
+
+	path, err := exec.LookPath("/bin/bash")
+	if err != nil {
+		log.Println("LookPath error:")
+		log.Println(err)
+	} else {
+		log.Println("PATH=")
+		log.Println(path)
+	}
 
 	// Cloneflags is only available in Linux
 	// CLONE_NEWUTS namespace isolates hostname
