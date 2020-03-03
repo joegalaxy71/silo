@@ -7,7 +7,6 @@ import (
 	_ "expvar" // Register the expvar handlers
 	"fmt"
 	"github.com/ardanlabs/conf"
-	"github.com/gen2brain/beeep"
 	_ "github.com/go-sql-driver/mysql"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/jmoiron/sqlx"
@@ -51,18 +50,18 @@ var _cfg struct {
 		Host     string `conf:"default:127.0.0.1"`
 		Instance string
 		Port     string `conf:"default:3306"`
-		Name     string `conf:"default:hx"`
+		Name     string `conf:"default:asd"`
 	}
 	Telegram struct {
 		Mode string `conf:"default:webhook"` //possible modes "webhook" and "tcp"
-		Hook string `conf:"default:https://hx.apps.avero.it"`
+		Hook string `conf:"default:https://asd.apps.avero.it"`
 		Port string `conf:"default:8000"`
 	}
 	Log struct {
 		Verbose bool `conf:"default:false"`
 	}
 	FileCache struct {
-		Path string `conf:"default:/var/cache/hx"`
+		Path string `conf:"default:/var/cache/asd"`
 	}
 }
 
@@ -95,7 +94,7 @@ var fileCache *stash.Cache
 // metrics globals
 var (
 	_workerOps = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "hx_worker_ops_total",
+		Name: "asd_worker_ops_total",
 		Help: "The total number worker was spawned by internal cron subsys",
 	})
 )
@@ -126,9 +125,9 @@ func run() error {
 	// 	\___\___/|_| |_|_| |_|\__, |
 	//                         |___/
 
-	if err := conf.Parse(os.Args[1:], "HX", &_cfg); err != nil {
+	if err := conf.Parse(os.Args[1:], "ASD", &_cfg); err != nil {
 		if err == conf.ErrHelpWanted {
-			usage, err := conf.Usage("HX", &_cfg)
+			usage, err := conf.Usage("ASD", &_cfg)
 			if err != nil {
 				return errors.Wrap(err, "generating config usage")
 			}
@@ -167,7 +166,7 @@ func run() error {
 	//  \__,_|_| |_|_|\__, |\__,_|\___|
 	//                   |_|
 
-	s := single.New("hx")
+	s := single.New("asd")
 	if err := s.CheckLock(); err != nil && err == single.ErrAlreadyRunning {
 		_log.Errorf("another instance of the app is already running, exiting")
 		return err
@@ -310,7 +309,7 @@ func run() error {
 	//  \ V /  __/ |  \__ \ | (_) | | | |
 	//   \_/ \___|_|  |___/_|\___/|_| |_|
 
-	_log.Infof("HX: Version %s started", Version)
+	_log.Infof("asd: Version %s started", Version)
 
 	// =====================================================================================================================
 	// execute on startup
@@ -695,9 +694,4 @@ func worker() {
 	// show elapsed time
 	elapsed := time.Since(start)
 	_log.Debugf("Worker took %s", elapsed)
-}
-
-func Notification(message string) error {
-	err := beeep.Alert("HX", message, "assets/warning.png")
-	return err
 }

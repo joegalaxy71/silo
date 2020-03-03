@@ -9,10 +9,10 @@ import (
 	"syscall"
 )
 
-func main() {
+func main_old() {
 	switch os.Args[1] {
 	case "run":
-		run()
+		run2()
 	case "child":
 		child()
 	default:
@@ -20,7 +20,7 @@ func main() {
 	}
 }
 
-func run() {
+func run2() {
 	//cmd := exec.Command(os.Args[2], os.Args[3:]...)
 	//cmd.Stdin = os.Stdin
 	//cmd.Stdout = os.Stdout

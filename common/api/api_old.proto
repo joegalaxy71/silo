@@ -1,0 +1,61 @@
+syntax = "proto3";
+package api;
+
+//import "google/api/annotations.proto";
+
+// messages
+
+message Void {}
+
+message Gps {
+    repeated Gp gp = 1;
+}
+
+message Gp {
+    string gpId = 1;
+}
+
+message Job {
+    string IdJob = 1;
+    string Type = 2;
+    string Content = 3;
+    string GpId = 4;
+    string Active = 5;
+}
+
+message Jobs {
+    repeated Job job = 1;
+}
+
+message Results {
+    repeated Result result = 1;
+}
+
+message Entry {
+    string Name = 1;
+    string Value = 2;
+}
+
+message Result {
+    string IdJob = 1;
+    string Type = 2;
+    repeated Entry Entries = 3;
+    string GpId = 4;
+    int64 Elapsed = 5;
+    string GpName = 6;
+}
+
+message Status {
+    bool code = 1;
+    string message = 2;
+}
+
+// services
+
+service Server {
+    rpc GetJobs(Gps) returns (Jobs) {}
+    rpc GetAllJobs(Void) returns (Jobs) {}
+    rpc PutResult(Result) returns (Status) {}
+    rpc GetAllResults(Void) returns (Results) {}
+    rpc GetAllGps(Void) returns (Gps) {}
+}
