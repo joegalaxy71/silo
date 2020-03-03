@@ -1,14 +1,16 @@
 package main
 
 import (
+	"asd/common/api"
 	"asd/common/helpers"
 	"asd/common/types"
-	"encoding/json"
+	"context"
 	_ "expvar" // Register the expvar handlers
 	"fmt"
 	"github.com/ardanlabs/conf"
 	_ "github.com/go-sql-driver/mysql"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"github.com/marcsauter/single"
@@ -18,14 +20,13 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/robfig/cron"
+	"google.golang.org/grpc"
 	"gopkg.in/stash.v1"
-	"io/ioutil"
 	"log"
+	"net"
 	"net/http"
 	_ "net/http/pprof" // Register the pprof handlers
 	"os"
-	"strconv"
-	"strings"
 	"sync"
 	"time"
 )
@@ -70,6 +71,12 @@ var _cfg struct {
 
 var Build int
 var Version string
+
+// =====================================================================================================================
+// Server represents the gRPC server
+
+type Server struct {
+}
 
 // =====================================================================================================================
 // module wide globals (logging, locks, db, etc)
@@ -214,28 +221,6 @@ func run() error {
 	_log.Infof("Metrics: initialized")
 
 	// =====================================================================================================================
-	//      _ _
-	//   __| | |__
-	//  / _` | '_ \
-	// | (_| | |_) |
-	//  \__,_|_.__/
-	//
-
-	var connectString string
-	if _cfg.Db.Instance != "" {
-		connectString = fmt.Sprintf("%s:%s@unix(/cloudsql/%s)/%s", _cfg.Db.User, _cfg.Db.Password, _cfg.Db.Instance, _cfg.Db.Name)
-	} else {
-		connectString = _cfg.Db.User + ":" + _cfg.Db.Password + "@(" + _cfg.Db.Host + ":" + _cfg.Db.Port + ")/" + _cfg.Db.Name + "?parseTime=true"
-	}
-	//_log.Infof(connectString)
-	var err error
-	_db, err = sqlx.Connect("mysql", connectString)
-	if err != nil {
-		return errors.Wrap(err, "connecting to backend db")
-	}
-	_log.Infof("Db: initialized")
-
-	// =====================================================================================================================
 	//
 	//      _                            _
 	//  ___| |__   __ _ _ __  _ __   ___| |___
@@ -253,6 +238,7 @@ func run() error {
 	// | |_) | (_) | |_
 	// |_.__/ \___/ \__|
 
+	var err error
 	bot, err = tgbotapi.NewBotAPI("1021934418:AAFwdPiIkJS1iJESJJGSRnk5jIXA0jP_pa0")
 	if err != nil {
 		return errors.Wrap(err, "listening on Telegram tcp")
@@ -303,6 +289,82 @@ func run() error {
 	_log.Infof("Cron: initialized")
 
 	// =====================================================================================================================
+	//██████╗ ██████╗ ██████╗  ██████╗
+	//██╔════╝ ██╔══██╗██╔══██╗██╔════╝
+	//██║  ███╗██████╔╝██████╔╝██║
+	//██║   ██║██╔══██╗██╔═══╝ ██║
+	//╚██████╔╝██║  ██║██║     ╚██████╗
+	//╚═════╝ ╚═╝  ╚═╝╚═╝      ╚═════╝
+
+	//--------------------------------------------------------------------------------------
+	// goroutine for the standard grpc server
+	chanErrGrpc := make(chan error, 1)
+	go func(errGrpc chan<- error) {
+		// create a listener on TCP port 7777
+		lis, err := net.Listen("tcp", fmt.Sprintf(":%d", 7777))
+		if err != nil {
+			err = errors.Wrap(err, "trying to listen on tcp")
+			errGrpc <- err
+			return
+		}
+		// create a server instance
+		s := Server{}
+		// create a gRPC server object
+		grpcServer := grpc.NewServer()
+		// attach the Ping service to the server
+		api.RegisterServerServer(grpcServer, &s)
+		// start the server
+		_log.Infof("listening for grpc connections on port: 7777")
+		if err := grpcServer.Serve(lis); err != nil {
+			err = errors.Wrap(err, "failed to serve gRPC")
+			errGrpc <- err
+			return
+		}
+	}(chanErrGrpc)
+
+	//--------------------------------------------------------------------------------------
+	// goroutine for the grpc<->http reverse proxy
+	chanErrHttp := make(chan error, 1)
+	go func(errHttp chan<- error) {
+
+		// http server
+		port := 8080
+
+		router := mux.NewRouter()
+
+		// pages
+		//router.HandleFunc("/readall", readAll).Methods("GET")
+		//router.HandleFunc("/create", create).Methods("POST")
+		//router.HandleFunc("/update", update).Methods("POST")
+		//router.HandleFunc("/delete", delete).Methods("POST")
+		//router.HandleFunc("/getallresults", getAllResults).Methods("GET")
+		//router.HandleFunc("/getalljobs", getAllJobs).Methods("GET")
+		//router.HandleFunc("/getallgps", getAllGps).Methods("GET")
+
+		http.Handle("/", router)
+		// start the web server (blocking)
+		_log.Infof("listening for http connections on port: %v", port)
+		if err := http.ListenAndServe(fmt.Sprint(":", port), router); err != nil {
+			err = errors.Wrap(err, "failed to serve http<-->gRPC")
+			errHttp <- err
+			return
+		}
+	}(chanErrHttp)
+
+	//--------------------------------------------------------------------------------------
+	// vait for channels and return eventual errors
+	var errGrpc, errHttp error
+
+	select {
+	case errGrpc = <-chanErrGrpc:
+		_log.Error(errGrpc)
+		return errGrpc
+	case errHttp = <-chanErrHttp:
+		_log.Error(errHttp)
+		return errHttp
+	}
+
+	// =====================================================================================================================
 	//                     _
 	// __   _____ _ __ ___(_) ___  _ __
 	// \ \ / / _ \ '__/ __| |/ _ \| '_ \
@@ -312,386 +374,77 @@ func run() error {
 	_log.Infof("asd: Version %s started", Version)
 
 	// =====================================================================================================================
-	// execute on startup
-	worker()
-
-	go replayer(bot)
-
-	go poster(bot)
-
-	// =====================================================================================================================
 	// wain intefinitely on the main goroutine
 	select {}
 }
 
-func poster(bot *tgbotapi.BotAPI) {
-	for {
-		serverInfo := <-new
-		msg := tgbotapi.NewMessage(serverInfo.DbItem.ChatId, "")
-		msg.ParseMode = "markdown"
-
-		if serverInfo.Event == "VARIATION" {
-			msg.Text = "PRICE VARIATION\n"
-			msg.Text += serverInfoDetails(serverInfo.Server, serverInfo.DbItem, true)
-		}
-
-		if serverInfo.Event == "VANISHED" {
-			msg.Text = "SERVER VANISHED\n"
-			msg.Text += "ID=" + fmt.Sprint(serverInfo.DbItem.ServerId) + "\n"
-		}
-		bot.Send(msg)
-	}
-}
-
-func replayer(bot *tgbotapi.BotAPI) {
-
-	var updates <-chan tgbotapi.Update
-	var err error
-
-	if _cfg.Telegram.Mode == "tcp" {
-		u := tgbotapi.NewUpdate(0)
-		u.Timeout = 60
-
-		updates, err = bot.GetUpdatesChan(u)
-		if err != nil {
-			errors.Wrap(err, "bot: unable to get updates")
-		}
-	}
-
-	if _cfg.Telegram.Mode == "webhook" {
-		updates = bot.ListenForWebhook("/" + bot.Token)
-	}
-
-	for update := range updates {
-		if update.Message == nil { // ignore any non-Message Updates
-			continue
-		}
-
-		if update.Message.IsCommand() {
-			_log.Debugf("[%s] %s", update.Message.From.UserName, update.Message.Text)
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
-			words := strings.Fields(update.Message.Text)
-			switch update.Message.Command() {
-			case "help":
-				msg.Text = "HELP\n/watch <id>\n/forget <id>\n/list\n/astiastiieri"
-			case "watch":
-				if len(words) == 2 {
-					//correct number of elements
-					arg := words[1]
-					msg.Text = watch(arg, update.Message.Chat.ID, update.Message.From.UserName)
-				} else {
-					msg.Text = "wrong number of parameters"
-				}
-			case "forget":
-				if len(words) == 2 {
-					//correct number of elements
-					arg := words[1]
-					msg.Text = forget(arg)
-				} else {
-					msg.Text = "wrong number of parameters"
-				}
-			case "list":
-				if len(words) == 1 {
-					//correct number of elements
-					msg.Text = list()
-				} else {
-					msg.Text = "wrong number of parameters"
-				}
-			case "astiastiieri":
-				msg.Text = "Puppa"
-			}
-			msg.ReplyToMessageID = update.Message.MessageID
-			msg.ParseMode = "markdown"
-			bot.Send(msg)
-		}
-	}
-
-}
-
-func list() string {
-	msg := ""
-	err := selectItems()
-	if err != nil {
-		_log.Error("Error selecting db items (list)")
-	} else {
-		sbItemsLock.RLock()
-		dbItemsLock.RLock()
-		msg += "Elenco server\n"
-		for _, sbitem := range sbItems.Server {
-			for _, dbitem := range dbItems {
-				if dbitem.ServerId == sbitem.Key {
-					msg += serverInfoDetails(sbitem, dbitem, false)
-					//msg += sbitem.Description + "/n"
-				}
-			}
-		}
-		sbItemsLock.RUnlock()
-		dbItemsLock.RUnlock()
-	}
-	return msg
-}
-
-func serverInfoDetails(sbItem types.Server, dbItem types.DbItem, diff bool) string {
-	msg := "\n"
-	sKey := fmt.Sprint(sbItem.Key)
-	sCPUBenchmark := fmt.Sprint(sbItem.CPUBenchmark)
-	fPrice, err := strconv.ParseFloat(sbItem.Price, 64)
-	if err != nil {
-		fPrice = 0.0
-		_log.Errorf("Error parsing price from sbItem struct")
-	}
-	fPriceVat := fPrice * 1.22
-	sPriceVat := fmt.Sprintf("%.2f", fPriceVat)
-	msg += "*WATCHER:* " + dbItem.UserName + "\n"
-	msg += "*ID:* " + sKey + ", *NAME:* " + sbItem.Name + ", *CPU:* " + sbItem.CPU + ", *CPUMARK:* " + sCPUBenchmark + "\n"
-	msg += "*PRICE:* " + sbItem.Price + ", *PRICE*(inc. VAT): " + sPriceVat + "\n"
-
-	if diff {
-		msg += "Previous price:\n"
-		oldPrice := dbItem.Price
-		fPrice, err := strconv.ParseFloat(oldPrice, 64)
-		if err != nil {
-			fPrice = 0.0
-			_log.Errorf("Error parsing price from sbItem struct")
-		}
-		fPriceVat := fPrice * 1.22
-		sPriceVat := fmt.Sprintf("%.2f", fPriceVat)
-		msg += "*PRICE:* " + oldPrice + ", *PRICE*(inc. VAT): " + sPriceVat + "\n"
-	}
-
-	msg += "[ORDER](http://scnet.link/hetzner.html?id=" + sKey + ")\n"
-	return msg
-}
-
-func watch(arg string, chatId int64, userName string) string {
-	dbItemsLock.Lock()
-	serverId64, err := strconv.ParseInt(arg, 10, 64)
-	serverId := int(serverId64)
-	price, err := fetchPrice(serverId)
-	_, err = _db.Queryx("REPLACE INTO items VALUES (?,?,?,?,?);", 0, serverId, price, chatId, userName)
-	if err != nil {
-		msg := "error in REPLACE query (watch)"
-		_log.Error(msg, err)
-		dbItemsLock.Unlock()
-		return msg
-	} else {
-		msg := "new server added to watch list"
-		_log.Info(msg, err)
-		dbItemsLock.Unlock()
-		return msg
-	}
-}
-
-func forget(arg string) string {
-	dbItemsLock.Lock()
-	serverId64, err := strconv.ParseInt(arg, 10, 64)
-	serverId := int(serverId64)
-	//price, err := fetchPrice(serverId)
-	_, err = _db.Queryx("DELETE FROM items WHERE server_id = ?;", serverId)
-	if err != nil {
-		msg := "error in DELETE query (forget)"
-		_log.Error(msg, err)
-		dbItemsLock.Unlock()
-		return msg
-	} else {
-		msg := "server removed from watch list"
-		_log.Info(msg, err)
-		dbItemsLock.Unlock()
-		return msg
-	}
-}
-
-func fetchPrice(serverId int) (float64, error) {
-	sbItemsLock.RLock()
-	var price float64
-	var found bool
-	var err error
-	for _, item := range sbItems.Server {
-		if item.Key == serverId {
-			price, err = strconv.ParseFloat(item.Price, 64)
-			if err != nil {
-				_log.Error("error parsing string (price) to float64")
-				continue
-			} else {
-				found = true
-				continue
-			}
-		}
-	}
-	sbItemsLock.RUnlock()
-
-	if found {
-		return price, nil
-	} else {
-		return 0.0, err
-	}
-}
-
-func selectItems() error {
-	// global object, one writer a time, or n readers together
-	dbItemsLock.Lock()
-	dbItems = dbItems[:0]
-	// query for all the items present
-	err := _db.Select(&dbItems, `
-	SELECT * FROM items`)
-	if err != nil {
-		_log.Debugf("DB item fetch failed: %s", err)
-		dbItemsLock.Unlock()
-		return err
-	}
-
-	// done wiriting
-	dbItemsLock.Unlock()
-
-	return nil
-}
-
 func worker() {
+	return
+}
 
-	// increment metrics counter
-	_workerOps.Inc()
+// ██████╗ ██████╗ ██████╗  ██████╗    ███╗   ███╗███████╗████████╗██╗  ██╗ ██████╗ ██████╗ ███████╗
+//██╔════╝ ██╔══██╗██╔══██╗██╔════╝    ████╗ ████║██╔════╝╚══██╔══╝██║  ██║██╔═══██╗██╔══██╗██╔════╝
+//██║  ███╗██████╔╝██████╔╝██║         ██╔████╔██║█████╗     ██║   ███████║██║   ██║██║  ██║███████╗
+//██║   ██║██╔══██╗██╔═══╝ ██║         ██║╚██╔╝██║██╔══╝     ██║   ██╔══██║██║   ██║██║  ██║╚════██║
+//╚██████╔╝██║  ██║██║     ╚██████╗    ██║ ╚═╝ ██║███████╗   ██║   ██║  ██║╚██████╔╝██████╔╝███████║
+//╚═════╝ ╚═╝  ╚═╝╚═╝      ╚═════╝    ╚═╝     ╚═╝╚══════╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚══════╝
+func (s *Server) BackupSolution(ctx context.Context, in *api.Gps) (*api.Jobs, error) {
+	_log.Debugf("/ Received a message with message type: Gps")
+	_log.Debugf("| The Gps message contains %v Gp", len(in.Gp))
 
-	// get time
-	start := time.Now()
+	// create var to build up api response
+	var apiJobs api.Jobs
 
-	//_log.Debug(bot)
+	// for each Gp
+	for i, gp := range in.Gp {
+		_log.Debugf("| Gp #%v", i+1)
+		_log.Debugf("| Contains: %s", gp.GpId)
 
-	// notify
-	_log.Debug("Worker: resuming operations...")
+		//
+		//
+		//
 
-	err := selectItems()
-	if err != nil {
-		_log.Error("Error selecting db items")
-	} else {
-		// PHASE 3: fetch json from api, marshal, into sbItems (hetzner server bidding items)
+		_log.Debugf("|/ DB: Retrieve available jobs")
 
-		var body []byte
+		var jobs []types.DbJob
 
-		// json data
-		url := "https://www.hetzner.com/a_hz_serverboerse/live_data.json"
-		res, err := http.Get(url)
-		if err != nil {
-			_log.Errorf("failed to open JSON resource with the following error")
-			_log.Error(err)
+		// fetch all places from the db
+		err := _db.Select(&jobs, "SELECT * FROM jobs WHERE (Now() > date_from OR forced = 'S') AND (active = 'S');")
+
+		if err == nil {
+			_log.Debug("|| no error")
+			//spew.Dump(jobs)
+			for _, job := range jobs {
+				_log.Debugf("|| id=%v,job_id=%v,type=%s, date_from=%s\n", job.Id, job.Job_id, job.Type, job.DateFrom)
+				// for each job look into result table to check if already present
+
+				var results []types.DbResult
+
+				// fetch all places from the db
+				_log.Debugf("|| SELECT * FROM results WHERE job_id = %s AND gp_id = %s;", job.Job_id, gp.GpId)
+				err := _db.Select(&results, "SELECT * FROM results WHERE job_id = ? AND gp_id = ?;", job.Job_id, gp.GpId)
+				if err != nil {
+					_log.Debugf(err.Error())
+				} else {
+					_log.Debugf("|| results #: %v", len(results))
+					if len(results) == 0 || job.Forced == "S" {
+						// create one entry in api response var
+						var apiJob api.Job
+						apiJob.Type = job.Type
+						apiJob.Content = job.Content
+						apiJob.IdJob = job.Job_id
+						apiJob.GpId = gp.GpId
+						apiJobs.Job = append(apiJobs.Job, &apiJob)
+					}
+				}
+			}
 		} else {
-			body, err = ioutil.ReadAll(res.Body)
-			if err != nil {
-				_log.Errorf("failed to download JSON resource with the following error")
-				_log.Error(err)
-				return
-			}
-			// update file cache with []byte
-			err = fileCache.Put("sbItems", body)
-			if err != nil {
-				_log.Errorf("failed to store body in filecache")
-				_log.Error(err)
-				return
-			}
+			_log.Debugf(err.Error())
 		}
-
-		if len(body) == 0 {
-			// it network fetch fails, use the cache
-			_log.Notice("trying to acquire old version from filecache")
-			reader, err := fileCache.Get("sbItems")
-			if err != nil {
-				_log.Errorf("failed to open file in filecache")
-				_log.Error(err)
-				return
-			}
-
-			body, err = ioutil.ReadAll(reader) // => []byte("Hello, world!\n")
-			if err != nil {
-				_log.Errorf("failed to read body from filecache")
-				_log.Error(err)
-				return
-			} else {
-				_log.Noticef("sbItems read from filecache")
-				reader.Close()
-			}
-		}
-
-		// global object, one writer a time, or n readers together
-		sbItemsLock.Lock()
-
-		// unmarshael to sbItems
-		err = json.Unmarshal(body, &sbItems)
-
-		// done wiriting
-		sbItemsLock.Unlock()
-
-		if err != nil {
-			_log.Errorf("failed to unmarshal JSON resource with the following error")
-			_log.Error(err)
-			return
-		}
-
-		sbItemsLock.RLock()
-		dbItemsLock.RLock()
-		var found bool
-
-		for _, dbItem := range dbItems {
-			found = false
-			for _, sbItem := range sbItems.Server {
-				if dbItem.ServerId == sbItem.Key {
-					found = true
-					//if same id compare price
-					if dbItem.Price != sbItem.Price {
-						// if price has changed
-						// log it
-						_log.Infof("Price change detected")
-						_log.Infof("Key: %v desc: %s", sbItem.Key, sbItem.Name)
-						_log.Infof("new price: %s", sbItem.Price)
-						_log.Infof("old price: %s", dbItem.Price)
-						var oldPrice, newPrice float64
-						oldPrice, err = strconv.ParseFloat(dbItem.Price, 64)
-						newPrice, err = strconv.ParseFloat(sbItem.Price, 64)
-						_log.Infof("...change: %v", oldPrice-newPrice)
-						// then update the db
-						_log.Debugf("persisting record...")
-						_, err := _db.Queryx("UPDATE items SET price = ? WHERE server_id = ?;", sbItem.Price, sbItem.Key)
-						if err != nil {
-							_log.Error("error in update query:", err)
-						} else {
-							_log.Infof("price persisted")
-							serverInfo := types.ServerInfo{"VARIATION", sbItem, dbItem}
-							new <- serverInfo
-						}
-					}
-				}
-			}
-			if !found {
-				serverInfo := types.ServerInfo{"VANISH", types.Server{}, dbItem}
-				new <- serverInfo
-			}
-		}
-
-		dbItemsLock.RUnlock()
-		sbItemsLock.RUnlock()
-
-		/*		var keys []int
-				for _, item := range sbItems.Server {
-					keys = append(keys, item.Key)
-				}
-
-				sort.Ints(keys)
-				var last int
-				for _, key := range keys {
-					if last == key {
-						_log.Info("duplicate key:", key)
-					}
-					last = key
-					//_log.Info("key:", key)
-				}
-		*/
-		// if they match and same price, no action
-
-		// if they match and new price -> telegram report new price
-
-		// if no match -> telegram report missing server
-
+		_log.Debug("|\\ DB: end segment")
 	}
+	_log.Debugf("\\ Message processing complete")
 
-	// show elapsed time
-	elapsed := time.Since(start)
-	_log.Debugf("Worker took %s", elapsed)
+	//_log.Debugf("apiJobs=%+v", apiJobs)
+	return &apiJobs, nil
 }
