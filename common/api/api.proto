@@ -14,7 +14,7 @@ message Info {
     repeated UnitInfo Units = 2;
 }
 
-message Request {
+message Solution {
 
 }
 
@@ -25,26 +25,27 @@ message Outcome {
 // services
 
 service Asd {
-    rpc Init(Request) returns (Outcome) {} //specify only a dataset full name
+    rpc Init(Solution) returns (Outcome) {} //specify only a dataset full name
     // like rpool/asd
 
     //missing state=0
 
-    rpc Create(Request) returns (Outcome) {} //+1 -> available
-    rpc Destroy(Request) returns (Outcome) {} //-1 ->missing
+    rpc Create(Solution) returns (Outcome) {} //+1 -> available
+    rpc Destroy(Solution) returns (Outcome) {} //-1 ->missing
 
-    rpc Backup(Request) returns (Outcome) {}
-    rpc Restore(Request) returns (Outcome) {}
+    rpc Backup(Solution) returns (Outcome) {}
+    rpc Restore(Solution) returns (Outcome) {}
 
-    rpc Deploy(Request) returns (Outcome) {} //+1 -> deployed
-    rpc Retreat(Request) returns (Outcome) {} //-1 -> available
+    rpc Deploy(Solution) returns (Outcome) {} //+1 -> deployed
+    rpc Retreat(Solution) returns (Outcome) {} //-1 -> available
 
-    rpc Start(Request) returns (Outcome) {} //+1 -> started
-    rpc Stop(Request) returns (Outcome) {} //-1 -> deployed
+    rpc Start(Solution) returns (Outcome) {} //+1 -> started
+    rpc Stop(Solution) returns (Outcome) {} //-1 -> deployed
 
-    rpc Expose(Request) returns (Outcome) {} //+1 -> exposed
-    rpc Contain(Request) returns (Outcome) {} //-1 ->started
+    rpc Expose(Solution) returns (Outcome) {} //+1 -> exposed
+    rpc Contain(Solution) returns (Outcome) {} //-1 ->started
 
-    rpc Snapshot(Request) returns (Outcome) {}
-    rpc Rollback(Request) returns (Outcome) {}
+    rpc Snapshot(Solution) returns (Outcome) {}
+    rpc
+    rpc Rollback(Solution) returns (Outcome) {}
 }
