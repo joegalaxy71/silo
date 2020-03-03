@@ -3,15 +3,11 @@ package main
 import (
 	"asd/common/api"
 	"asd/common/helpers"
-	"asd/common/types"
 	"context"
 	_ "expvar" // Register the expvar handlers
 	"fmt"
 	"github.com/ardanlabs/conf"
-	_ "github.com/go-sql-driver/mysql"
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/gorilla/mux"
-	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"github.com/marcsauter/single"
 	"github.com/op/go-logging"
@@ -27,7 +23,6 @@ import (
 	"net/http"
 	_ "net/http/pprof" // Register the pprof handlers
 	"os"
-	"sync"
 	"time"
 )
 
@@ -82,18 +77,6 @@ type Server struct {
 // module wide globals (logging, locks, db, etc)
 var _log *logging.Logger
 var _verbose bool
-
-var _db *sqlx.DB
-
-var dbItems []types.DbItem
-var dbItemsLock sync.RWMutex
-
-var sbItems types.SbItems
-var sbItemsLock sync.RWMutex
-
-var bot *tgbotapi.BotAPI
-
-var new chan types.ServerInfo
 
 var fileCache *stash.Cache
 
@@ -228,44 +211,11 @@ func run() error {
 	//| (__| | | | (_| | | | | | | |  __/ \__ \
 	// \___|_| |_|\__,_|_| |_|_| |_|\___|_|___/
 
-	new = make(chan types.ServerInfo, 100)
 	_log.Infof("Channels: initialized")
 
 	// =====================================================================================================================
-	//  _           _
-	// | |__   ___ | |_
-	// | '_ \ / _ \| __|
-	// | |_) | (_) | |_
-	// |_.__/ \___/ \__|
-
-	var err error
-	bot, err = tgbotapi.NewBotAPI("1021934418:AAFwdPiIkJS1iJESJJGSRnk5jIXA0jP_pa0")
-	if err != nil {
-		return errors.Wrap(err, "listening on Telegram tcp")
-	}
-
-	if _cfg.Telegram.Mode == "tcp" {
-	}
-
-	if _cfg.Telegram.Mode == "webhook" {
-		bot.Debug = true
-
-		_log.Infof("Authorized on account %s", bot.Self.UserName)
-
-		_, err = bot.SetWebhook(tgbotapi.NewWebhook(_cfg.Telegram.Hook + "/" + bot.Token))
-		if err != nil {
-			return errors.Wrap(err, "setting Telegram webhook")
-		}
-
-		go http.ListenAndServe(":"+_cfg.Telegram.Port, nil)
-	}
-
-	_log.Infof("Bot: initialized")
-	_log.Debugf("Bot: authorized on account %s", bot.Self.UserName)
-
-	// =====================================================================================================================
 	// STASH
-
+	var err error
 	fileCache, err = stash.New(_cfg.FileCache.Path, 10000000, 1000)
 	if err != nil {
 		errors.Wrap(err, "Unable to initialize file cache, path="+_cfg.FileCache.Path)
@@ -312,7 +262,7 @@ func run() error {
 		// create a gRPC server object
 		grpcServer := grpc.NewServer()
 		// attach the Ping service to the server
-		api.RegisterServerServer(grpcServer, &s)
+		api.RegisterAsdServer(grpcServer, &s)
 		// start the server
 		_log.Infof("listening for grpc connections on port: 7777")
 		if err := grpcServer.Serve(lis); err != nil {
@@ -388,63 +338,114 @@ func worker() {
 //██║   ██║██╔══██╗██╔═══╝ ██║         ██║╚██╔╝██║██╔══╝     ██║   ██╔══██║██║   ██║██║  ██║╚════██║
 //╚██████╔╝██║  ██║██║     ╚██████╗    ██║ ╚═╝ ██║███████╗   ██║   ██║  ██║╚██████╔╝██████╔╝███████║
 //╚═════╝ ╚═╝  ╚═╝╚═╝      ╚═════╝    ╚═╝     ╚═╝╚══════╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚══════╝
-func (s *Server) BackupSolution(ctx context.Context, in *api.Gps) (*api.Jobs, error) {
-	_log.Debugf("/ Received a message with message type: Gps")
-	_log.Debugf("| The Gps message contains %v Gp", len(in.Gp))
+
+func (s *Server) Init(ctx context.Context, in *api.Request) (*api.Outcome, error) {
+	_log.Debugf("/ gRPS: received a message with message type: Request")
 
 	// create var to build up api response
-	var apiJobs api.Jobs
+	var apiOutcome api.Outcome
 
-	// for each Gp
-	for i, gp := range in.Gp {
-		_log.Debugf("| Gp #%v", i+1)
-		_log.Debugf("| Contains: %s", gp.GpId)
+	return &apiOutcome, nil
+}
 
-		//
-		//
-		//
+func (s *Server) Create(ctx context.Context, in *api.Request) (*api.Outcome, error) {
+	_log.Debugf("/ gRPS: received a message with message type: Request")
 
-		_log.Debugf("|/ DB: Retrieve available jobs")
+	// create var to build up api response
+	var apiOutcome api.Outcome
 
-		var jobs []types.DbJob
+	return &apiOutcome, nil
+}
 
-		// fetch all places from the db
-		err := _db.Select(&jobs, "SELECT * FROM jobs WHERE (Now() > date_from OR forced = 'S') AND (active = 'S');")
+func (s *Server) Destroy(ctx context.Context, in *api.Request) (*api.Outcome, error) {
+	_log.Debugf("/ gRPS: received a message with message type: Request")
 
-		if err == nil {
-			_log.Debug("|| no error")
-			//spew.Dump(jobs)
-			for _, job := range jobs {
-				_log.Debugf("|| id=%v,job_id=%v,type=%s, date_from=%s\n", job.Id, job.Job_id, job.Type, job.DateFrom)
-				// for each job look into result table to check if already present
+	// create var to build up api response
+	var apiOutcome api.Outcome
 
-				var results []types.DbResult
+	return &apiOutcome, nil
+}
 
-				// fetch all places from the db
-				_log.Debugf("|| SELECT * FROM results WHERE job_id = %s AND gp_id = %s;", job.Job_id, gp.GpId)
-				err := _db.Select(&results, "SELECT * FROM results WHERE job_id = ? AND gp_id = ?;", job.Job_id, gp.GpId)
-				if err != nil {
-					_log.Debugf(err.Error())
-				} else {
-					_log.Debugf("|| results #: %v", len(results))
-					if len(results) == 0 || job.Forced == "S" {
-						// create one entry in api response var
-						var apiJob api.Job
-						apiJob.Type = job.Type
-						apiJob.Content = job.Content
-						apiJob.IdJob = job.Job_id
-						apiJob.GpId = gp.GpId
-						apiJobs.Job = append(apiJobs.Job, &apiJob)
-					}
-				}
-			}
-		} else {
-			_log.Debugf(err.Error())
-		}
-		_log.Debug("|\\ DB: end segment")
-	}
-	_log.Debugf("\\ Message processing complete")
+func (s *Server) Backup(ctx context.Context, in *api.Request) (*api.Outcome, error) {
+	_log.Debugf("/ gRPS: received a message with message type: Request")
 
-	//_log.Debugf("apiJobs=%+v", apiJobs)
-	return &apiJobs, nil
+	// create var to build up api response
+	var apiOutcome api.Outcome
+
+	return &apiOutcome, nil
+}
+
+func (s *Server) Restore(ctx context.Context, in *api.Request) (*api.Outcome, error) {
+	_log.Debugf("/ gRPS: received a message with message type: Request")
+
+	// create var to build up api response
+	var apiOutcome api.Outcome
+
+	return &apiOutcome, nil
+}
+
+func (s *Server) Deploy(ctx context.Context, in *api.Request) (*api.Outcome, error) {
+	_log.Debugf("/ gRPS: received a message with message type: Request")
+
+	// create var to build up api response
+	var apiOutcome api.Outcome
+
+	return &apiOutcome, nil
+}
+
+func (s *Server) Retreat(ctx context.Context, in *api.Request) (*api.Outcome, error) {
+	_log.Debugf("/ gRPS: received a message with message type: Request")
+
+	// create var to build up api response
+	var apiOutcome api.Outcome
+
+	return &apiOutcome, nil
+}
+func (s *Server) Start(ctx context.Context, in *api.Request) (*api.Outcome, error) {
+	_log.Debugf("/ gRPS: received a message with message type: Request")
+
+	// create var to build up api response
+	var apiOutcome api.Outcome
+
+	return &apiOutcome, nil
+}
+func (s *Server) Stop(ctx context.Context, in *api.Request) (*api.Outcome, error) {
+	_log.Debugf("/ gRPS: received a message with message type: Request")
+
+	// create var to build up api response
+	var apiOutcome api.Outcome
+
+	return &apiOutcome, nil
+}
+func (s *Server) Expose(ctx context.Context, in *api.Request) (*api.Outcome, error) {
+	_log.Debugf("/ gRPS: received a message with message type: Request")
+
+	// create var to build up api response
+	var apiOutcome api.Outcome
+
+	return &apiOutcome, nil
+}
+func (s *Server) Contain(ctx context.Context, in *api.Request) (*api.Outcome, error) {
+	_log.Debugf("/ gRPS: received a message with message type: Request")
+
+	// create var to build up api response
+	var apiOutcome api.Outcome
+
+	return &apiOutcome, nil
+}
+func (s *Server) Snapshot(ctx context.Context, in *api.Request) (*api.Outcome, error) {
+	_log.Debugf("/ gRPS: received a message with message type: Request")
+
+	// create var to build up api response
+	var apiOutcome api.Outcome
+
+	return &apiOutcome, nil
+}
+func (s *Server) Rollback(ctx context.Context, in *api.Request) (*api.Outcome, error) {
+	_log.Debugf("/ gRPS: received a message with message type: Request")
+
+	// create var to build up api response
+	var apiOutcome api.Outcome
+
+	return &apiOutcome, nil
 }

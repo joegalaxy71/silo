@@ -63,7 +63,7 @@ func (m *UnitInfo) GetName() string {
 	return ""
 }
 
-type SolutionInfo struct {
+type Info struct {
 	Name                 string      `protobuf:"bytes,1,opt,name=Name,proto3" json:"Name,omitempty"`
 	Units                []*UnitInfo `protobuf:"bytes,2,rep,name=Units,proto3" json:"Units,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}    `json:"-"`
@@ -71,39 +71,39 @@ type SolutionInfo struct {
 	XXX_sizecache        int32       `json:"-"`
 }
 
-func (m *SolutionInfo) Reset()         { *m = SolutionInfo{} }
-func (m *SolutionInfo) String() string { return proto.CompactTextString(m) }
-func (*SolutionInfo) ProtoMessage()    {}
-func (*SolutionInfo) Descriptor() ([]byte, []int) {
+func (m *Info) Reset()         { *m = Info{} }
+func (m *Info) String() string { return proto.CompactTextString(m) }
+func (*Info) ProtoMessage()    {}
+func (*Info) Descriptor() ([]byte, []int) {
 	return fileDescriptor_00212fb1f9d3bf1c, []int{1}
 }
 
-func (m *SolutionInfo) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_SolutionInfo.Unmarshal(m, b)
+func (m *Info) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Info.Unmarshal(m, b)
 }
-func (m *SolutionInfo) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_SolutionInfo.Marshal(b, m, deterministic)
+func (m *Info) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Info.Marshal(b, m, deterministic)
 }
-func (m *SolutionInfo) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_SolutionInfo.Merge(m, src)
+func (m *Info) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Info.Merge(m, src)
 }
-func (m *SolutionInfo) XXX_Size() int {
-	return xxx_messageInfo_SolutionInfo.Size(m)
+func (m *Info) XXX_Size() int {
+	return xxx_messageInfo_Info.Size(m)
 }
-func (m *SolutionInfo) XXX_DiscardUnknown() {
-	xxx_messageInfo_SolutionInfo.DiscardUnknown(m)
+func (m *Info) XXX_DiscardUnknown() {
+	xxx_messageInfo_Info.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_SolutionInfo proto.InternalMessageInfo
+var xxx_messageInfo_Info proto.InternalMessageInfo
 
-func (m *SolutionInfo) GetName() string {
+func (m *Info) GetName() string {
 	if m != nil {
 		return m.Name
 	}
 	return ""
 }
 
-func (m *SolutionInfo) GetUnits() []*UnitInfo {
+func (m *Info) GetUnits() []*UnitInfo {
 	if m != nil {
 		return m.Units
 	}
@@ -174,7 +174,7 @@ var xxx_messageInfo_Outcome proto.InternalMessageInfo
 
 func init() {
 	proto.RegisterType((*UnitInfo)(nil), "api.UnitInfo")
-	proto.RegisterType((*SolutionInfo)(nil), "api.SolutionInfo")
+	proto.RegisterType((*Info)(nil), "api.Info")
 	proto.RegisterType((*Request)(nil), "api.Request")
 	proto.RegisterType((*Outcome)(nil), "api.Outcome")
 }
@@ -182,25 +182,24 @@ func init() {
 func init() { proto.RegisterFile("api.proto", fileDescriptor_00212fb1f9d3bf1c) }
 
 var fileDescriptor_00212fb1f9d3bf1c = []byte{
-	// 276 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x93, 0x41, 0x4f, 0xc2, 0x40,
-	0x10, 0x85, 0x45, 0x10, 0xec, 0x58, 0xd0, 0xec, 0x89, 0x78, 0x30, 0xa4, 0x1e, 0xe4, 0xa0, 0xd5,
-	0xe0, 0x2f, 0x50, 0x30, 0x86, 0x8b, 0x26, 0x6d, 0xfc, 0x01, 0x4b, 0x1d, 0xe3, 0x86, 0xb2, 0xb3,
-	0xee, 0x4e, 0x8d, 0xfe, 0x71, 0xcf, 0xa6, 0x05, 0x8e, 0xc6, 0xe1, 0x36, 0x9b, 0x7d, 0xdf, 0x7b,
-	0x6f, 0x37, 0x19, 0x88, 0xb4, 0x33, 0xa9, 0xf3, 0xc4, 0xa4, 0xda, 0xda, 0x99, 0xe4, 0x0c, 0x0e,
-	0x5f, 0xac, 0xe1, 0xb9, 0x7d, 0x23, 0xa5, 0xa0, 0xf3, 0xa4, 0x57, 0x38, 0x6c, 0x8d, 0x5a, 0xe3,
-	0x28, 0x6b, 0xe6, 0xe4, 0x11, 0xe2, 0x9c, 0xca, 0x8a, 0x0d, 0xd9, 0xbf, 0x34, 0xea, 0x1c, 0x0e,
-	0x6a, 0x8f, 0x30, 0xdc, 0x1f, 0xb5, 0xc7, 0x47, 0x93, 0x7e, 0x5a, 0x67, 0x6c, 0x5d, 0xb3, 0xf5,
-	0x5d, 0x12, 0x41, 0x2f, 0xc3, 0x8f, 0x0a, 0x03, 0xd7, 0xe3, 0x73, 0xc5, 0x05, 0xad, 0x70, 0xf2,
-	0xd3, 0x81, 0x6e, 0x8e, 0xfe, 0x13, 0xbd, 0xba, 0x80, 0xde, 0xdc, 0x1a, 0xbe, 0x0b, 0xaf, 0x2a,
-	0x6e, 0x1c, 0x36, 0xf2, 0xd3, 0xf5, 0x69, 0x43, 0x24, 0x7b, 0x2a, 0x85, 0xc1, 0xd4, 0xa3, 0x66,
-	0xdc, 0x16, 0xfb, 0x47, 0x7f, 0x0d, 0xc7, 0x33, 0x0c, 0xec, 0xe9, 0x5b, 0x08, 0xa4, 0x30, 0xb8,
-	0xd7, 0xc5, 0xb2, 0x72, 0xf2, 0x80, 0x0c, 0x03, 0x93, 0x47, 0x79, 0xc0, 0x0c, 0x5d, 0x29, 0x2e,
-	0xd4, 0x04, 0x70, 0xfd, 0x66, 0x21, 0x70, 0x05, 0xfd, 0x9c, 0xb5, 0x97, 0xca, 0x2f, 0x21, 0xce,
-	0x99, 0x9c, 0xbc, 0xfd, 0xc3, 0x97, 0xa3, 0xb0, 0xc3, 0xff, 0x4f, 0xc9, 0xb2, 0x36, 0x56, 0x08,
-	0xdc, 0xc0, 0x49, 0x6e, 0xb5, 0x0b, 0xef, 0xc4, 0x72, 0x22, 0xa3, 0xb2, 0x5c, 0xe8, 0x62, 0x29,
-	0x23, 0x16, 0xdd, 0x66, 0x07, 0x6e, 0x7f, 0x03, 0x00, 0x00, 0xff, 0xff, 0xdf, 0x4b, 0x38, 0xae,
-	0x10, 0x03, 0x00, 0x00,
+	// 257 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x92, 0x3b, 0x4e, 0x03, 0x31,
+	0x10, 0x86, 0x09, 0xd9, 0x3c, 0x76, 0x80, 0xc6, 0x55, 0x44, 0x81, 0xa2, 0x25, 0xc0, 0x56, 0x29,
+	0xc2, 0x01, 0x10, 0x24, 0x14, 0x34, 0x20, 0x79, 0xc5, 0x01, 0x9c, 0x65, 0x10, 0x56, 0x36, 0x1e,
+	0x63, 0xcf, 0x4a, 0x70, 0x0b, 0x8e, 0x8c, 0xbc, 0x09, 0x25, 0x0c, 0xdd, 0x58, 0xff, 0xf7, 0x7f,
+	0x7e, 0xc8, 0x90, 0x1b, 0x6f, 0xe7, 0x3e, 0x10, 0x93, 0xea, 0x1b, 0x6f, 0x8b, 0x33, 0x18, 0x3f,
+	0x3b, 0xcb, 0x0f, 0xee, 0x95, 0x94, 0x82, 0xec, 0xd1, 0x6c, 0x71, 0xd2, 0x9b, 0xf6, 0xca, 0x5c,
+	0x77, 0x73, 0x71, 0x03, 0xd9, 0x6f, 0x99, 0x3a, 0x87, 0x41, 0xea, 0xc6, 0xc9, 0xe1, 0xb4, 0x5f,
+	0x1e, 0x2d, 0x4e, 0xe6, 0xc9, 0xfd, 0x63, 0xd3, 0xbb, 0xac, 0xc8, 0x61, 0xa4, 0xf1, 0xbd, 0xc5,
+	0xc8, 0x69, 0x7c, 0x6a, 0xb9, 0xa6, 0x2d, 0x2e, 0xbe, 0x32, 0xe8, 0xdf, 0xc6, 0x17, 0x35, 0x4b,
+	0x7a, 0xcb, 0xea, 0xb8, 0xeb, 0xee, 0xc1, 0xd3, 0xdd, 0x6a, 0xcf, 0x16, 0x07, 0xea, 0x12, 0x86,
+	0xcb, 0x80, 0x86, 0x51, 0xe0, 0xae, 0x60, 0xb4, 0xc2, 0xc8, 0x81, 0x3e, 0x65, 0xe1, 0x9d, 0xa9,
+	0x37, 0xad, 0x97, 0x85, 0x1a, 0x23, 0x53, 0x40, 0x59, 0xb8, 0x42, 0xdf, 0x88, 0x1b, 0x77, 0x42,
+	0x4e, 0x77, 0x11, 0xc0, 0x0b, 0x18, 0x54, 0x6c, 0x82, 0x84, 0xcd, 0x20, 0xab, 0x98, 0xbc, 0x7c,
+	0xba, 0xfb, 0x0f, 0x4f, 0xf1, 0x1f, 0xef, 0xb7, 0x24, 0xc7, 0xc6, 0x3a, 0x01, 0x2c, 0x61, 0x5c,
+	0x39, 0xe3, 0xe3, 0x1b, 0xb1, 0x4c, 0x6a, 0x6a, 0x9a, 0xb5, 0xa9, 0x37, 0x7f, 0x93, 0xeb, 0x61,
+	0xf7, 0x2b, 0xaf, 0xbf, 0x03, 0x00, 0x00, 0xff, 0xff, 0x90, 0x0b, 0x05, 0x38, 0xa2, 0x02, 0x00,
+	0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -211,504 +210,504 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion4
 
-// ServerClient is the client API for Server service.
+// AsdClient is the client API for Asd service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
-type ServerClient interface {
-	InitAsd(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error)
-	CreateSolution(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error)
-	DestroySolution(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error)
-	BackupSolution(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error)
-	RestoreSolution(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error)
-	DeploySolution(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error)
-	RetreatSolution(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error)
-	StartSolution(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error)
-	StopSolution(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error)
-	ExposeSolution(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error)
-	ContainSolution(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error)
-	SnapshotSolution(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error)
-	RollbackSolution(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error)
+type AsdClient interface {
+	Init(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error)
+	Create(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error)
+	Destroy(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error)
+	Backup(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error)
+	Restore(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error)
+	Deploy(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error)
+	Retreat(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error)
+	Start(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error)
+	Stop(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error)
+	Expose(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error)
+	Contain(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error)
+	Snapshot(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error)
+	Rollback(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error)
 }
 
-type serverClient struct {
+type asdClient struct {
 	cc *grpc.ClientConn
 }
 
-func NewServerClient(cc *grpc.ClientConn) ServerClient {
-	return &serverClient{cc}
+func NewAsdClient(cc *grpc.ClientConn) AsdClient {
+	return &asdClient{cc}
 }
 
-func (c *serverClient) InitAsd(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error) {
+func (c *asdClient) Init(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error) {
 	out := new(Outcome)
-	err := c.cc.Invoke(ctx, "/api.Server/InitAsd", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.Asd/Init", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *serverClient) CreateSolution(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error) {
+func (c *asdClient) Create(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error) {
 	out := new(Outcome)
-	err := c.cc.Invoke(ctx, "/api.Server/CreateSolution", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.Asd/Create", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *serverClient) DestroySolution(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error) {
+func (c *asdClient) Destroy(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error) {
 	out := new(Outcome)
-	err := c.cc.Invoke(ctx, "/api.Server/DestroySolution", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.Asd/Destroy", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *serverClient) BackupSolution(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error) {
+func (c *asdClient) Backup(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error) {
 	out := new(Outcome)
-	err := c.cc.Invoke(ctx, "/api.Server/BackupSolution", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.Asd/Backup", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *serverClient) RestoreSolution(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error) {
+func (c *asdClient) Restore(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error) {
 	out := new(Outcome)
-	err := c.cc.Invoke(ctx, "/api.Server/RestoreSolution", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.Asd/Restore", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *serverClient) DeploySolution(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error) {
+func (c *asdClient) Deploy(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error) {
 	out := new(Outcome)
-	err := c.cc.Invoke(ctx, "/api.Server/DeploySolution", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.Asd/Deploy", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *serverClient) RetreatSolution(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error) {
+func (c *asdClient) Retreat(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error) {
 	out := new(Outcome)
-	err := c.cc.Invoke(ctx, "/api.Server/RetreatSolution", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.Asd/Retreat", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *serverClient) StartSolution(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error) {
+func (c *asdClient) Start(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error) {
 	out := new(Outcome)
-	err := c.cc.Invoke(ctx, "/api.Server/StartSolution", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.Asd/Start", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *serverClient) StopSolution(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error) {
+func (c *asdClient) Stop(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error) {
 	out := new(Outcome)
-	err := c.cc.Invoke(ctx, "/api.Server/StopSolution", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.Asd/Stop", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *serverClient) ExposeSolution(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error) {
+func (c *asdClient) Expose(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error) {
 	out := new(Outcome)
-	err := c.cc.Invoke(ctx, "/api.Server/ExposeSolution", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.Asd/Expose", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *serverClient) ContainSolution(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error) {
+func (c *asdClient) Contain(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error) {
 	out := new(Outcome)
-	err := c.cc.Invoke(ctx, "/api.Server/ContainSolution", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.Asd/Contain", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *serverClient) SnapshotSolution(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error) {
+func (c *asdClient) Snapshot(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error) {
 	out := new(Outcome)
-	err := c.cc.Invoke(ctx, "/api.Server/SnapshotSolution", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.Asd/Snapshot", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *serverClient) RollbackSolution(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error) {
+func (c *asdClient) Rollback(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Outcome, error) {
 	out := new(Outcome)
-	err := c.cc.Invoke(ctx, "/api.Server/RollbackSolution", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.Asd/Rollback", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// ServerServer is the server API for Server service.
-type ServerServer interface {
-	InitAsd(context.Context, *Request) (*Outcome, error)
-	CreateSolution(context.Context, *Request) (*Outcome, error)
-	DestroySolution(context.Context, *Request) (*Outcome, error)
-	BackupSolution(context.Context, *Request) (*Outcome, error)
-	RestoreSolution(context.Context, *Request) (*Outcome, error)
-	DeploySolution(context.Context, *Request) (*Outcome, error)
-	RetreatSolution(context.Context, *Request) (*Outcome, error)
-	StartSolution(context.Context, *Request) (*Outcome, error)
-	StopSolution(context.Context, *Request) (*Outcome, error)
-	ExposeSolution(context.Context, *Request) (*Outcome, error)
-	ContainSolution(context.Context, *Request) (*Outcome, error)
-	SnapshotSolution(context.Context, *Request) (*Outcome, error)
-	RollbackSolution(context.Context, *Request) (*Outcome, error)
+// AsdServer is the server API for Asd service.
+type AsdServer interface {
+	Init(context.Context, *Request) (*Outcome, error)
+	Create(context.Context, *Request) (*Outcome, error)
+	Destroy(context.Context, *Request) (*Outcome, error)
+	Backup(context.Context, *Request) (*Outcome, error)
+	Restore(context.Context, *Request) (*Outcome, error)
+	Deploy(context.Context, *Request) (*Outcome, error)
+	Retreat(context.Context, *Request) (*Outcome, error)
+	Start(context.Context, *Request) (*Outcome, error)
+	Stop(context.Context, *Request) (*Outcome, error)
+	Expose(context.Context, *Request) (*Outcome, error)
+	Contain(context.Context, *Request) (*Outcome, error)
+	Snapshot(context.Context, *Request) (*Outcome, error)
+	Rollback(context.Context, *Request) (*Outcome, error)
 }
 
-// UnimplementedServerServer can be embedded to have forward compatible implementations.
-type UnimplementedServerServer struct {
+// UnimplementedAsdServer can be embedded to have forward compatible implementations.
+type UnimplementedAsdServer struct {
 }
 
-func (*UnimplementedServerServer) InitAsd(ctx context.Context, req *Request) (*Outcome, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method InitAsd not implemented")
+func (*UnimplementedAsdServer) Init(ctx context.Context, req *Request) (*Outcome, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Init not implemented")
 }
-func (*UnimplementedServerServer) CreateSolution(ctx context.Context, req *Request) (*Outcome, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateSolution not implemented")
+func (*UnimplementedAsdServer) Create(ctx context.Context, req *Request) (*Outcome, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
 }
-func (*UnimplementedServerServer) DestroySolution(ctx context.Context, req *Request) (*Outcome, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DestroySolution not implemented")
+func (*UnimplementedAsdServer) Destroy(ctx context.Context, req *Request) (*Outcome, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Destroy not implemented")
 }
-func (*UnimplementedServerServer) BackupSolution(ctx context.Context, req *Request) (*Outcome, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method BackupSolution not implemented")
+func (*UnimplementedAsdServer) Backup(ctx context.Context, req *Request) (*Outcome, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Backup not implemented")
 }
-func (*UnimplementedServerServer) RestoreSolution(ctx context.Context, req *Request) (*Outcome, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RestoreSolution not implemented")
+func (*UnimplementedAsdServer) Restore(ctx context.Context, req *Request) (*Outcome, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Restore not implemented")
 }
-func (*UnimplementedServerServer) DeploySolution(ctx context.Context, req *Request) (*Outcome, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DeploySolution not implemented")
+func (*UnimplementedAsdServer) Deploy(ctx context.Context, req *Request) (*Outcome, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Deploy not implemented")
 }
-func (*UnimplementedServerServer) RetreatSolution(ctx context.Context, req *Request) (*Outcome, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RetreatSolution not implemented")
+func (*UnimplementedAsdServer) Retreat(ctx context.Context, req *Request) (*Outcome, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Retreat not implemented")
 }
-func (*UnimplementedServerServer) StartSolution(ctx context.Context, req *Request) (*Outcome, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method StartSolution not implemented")
+func (*UnimplementedAsdServer) Start(ctx context.Context, req *Request) (*Outcome, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Start not implemented")
 }
-func (*UnimplementedServerServer) StopSolution(ctx context.Context, req *Request) (*Outcome, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method StopSolution not implemented")
+func (*UnimplementedAsdServer) Stop(ctx context.Context, req *Request) (*Outcome, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Stop not implemented")
 }
-func (*UnimplementedServerServer) ExposeSolution(ctx context.Context, req *Request) (*Outcome, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ExposeSolution not implemented")
+func (*UnimplementedAsdServer) Expose(ctx context.Context, req *Request) (*Outcome, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Expose not implemented")
 }
-func (*UnimplementedServerServer) ContainSolution(ctx context.Context, req *Request) (*Outcome, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ContainSolution not implemented")
+func (*UnimplementedAsdServer) Contain(ctx context.Context, req *Request) (*Outcome, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Contain not implemented")
 }
-func (*UnimplementedServerServer) SnapshotSolution(ctx context.Context, req *Request) (*Outcome, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SnapshotSolution not implemented")
+func (*UnimplementedAsdServer) Snapshot(ctx context.Context, req *Request) (*Outcome, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Snapshot not implemented")
 }
-func (*UnimplementedServerServer) RollbackSolution(ctx context.Context, req *Request) (*Outcome, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RollbackSolution not implemented")
-}
-
-func RegisterServerServer(s *grpc.Server, srv ServerServer) {
-	s.RegisterService(&_Server_serviceDesc, srv)
+func (*UnimplementedAsdServer) Rollback(ctx context.Context, req *Request) (*Outcome, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Rollback not implemented")
 }
 
-func _Server_InitAsd_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func RegisterAsdServer(s *grpc.Server, srv AsdServer) {
+	s.RegisterService(&_Asd_serviceDesc, srv)
+}
+
+func _Asd_Init_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Request)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ServerServer).InitAsd(ctx, in)
+		return srv.(AsdServer).Init(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.Server/InitAsd",
+		FullMethod: "/api.Asd/Init",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ServerServer).InitAsd(ctx, req.(*Request))
+		return srv.(AsdServer).Init(ctx, req.(*Request))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Server_CreateSolution_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Asd_Create_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Request)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ServerServer).CreateSolution(ctx, in)
+		return srv.(AsdServer).Create(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.Server/CreateSolution",
+		FullMethod: "/api.Asd/Create",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ServerServer).CreateSolution(ctx, req.(*Request))
+		return srv.(AsdServer).Create(ctx, req.(*Request))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Server_DestroySolution_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Asd_Destroy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Request)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ServerServer).DestroySolution(ctx, in)
+		return srv.(AsdServer).Destroy(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.Server/DestroySolution",
+		FullMethod: "/api.Asd/Destroy",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ServerServer).DestroySolution(ctx, req.(*Request))
+		return srv.(AsdServer).Destroy(ctx, req.(*Request))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Server_BackupSolution_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Asd_Backup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Request)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ServerServer).BackupSolution(ctx, in)
+		return srv.(AsdServer).Backup(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.Server/BackupSolution",
+		FullMethod: "/api.Asd/Backup",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ServerServer).BackupSolution(ctx, req.(*Request))
+		return srv.(AsdServer).Backup(ctx, req.(*Request))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Server_RestoreSolution_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Asd_Restore_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Request)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ServerServer).RestoreSolution(ctx, in)
+		return srv.(AsdServer).Restore(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.Server/RestoreSolution",
+		FullMethod: "/api.Asd/Restore",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ServerServer).RestoreSolution(ctx, req.(*Request))
+		return srv.(AsdServer).Restore(ctx, req.(*Request))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Server_DeploySolution_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Asd_Deploy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Request)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ServerServer).DeploySolution(ctx, in)
+		return srv.(AsdServer).Deploy(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.Server/DeploySolution",
+		FullMethod: "/api.Asd/Deploy",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ServerServer).DeploySolution(ctx, req.(*Request))
+		return srv.(AsdServer).Deploy(ctx, req.(*Request))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Server_RetreatSolution_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Asd_Retreat_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Request)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ServerServer).RetreatSolution(ctx, in)
+		return srv.(AsdServer).Retreat(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.Server/RetreatSolution",
+		FullMethod: "/api.Asd/Retreat",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ServerServer).RetreatSolution(ctx, req.(*Request))
+		return srv.(AsdServer).Retreat(ctx, req.(*Request))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Server_StartSolution_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Asd_Start_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Request)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ServerServer).StartSolution(ctx, in)
+		return srv.(AsdServer).Start(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.Server/StartSolution",
+		FullMethod: "/api.Asd/Start",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ServerServer).StartSolution(ctx, req.(*Request))
+		return srv.(AsdServer).Start(ctx, req.(*Request))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Server_StopSolution_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Asd_Stop_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Request)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ServerServer).StopSolution(ctx, in)
+		return srv.(AsdServer).Stop(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.Server/StopSolution",
+		FullMethod: "/api.Asd/Stop",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ServerServer).StopSolution(ctx, req.(*Request))
+		return srv.(AsdServer).Stop(ctx, req.(*Request))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Server_ExposeSolution_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Asd_Expose_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Request)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ServerServer).ExposeSolution(ctx, in)
+		return srv.(AsdServer).Expose(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.Server/ExposeSolution",
+		FullMethod: "/api.Asd/Expose",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ServerServer).ExposeSolution(ctx, req.(*Request))
+		return srv.(AsdServer).Expose(ctx, req.(*Request))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Server_ContainSolution_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Asd_Contain_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Request)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ServerServer).ContainSolution(ctx, in)
+		return srv.(AsdServer).Contain(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.Server/ContainSolution",
+		FullMethod: "/api.Asd/Contain",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ServerServer).ContainSolution(ctx, req.(*Request))
+		return srv.(AsdServer).Contain(ctx, req.(*Request))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Server_SnapshotSolution_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Asd_Snapshot_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Request)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ServerServer).SnapshotSolution(ctx, in)
+		return srv.(AsdServer).Snapshot(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.Server/SnapshotSolution",
+		FullMethod: "/api.Asd/Snapshot",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ServerServer).SnapshotSolution(ctx, req.(*Request))
+		return srv.(AsdServer).Snapshot(ctx, req.(*Request))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Server_RollbackSolution_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Asd_Rollback_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Request)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ServerServer).RollbackSolution(ctx, in)
+		return srv.(AsdServer).Rollback(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.Server/RollbackSolution",
+		FullMethod: "/api.Asd/Rollback",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ServerServer).RollbackSolution(ctx, req.(*Request))
+		return srv.(AsdServer).Rollback(ctx, req.(*Request))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-var _Server_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "api.Server",
-	HandlerType: (*ServerServer)(nil),
+var _Asd_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "api.Asd",
+	HandlerType: (*AsdServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "InitAsd",
-			Handler:    _Server_InitAsd_Handler,
+			MethodName: "Init",
+			Handler:    _Asd_Init_Handler,
 		},
 		{
-			MethodName: "CreateSolution",
-			Handler:    _Server_CreateSolution_Handler,
+			MethodName: "Create",
+			Handler:    _Asd_Create_Handler,
 		},
 		{
-			MethodName: "DestroySolution",
-			Handler:    _Server_DestroySolution_Handler,
+			MethodName: "Destroy",
+			Handler:    _Asd_Destroy_Handler,
 		},
 		{
-			MethodName: "BackupSolution",
-			Handler:    _Server_BackupSolution_Handler,
+			MethodName: "Backup",
+			Handler:    _Asd_Backup_Handler,
 		},
 		{
-			MethodName: "RestoreSolution",
-			Handler:    _Server_RestoreSolution_Handler,
+			MethodName: "Restore",
+			Handler:    _Asd_Restore_Handler,
 		},
 		{
-			MethodName: "DeploySolution",
-			Handler:    _Server_DeploySolution_Handler,
+			MethodName: "Deploy",
+			Handler:    _Asd_Deploy_Handler,
 		},
 		{
-			MethodName: "RetreatSolution",
-			Handler:    _Server_RetreatSolution_Handler,
+			MethodName: "Retreat",
+			Handler:    _Asd_Retreat_Handler,
 		},
 		{
-			MethodName: "StartSolution",
-			Handler:    _Server_StartSolution_Handler,
+			MethodName: "Start",
+			Handler:    _Asd_Start_Handler,
 		},
 		{
-			MethodName: "StopSolution",
-			Handler:    _Server_StopSolution_Handler,
+			MethodName: "Stop",
+			Handler:    _Asd_Stop_Handler,
 		},
 		{
-			MethodName: "ExposeSolution",
-			Handler:    _Server_ExposeSolution_Handler,
+			MethodName: "Expose",
+			Handler:    _Asd_Expose_Handler,
 		},
 		{
-			MethodName: "ContainSolution",
-			Handler:    _Server_ContainSolution_Handler,
+			MethodName: "Contain",
+			Handler:    _Asd_Contain_Handler,
 		},
 		{
-			MethodName: "SnapshotSolution",
-			Handler:    _Server_SnapshotSolution_Handler,
+			MethodName: "Snapshot",
+			Handler:    _Asd_Snapshot_Handler,
 		},
 		{
-			MethodName: "RollbackSolution",
-			Handler:    _Server_RollbackSolution_Handler,
+			MethodName: "Rollback",
+			Handler:    _Asd_Rollback_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
