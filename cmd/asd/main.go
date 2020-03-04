@@ -11,6 +11,7 @@ import (
 	"github.com/op/go-logging"
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
 	"log"
 	"net/http"
@@ -177,7 +178,7 @@ func run() error {
 	}()
 	_log.Infof("Metrics: initialized")
 
-	//██████╗ ██████╗ ██████╗  ██████╗     ██████╗██╗     ██╗███████╗███╗   ██╗████████╗
+	// ██████╗ ██████╗ ██████╗  ██████╗     ██████╗██╗     ██╗███████╗███╗   ██╗████████╗
 	//██╔════╝ ██╔══██╗██╔══██╗██╔════╝    ██╔════╝██║     ██║██╔════╝████╗  ██║╚══██╔══╝
 	//██║  ███╗██████╔╝██████╔╝██║         ██║     ██║     ██║█████╗  ██╔██╗ ██║   ██║
 	//██║   ██║██╔══██╗██╔═══╝ ██║         ██║     ██║     ██║██╔══╝  ██║╚██╗██║   ██║
@@ -191,6 +192,42 @@ func run() error {
 		return err
 	}
 
-	// wain intefinitely on the main goroutine
-	select {}
+	// ██████╗ ██████╗ ███╗   ███╗███╗   ███╗ █████╗ ███╗   ██╗██████╗ ███████╗
+	//██╔════╝██╔═══██╗████╗ ████║████╗ ████║██╔══██╗████╗  ██║██╔══██╗██╔════╝
+	//██║     ██║   ██║██╔████╔██║██╔████╔██║███████║██╔██╗ ██║██║  ██║███████╗
+	//██║     ██║   ██║██║╚██╔╝██║██║╚██╔╝██║██╔══██║██║╚██╗██║██║  ██║╚════██║
+	//╚██████╗╚██████╔╝██║ ╚═╝ ██║██║ ╚═╝ ██║██║  ██║██║ ╚████║██████╔╝███████║
+	//╚═════╝ ╚═════╝ ╚═╝     ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝ ╚══════╝
+
+	var cmdAccount = &cobra.Command{
+		Use:   "account",
+		Short: "Manage account on sherpa cloud",
+		Long:  "Account is a master _command used to signup, signin, change or recover password and add or remove machines.",
+		Args:  cobra.MinimumNArgs(0),
+		Run:   account,
+	}
+
+	var cmdAccountInfo = &cobra.Command{
+		Use:   "info",
+		Short: "Gives back summarized account info",
+		Long:  "Account info reports the number of connected machines, with summarized details about the sherpa daemons running on them.",
+		Args:  cobra.MinimumNArgs(0),
+		Run:   accountInfo,
+	}
+
+	var cmdVersion = &cobra.Command{
+		Use:   "version",
+		Short: "Prints version information",
+		Long:  "Prints the git commit number as build version and build date",
+		Args:  cobra.MinimumNArgs(0),
+		Run:   cmdVersion,
+	}
+
+	var rootCmd = &cobra.Command{Use: "sherpa"}
+	rootCmd.AddCommand(cmdAccount, cmdHistory, cmdPrompt, cmdTest, cmdDaemonize, cmdVersion)
+	cmdAccount.AddCommand(cmdAccountInfo, cmdAccountCreate, cmdAccountLogin)
+	cmdAccount.AddCommand(cmdAccountPassword)
+	cmdAccountPassword.AddCommand(cmdAccountPasswordChange, cmdAccountPasswordRecover, cmdAccountPasswordReset)
+	rootCmd.Execute()
+
 }
