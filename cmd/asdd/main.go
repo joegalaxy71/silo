@@ -3,7 +3,7 @@ package main
 import (
 	"asd/common/api"
 	"asd/common/helpers"
-	_ "expvar" // Register the expvar handlers
+	_ "expvar"
 	"fmt"
 	"github.com/ardanlabs/conf"
 	"github.com/gorilla/mux"
@@ -20,7 +20,7 @@ import (
 	"log"
 	"net"
 	"net/http"
-	_ "net/http/pprof" // Register the pprof handlers
+	_ "net/http/pprof"
 	"os"
 	"time"
 )
@@ -250,7 +250,7 @@ func run() error {
 	chanErrGrpc := make(chan error, 1)
 	go func(errGrpc chan<- error) {
 		// create a listener on TCP port 7777
-		lis, err := net.Listen("tcp", fmt.Sprintf(":%d", 7777))
+		lis, err := net.Listen("tcp", fmt.Sprintf(":%d", 9000))
 		if err != nil {
 			err = errors.Wrap(err, "trying to listen on tcp")
 			errGrpc <- err
