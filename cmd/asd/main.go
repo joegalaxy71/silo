@@ -1,6 +1,7 @@
 package main
 
 import (
+	"asd/cmd/asd/commands"
 	"asd/common/helpers"
 	_ "database/sql"
 	_ "expvar" // Register the expvar handlers
@@ -10,11 +11,8 @@ import (
 	"github.com/marcsauter/single"
 	"github.com/op/go-logging"
 	"github.com/pkg/errors"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/spf13/cobra"
-	"google.golang.org/grpc"
 	"log"
-	"net/http"
 	"os"
 	"sync"
 	"time"
@@ -141,20 +139,6 @@ func run() error {
 	}
 	defer s.TryUnlock()
 
-	// ██████╗ ██████╗ ██████╗  ██████╗     ██████╗██╗     ██╗███████╗███╗   ██╗████████╗
-	//██╔════╝ ██╔══██╗██╔══██╗██╔════╝    ██╔════╝██║     ██║██╔════╝████╗  ██║╚══██╔══╝
-	//██║  ███╗██████╔╝██████╔╝██║         ██║     ██║     ██║█████╗  ██╔██╗ ██║   ██║
-	//██║   ██║██╔══██╗██╔═══╝ ██║         ██║     ██║     ██║██╔══╝  ██║╚██╗██║   ██║
-	//╚██████╔╝██║  ██║██║     ╚██████╗    ╚██████╗███████╗██║███████╗██║ ╚████║   ██║
-	//╚═════╝ ╚═╝  ╚═╝╚═╝      ╚═════╝     ╚═════╝╚══════╝╚═╝╚══════╝╚═╝  ╚═══╝   ╚═╝
-
-	var err error
-	conn, err = grpc.Dial(_cfg.Server.Address+":9000", grpc.WithInsecure())
-	if err != nil {
-		_log.Errorf("error dialing gRPC server on port 9000: %s", err)
-		return err
-	}
-
 	// ██████╗ ██████╗ ███╗   ███╗███╗   ███╗ █████╗ ███╗   ██╗██████╗ ███████╗
 	//██╔════╝██╔═══██╗████╗ ████║████╗ ████║██╔══██╗████╗  ██║██╔══██╗██╔════╝
 	//██║     ██║   ██║██╔████╔██║██╔████╔██║███████║██╔██╗ ██║██║  ██║███████╗
@@ -162,35 +146,44 @@ func run() error {
 	//╚██████╗╚██████╔╝██║ ╚═╝ ██║██║ ╚═╝ ██║██║  ██║██║ ╚████║██████╔╝███████║
 	//╚═════╝ ╚═════╝ ╚═╝     ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝ ╚══════╝
 
-	var cmdAccount = &cobra.Command{
-		Use:   "account",
-		Short: "Manage account on sherpa cloud",
-		Long:  "Account is a master _command used to signup, signin, change or recover password and add or remove machines.",
-		Args:  cobra.MinimumNArgs(0),
-		Run:   account,
-	}
-
-	var cmdAccountInfo = &cobra.Command{
-		Use:   "info",
-		Short: "Gives back summarized account info",
-		Long:  "Account info reports the number of connected machines, with summarized details about the sherpa daemons running on them.",
-		Args:  cobra.MinimumNArgs(0),
-		Run:   accountInfo,
-	}
+	//var cmdAccount = &cobra.Command{
+	//	Use:   "account",
+	//	Short: "Manage account on sherpa cloud",
+	//	Long:  "Account is a master _command used to signup, signin, change or recover password and add or remove machines.",
+	//	Args:  cobra.MinimumNArgs(0),
+	//	Run:   account,
+	//}
+	//
+	//var cmdAccountInfo = &cobra.Command{
+	//	Use:   "info",
+	//	Short: "Gives back summarized account info",
+	//	Long:  "Account info reports the number of connected machines, with summarized details about the sherpa daemons running on them.",
+	//	Args:  cobra.MinimumNArgs(0),
+	//	Run:   accountInfo,
+	//}
 
 	var cmdVersion = &cobra.Command{
 		Use:   "version",
 		Short: "Prints version information",
 		Long:  "Prints the git commit number as build version and build date",
 		Args:  cobra.MinimumNArgs(0),
-		Run:   cmdVersion,
+		Run:   commands.Version,
 	}
 
-	var rootCmd = &cobra.Command{Use: "sherpa"}
-	rootCmd.AddCommand(cmdAccount, cmdHistory, cmdPrompt, cmdTest, cmdDaemonize, cmdVersion)
-	cmdAccount.AddCommand(cmdAccountInfo, cmdAccountCreate, cmdAccountLogin)
-	cmdAccount.AddCommand(cmdAccountPassword)
-	cmdAccountPassword.AddCommand(cmdAccountPasswordChange, cmdAccountPasswordRecover, cmdAccountPasswordReset)
+	var cmdInit = &cobra.Command{
+		Use:   "init",
+		Short: "Initialize ASD",
+		Long:  "Creates necessary datasets and config for ASD",
+		Args:  cobra.MinimumNArgs(0),
+		Run:   commands.Init,
+	}
+
+	var rootCmd = &cobra.Command{Use: "asd"}
+	rootCmd.AddCommand(cmdVersion, cmdInit)
+	//cmdAccount.AddCommand(cmdAccountInfo, cmdAccountCreate, cmdAccountLogin)
+	//cmdAccount.AddCommand(cmdAccountPassword)
+	//cmdAccountPassword.AddCommand(cmdAccountPasswordChange, cmdAccountPasswordRecover, cmdAccountPasswordReset)
 	rootCmd.Execute()
 
+	return nil
 }

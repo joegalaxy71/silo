@@ -5,11 +5,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func Init(cmd *cobra.Command, args []string) {
+func Version(cmd *cobra.Command, args []string) {
 
 	// init logs ====================================
 	log := helpers.InitLogs(true)
-	log.Info("Init called")
+	log.Info("Version called")
 
 	//client, err := dialGrpc()
 	//if err != nil {
