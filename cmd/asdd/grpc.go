@@ -2,7 +2,6 @@ package main
 
 import (
 	"asd/common/api"
-	"asd/common/version"
 	"context"
 )
 
@@ -12,20 +11,6 @@ import (
 //██║   ██║██╔══██╗██╔═══╝ ██║         ██║╚██╔╝██║██╔══╝     ██║   ██╔══██║██║   ██║██║  ██║╚════██║
 //╚██████╔╝██║  ██║██║     ╚██████╗    ██║ ╚═╝ ██║███████╗   ██║   ██║  ██║╚██████╔╝██████╔╝███████║
 //╚═════╝ ╚═╝  ╚═╝╚═╝      ╚═════╝    ╚═╝     ╚═╝╚══════╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚══════╝
-
-func (s *Server) Version(ctx context.Context, in *api.Void) (*api.Outcome, error) {
-	_log.Debugf("/ gRPS: received a message with message type: Solution")
-
-	//should
-	// create the config
-	// create the main dataset: asd
-
-	var apiOutcome api.Outcome
-	apiOutcome.Error = false
-	apiOutcome.Message = version.VERSION
-
-	return &apiOutcome, nil
-}
 
 func (s *Server) Init(ctx context.Context, in *api.Pool) (*api.Outcome, error) {
 	_log.Debugf("/ gRPS: received a message with message type: Solution")
