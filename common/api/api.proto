@@ -15,7 +15,11 @@ message Info {
 }
 
 message Solution {
+    string Name = 1;
+}
 
+message Pool {
+    string Name = 1;
 }
 
 message Outcome {
@@ -25,7 +29,7 @@ message Outcome {
 // services
 
 service Asd {
-    rpc Init(Solution) returns (Outcome) {} //specify only a dataset full name
+    rpc Init(Pool) returns (Outcome) {} //specify only a dataset full name
     // like rpool/asd
 
     //missing state=0
@@ -46,6 +50,5 @@ service Asd {
     rpc Contain(Solution) returns (Outcome) {} //-1 ->started
 
     rpc Snapshot(Solution) returns (Outcome) {}
-    rpc
     rpc Rollback(Solution) returns (Outcome) {}
 }

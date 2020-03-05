@@ -53,7 +53,6 @@ var Version string
 // module wide globals (logging, locks, db, etc)
 var _log *logging.Logger
 var _lock sync.Mutex
-var conn *grpc.ClientConn
 
 // =====================================================================================================================
 //███╗   ███╗ █████╗ ██╗███╗   ██╗
@@ -131,7 +130,7 @@ func run() error {
 	//╚██████╔╝██║ ╚████║██║╚██████╔╝╚██████╔╝███████╗
 	//╚═════╝ ╚═╝  ╚═══╝╚═╝ ╚══▀▀═╝  ╚═════╝ ╚══════╝
 
-	s := single.New("asd-client")
+	s := single.New("asd")
 	if err := s.CheckLock(); err != nil && err == single.ErrAlreadyRunning {
 		log.Println("another instance of the app is already running, exiting")
 		return err
@@ -141,42 +140,6 @@ func run() error {
 		return err
 	}
 	defer s.TryUnlock()
-
-	// =========================================================================
-	//██████╗ ███████╗██████╗ ██╗   ██╗ ██████╗
-	//██╔══██╗██╔════╝██╔══██╗██║   ██║██╔════╝
-	//██║  ██║█████╗  ██████╔╝██║   ██║██║  ███╗
-	//██║  ██║██╔══╝  ██╔══██╗██║   ██║██║   ██║
-	//██████╔╝███████╗██████╔╝╚██████╔╝╚██████╔╝
-	//╚═════╝ ╚══════╝╚═════╝  ╚═════╝  ╚═════╝
-
-	// /debug/pprof - Added to the default mux by importing the net/http/pprof package.
-	// /debug/vars - Added to the default mux by importing the expvar package.
-	//
-	// Not concerned with shutting this down when the application is shutdown.
-
-	go func() {
-		_log.Debugf("Debug: listening on: %s", _cfg.Web.DebugHost+":"+_cfg.Web.DebugPort)
-		_log.Debugf("Debug: listener closed : %v", http.ListenAndServe(_cfg.Web.DebugHost+":"+_cfg.Web.DebugPort, http.DefaultServeMux))
-	}()
-	_log.Infof("Debug: initialized")
-
-	// =========================================================================
-	//███╗   ███╗███████╗████████╗██████╗ ██╗ ██████╗███████╗
-	//████╗ ████║██╔════╝╚══██╔══╝██╔══██╗██║██╔════╝██╔════╝
-	//██╔████╔██║█████╗     ██║   ██████╔╝██║██║     ███████╗
-	//██║╚██╔╝██║██╔══╝     ██║   ██╔══██╗██║██║     ╚════██║
-	//██║ ╚═╝ ██║███████╗   ██║   ██║  ██║██║╚██████╗███████║
-	//╚═╝     ╚═╝╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝ ╚═════╝╚══════╝
-
-	// /metrics - Added to the metrics handler
-
-	go func() {
-		_log.Debugf("Metrics: listening on %s", _cfg.Web.MetricsHost+":"+_cfg.Web.MetricsPort)
-		http.Handle("/metrics", promhttp.Handler())
-		_log.Debugf("Metrics: listener closed : %v", http.ListenAndServe(_cfg.Web.MetricsHost+":"+_cfg.Web.MetricsPort, nil))
-	}()
-	_log.Infof("Metrics: initialized")
 
 	// ██████╗ ██████╗ ██████╗  ██████╗     ██████╗██╗     ██╗███████╗███╗   ██╗████████╗
 	//██╔════╝ ██╔══██╗██╔══██╗██╔════╝    ██╔════╝██║     ██║██╔════╝████╗  ██║╚══██╔══╝

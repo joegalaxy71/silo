@@ -155,7 +155,7 @@ func run() error {
 	//  \__,_|_| |_|_|\__, |\__,_|\___|
 	//                   |_|
 
-	s := single.New("asd")
+	s := single.New("asdd")
 	if err := s.CheckLock(); err != nil && err == single.ErrAlreadyRunning {
 		_log.Errorf("another instance of the app is already running, exiting")
 		return err
