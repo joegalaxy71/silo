@@ -12,7 +12,7 @@ import (
 func Init(cmd *cobra.Command, args []string) {
 
 	_log = helpers.InitLogs(true)
-	_log.Debug("Init called")
+	_log.Debug("Command:Init")
 
 	conn, err := grpc.Dial("0.0.0.0:9000", grpc.WithInsecure())
 	if err != nil {
@@ -23,6 +23,7 @@ func Init(cmd *cobra.Command, args []string) {
 	defer conn.Close()
 	c := api.NewAsdClient(conn)
 	var apiPool api.Pool
+	apiPool.Name = args[0]
 	apiOutcome, err := c.Init(context.Background(), &apiPool)
 	if err != nil {
 		_log.Error("Unable to call ASDD gRPC server")

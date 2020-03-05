@@ -114,11 +114,13 @@ func run() error {
 		Use:   "init",
 		Short: "Initialize ASD",
 		Long:  "Creates necessary datasets and config for ASD",
-		Args:  cobra.MinimumNArgs(0),
+		Args:  cobra.ExactArgs(1),
 		Run:   commands.Init,
 	}
 
+	var verbose bool
 	var rootCmd = &cobra.Command{Use: "asd"}
+	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "verbose output")
 	rootCmd.AddCommand(cmdVersion, cmdInit)
 	//cmdAccount.AddCommand(cmdAccountInfo, cmdAccountCreate, cmdAccountLogin)
 	//cmdAccount.AddCommand(cmdAccountPassword)

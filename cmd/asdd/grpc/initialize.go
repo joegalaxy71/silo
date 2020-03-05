@@ -3,7 +3,6 @@ package grpc
 import (
 	"asd/common/api"
 	"asd/common/helpers"
-	"context"
 	"fmt"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"

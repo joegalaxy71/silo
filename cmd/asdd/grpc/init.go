@@ -8,7 +8,7 @@ import (
 
 func (s *Server) Init(ctx context.Context, in *api.Pool) (*api.Outcome, error) {
 	_log := helpers.InitLogs(true)
-	_log.Debug("gRPC call: Init")
+	_log.Debugf("gRPC call: Init(%s)\n", in.Name)
 	//should
 	// create the config
 	// create the main dataset: asd

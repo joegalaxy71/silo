@@ -17,7 +17,7 @@ func Version(cmd *cobra.Command, args []string) {
 
 	// init logs ====================================
 	_log = helpers.InitLogs(true)
-	_log.Debug("Version called")
+	_log.Debug("Command: version")
 
 	_log.Infof("ASD (client) version:%s\n", version.VERSION)
 
