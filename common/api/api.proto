@@ -22,17 +22,21 @@ message Pool {
     string Name = 1;
 }
 
-message Outcome {
+message Void {
 
+}
+
+message Outcome {
+    bool error = 1;
+    string message = 2;
 }
 
 // services
 
 service Asd {
-    rpc Init(Pool) returns (Outcome) {} //specify only a dataset full name
-    // like rpool/asd
+    rpc Version(Void) returns (Outcome) {} //specify only a dataset full name
 
-    //missing state=0
+    rpc Init(Pool) returns (Outcome) {} //specify only a dataset full name
 
     rpc Create(Solution) returns (Outcome) {} //+1 -> available
     rpc Destroy(Solution) returns (Outcome) {} //-1 ->missing

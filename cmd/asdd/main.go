@@ -5,7 +5,6 @@ import (
 	"asd/common/helpers"
 	_ "expvar"
 	"fmt"
-	"github.com/ardanlabs/conf"
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
 	"github.com/marcsauter/single"
@@ -16,49 +15,11 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/robfig/cron"
 	"google.golang.org/grpc"
-	"gopkg.in/stash.v1"
 	"log"
 	"net"
 	"net/http"
 	_ "net/http/pprof"
-	"os"
-	"time"
 )
-
-// =====================================================================================================================
-// configuration structure
-var _cfg struct {
-	Web struct {
-		DebugHost string `conf:"default:0.0.0.0"`
-		DebugPort string `conf:"default:3300"`
-
-		MetricsHost string `conf:"default:0.0.0.0"`
-		MetricsPort string `conf:"default:2112"`
-
-		ReadTimeout     time.Duration `conf:"default:5s"`
-		WriteTimeout    time.Duration `conf:"default:5s"`
-		ShutdownTimeout time.Duration `conf:"default:5s"`
-	}
-	Db struct {
-		User     string `conf:"default:joegalaxy"`
-		Password string `conf:"default:1hugesoul,noprint"`
-		Host     string `conf:"default:127.0.0.1"`
-		Instance string
-		Port     string `conf:"default:3306"`
-		Name     string `conf:"default:asd"`
-	}
-	Telegram struct {
-		Mode string `conf:"default:webhook"` //possible modes "webhook" and "tcp"
-		Hook string `conf:"default:https://asd.apps.avero.it"`
-		Port string `conf:"default:8000"`
-	}
-	Log struct {
-		Verbose bool `conf:"default:false"`
-	}
-	FileCache struct {
-		Path string `conf:"default:/var/cache/asd"`
-	}
-}
 
 // =====================================================================================================================
 // version and build info
@@ -76,8 +37,6 @@ type Server struct {
 // module wide globals (logging, locks, db, etc)
 var _log *logging.Logger
 var _verbose bool
-
-var fileCache *stash.Cache
 
 // =====================================================================================================================
 // metrics globals
@@ -106,25 +65,6 @@ func run() error {
 	Version = "0.3.0-3a"
 	Build = 0_3_0
 
-	//██████╗ ██████╗ ███╗   ██╗███████╗██╗ ██████╗
-	//██╔════╝██╔═══██╗████╗  ██║██╔════╝██║██╔════╝
-	//██║     ██║   ██║██╔██╗ ██║█████╗  ██║██║  ███╗
-	//██║     ██║   ██║██║╚██╗██║██╔══╝  ██║██║   ██║
-	//╚██████╗╚██████╔╝██║ ╚████║██║     ██║╚██████╔╝
-	//╚═════╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝     ╚═╝ ╚═════╝
-
-	if err := conf.Parse(os.Args[1:], "ASD", &_cfg); err != nil {
-		if err == conf.ErrHelpWanted {
-			usage, err := conf.Usage("ASD", &_cfg)
-			if err != nil {
-				return errors.Wrap(err, "generating config usage")
-			}
-			fmt.Println(usage)
-			return nil
-		}
-		return errors.Wrap(err, "parsing config")
-	}
-
 	//██╗      ██████╗  ██████╗ ███████╗
 	//██║     ██╔═══██╗██╔════╝ ██╔════╝
 	//██║     ██║   ██║██║  ███╗███████╗
@@ -132,8 +72,8 @@ func run() error {
 	//███████╗╚██████╔╝╚██████╔╝███████║
 	//╚══════╝ ╚═════╝  ╚═════╝ ╚══════╝
 
-	_log = helpers.InitLogs(_cfg.Log.Verbose)
-	_log.Info("Log: initialized")
+	_log = helpers.InitLogs(true)
+	_log.Debug("Log: initialized")
 
 	//███████╗██╗ ██████╗ ███╗   ██╗ █████╗ ██╗     ███████╗
 	//██╔════╝██║██╔════╝ ████╗  ██║██╔══██╗██║     ██╔════╝
@@ -142,7 +82,7 @@ func run() error {
 	//███████║██║╚██████╔╝██║ ╚████║██║  ██║███████╗███████║
 	//╚══════╝╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝╚══════╝
 	helpers.InitSignals()
-	_log.Infof("Signals: initialized")
+	_log.Debugf("Signals: initialized")
 
 	//██╗   ██╗███╗   ██╗██╗ ██████╗ ██╗   ██╗███████╗
 	//██║   ██║████╗  ██║██║██╔═══██╗██║   ██║██╔════╝
@@ -161,7 +101,7 @@ func run() error {
 		return err
 	}
 	defer s.TryUnlock()
-	_log.Infof("Unique: initialized")
+	_log.Debugf("Unique: initialized")
 
 	//██████╗ ███████╗██████╗ ██╗   ██╗ ██████╗
 	//██╔══██╗██╔════╝██╔══██╗██║   ██║██╔════╝
@@ -176,10 +116,10 @@ func run() error {
 	// Not concerned with shutting this down when the application is shutdown.
 
 	go func() {
-		_log.Debugf("Debug: listening on: %s", _cfg.Web.DebugHost+":"+_cfg.Web.DebugPort)
-		_log.Debugf("Debug: listener closed : %v", http.ListenAndServe(_cfg.Web.DebugHost+":"+_cfg.Web.DebugPort, http.DefaultServeMux))
+		_log.Debugf("Debug: listening on: %s", "0.0.0.0:3300")
+		_log.Debugf("Debug: listener closed : %v", http.ListenAndServe("0.0.0.0:3300", http.DefaultServeMux))
 	}()
-	_log.Infof("Debug: initialized")
+	_log.Debugf("Debug: initialized")
 
 	//███╗   ███╗███████╗████████╗██████╗ ██╗ ██████╗███████╗
 	//████╗ ████║██╔════╝╚══██╔══╝██╔══██╗██║██╔════╝██╔════╝
@@ -191,29 +131,20 @@ func run() error {
 	// /metrics - Added to the metrics handler
 
 	go func() {
-		_log.Debugf("Metrics: listening on %s", _cfg.Web.MetricsHost+":"+_cfg.Web.MetricsPort)
+		_log.Debugf("Metrics: listening on %s", "0.0.0.0:2112")
 		http.Handle("/metrics", promhttp.Handler())
-		_log.Debugf("Metrics: listener closed : %v", http.ListenAndServe(_cfg.Web.MetricsHost+":"+_cfg.Web.MetricsPort, nil))
+		_log.Debugf("Metrics: listener closed : %v", http.ListenAndServe("0.0.0.0:2112", nil))
 	}()
-	_log.Infof("Metrics: initialized")
+	_log.Debugf("Metrics: initialized")
 
-	//██████╗██╗  ██╗ █████╗ ███╗   ██╗███╗   ██╗███████╗██╗     ███████╗
+	// ██████╗██╗  ██╗ █████╗ ███╗   ██╗███╗   ██╗███████╗██╗     ███████╗
 	//██╔════╝██║  ██║██╔══██╗████╗  ██║████╗  ██║██╔════╝██║     ██╔════╝
 	//██║     ███████║███████║██╔██╗ ██║██╔██╗ ██║█████╗  ██║     ███████╗
 	//██║     ██╔══██║██╔══██║██║╚██╗██║██║╚██╗██║██╔══╝  ██║     ╚════██║
 	//╚██████╗██║  ██║██║  ██║██║ ╚████║██║ ╚████║███████╗███████╗███████║
 	//╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═══╝╚══════╝╚══════╝╚══════╝
 
-	_log.Infof("Channels: initialized")
-
-	// =====================================================================================================================
-	// STASH
-	var err error
-	fileCache, err = stash.New(_cfg.FileCache.Path, 10000000, 1000)
-	if err != nil {
-		errors.Wrap(err, "Unable to initialize file cache, path="+_cfg.FileCache.Path)
-		return err
-	}
+	_log.Debugf("Channels: initialized")
 
 	//██████╗██████╗  ██████╗ ███╗   ██╗
 	//██╔════╝██╔══██╗██╔═══██╗████╗  ██║
@@ -223,14 +154,14 @@ func run() error {
 	//╚═════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═══╝
 
 	cronTab := cron.New()
-	err = cronTab.AddFunc("0 * * * * *", worker) //every minute
+	err := cronTab.AddFunc("0 * * * * *", worker) //every minute
 	if err != nil {
 		errors.Wrap(err, "Unable to initialize CRON subsystem (worker)")
 		return err
 	}
 	cronTab.Start()
 
-	_log.Infof("Cron: initialized")
+	_log.Debugf("Cron: initialized")
 
 	// =====================================================================================================================
 	//██████╗ ██████╗ ██████╗  ██████╗
@@ -258,7 +189,7 @@ func run() error {
 		// attach the Ping service to the server
 		api.RegisterAsdServer(grpcServer, &s)
 		// start the server
-		_log.Infof("listening for grpc connections on port: 7777")
+		_log.Debugf("listening for grpc connections on port: 7777")
 		if err := grpcServer.Serve(lis); err != nil {
 			err = errors.Wrap(err, "failed to serve gRPC")
 			errGrpc <- err
@@ -287,13 +218,22 @@ func run() error {
 
 		http.Handle("/", router)
 		// start the web server (blocking)
-		_log.Infof("listening for http connections on port: %v", port)
+		_log.Debugf("listening for http connections on port: %v", port)
 		if err := http.ListenAndServe(fmt.Sprint(":", port), router); err != nil {
 			err = errors.Wrap(err, "failed to serve http<-->gRPC")
 			errHttp <- err
 			return
 		}
 	}(chanErrHttp)
+
+	//██╗   ██╗███████╗██████╗ ███████╗██╗ ██████╗ ███╗   ██╗
+	//██║   ██║██╔════╝██╔══██╗██╔════╝██║██╔═══██╗████╗  ██║
+	//██║   ██║█████╗  ██████╔╝███████╗██║██║   ██║██╔██╗ ██║
+	//╚██╗ ██╔╝██╔══╝  ██╔══██╗╚════██║██║██║   ██║██║╚██╗██║
+	//╚████╔╝ ███████╗██║  ██║███████║██║╚██████╔╝██║ ╚████║
+	//╚═══╝  ╚══════╝╚═╝  ╚═╝╚══════╝╚═╝ ╚═════╝ ╚═╝  ╚═══╝
+
+	_log.Debugf("asd: Version %s started", Version)
 
 	//--------------------------------------------------------------------------------------
 	// vait for channels and return eventual errors
@@ -308,18 +248,6 @@ func run() error {
 		return errHttp
 	}
 
-	//██╗   ██╗███████╗██████╗ ███████╗██╗ ██████╗ ███╗   ██╗
-	//██║   ██║██╔════╝██╔══██╗██╔════╝██║██╔═══██╗████╗  ██║
-	//██║   ██║█████╗  ██████╔╝███████╗██║██║   ██║██╔██╗ ██║
-	//╚██╗ ██╔╝██╔══╝  ██╔══██╗╚════██║██║██║   ██║██║╚██╗██║
-	//╚████╔╝ ███████╗██║  ██║███████║██║╚██████╔╝██║ ╚████║
-	//╚═══╝  ╚══════╝╚═╝  ╚═╝╚══════╝╚═╝ ╚═════╝ ╚═╝  ╚═══╝
-
-	_log.Infof("asd: Version %s started", Version)
-
-	// =====================================================================================================================
-	// wain intefinitely on the main goroutine
-	select {}
 }
 
 func worker() {

@@ -5,47 +5,13 @@ import (
 	"asd/common/helpers"
 	_ "database/sql"
 	_ "expvar" // Register the expvar handlers
-	"fmt"
-	"github.com/ardanlabs/conf"
 	_ "github.com/lib/pq"
 	"github.com/marcsauter/single"
 	"github.com/op/go-logging"
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"log"
-	"os"
 	"sync"
-	"time"
 )
-
-// =====================================================================================================================
-//configuration
-var _cfg struct {
-	Web struct {
-		DebugHost string `conf:"default:0.0.0.0"`
-		DebugPort string `conf:"default:3300"`
-
-		MetricsHost string `conf:"default:0.0.0.0"`
-		MetricsPort string `conf:"default:2112"`
-
-		ReadTimeout     time.Duration `conf:"default:5s"`
-		WriteTimeout    time.Duration `conf:"default:5s"`
-		ShutdownTimeout time.Duration `conf:"default:5s"`
-	}
-	Log struct {
-		Verbose bool `conf:"default:true"`
-	}
-	Server struct {
-		Address string `conf:"default:asd.avero.it"`
-		Port    string `conf:"default:7777"`
-	}
-}
-
-// =====================================================================================================================
-// version and build info
-
-var Build int
-var Version string
 
 // =====================================================================================================================
 // module wide globals (logging, locks, db, etc)
@@ -75,31 +41,6 @@ func main() {
 func run() error {
 
 	// =====================================================================================================================
-	// set version, build number
-	Version = "0.9.1-303b"
-	Build = 9_1_303
-
-	// =====================================================================================================================
-	// ██████╗ ██████╗ ███╗   ██╗███████╗██╗ ██████╗
-	//██╔════╝██╔═══██╗████╗  ██║██╔════╝██║██╔════╝
-	//██║     ██║   ██║██╔██╗ ██║█████╗  ██║██║  ███╗
-	//██║     ██║   ██║██║╚██╗██║██╔══╝  ██║██║   ██║
-	//╚██████╗╚██████╔╝██║ ╚████║██║     ██║╚██████╔╝
-	//╚═════╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝     ╚═╝ ╚═════╝
-
-	if err := conf.Parse(os.Args[1:], "ASD-CLIENT", &_cfg); err != nil {
-		if err == conf.ErrHelpWanted {
-			usage, err := conf.Usage("ASD-CLIENT", &_cfg)
-			if err != nil {
-				return errors.Wrap(err, "generating config usage")
-			}
-			fmt.Println(usage)
-			return nil
-		}
-		return errors.Wrap(err, "parsing config")
-	}
-
-	// =====================================================================================================================
 	//██╗      ██████╗  ██████╗ ███████╗
 	//██║     ██╔═══██╗██╔════╝ ██╔════╝
 	//██║     ██║   ██║██║  ███╗███████╗
@@ -107,7 +48,7 @@ func run() error {
 	//███████╗╚██████╔╝╚██████╔╝███████║
 	//╚══════╝ ╚═════╝  ╚═════╝ ╚══════╝
 
-	_log = helpers.InitLogs(_cfg.Log.Verbose)
+	_log = helpers.InitLogs(true)
 	_log.Info("Log: initialized")
 
 	// =====================================================================================================================

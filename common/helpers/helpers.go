@@ -15,7 +15,9 @@ func GetEnv(key, fallback string) string {
 }
 
 func HandleSignals(c chan os.Signal) {
+	_log := InitLogs(true)
 	<-c
+	_log.Info("Received SIGINT: terminating...")
 	os.Exit(1)
 }
 
