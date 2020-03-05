@@ -1,7 +1,7 @@
 package main
 
 import (
-	"asd/cmd/asdd/grpc"
+	asdGrpc "asd/cmd/asdd/grpc"
 	"asd/common/helpers"
 	_ "expvar"
 	"fmt"
@@ -14,7 +14,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/robfig/cron"
-	"google.golang.org/grpc"
 	"log"
 	"net/http"
 	_ "net/http/pprof"
@@ -174,7 +173,7 @@ func run() error {
 	// goroutine for the standard grpc server
 	chanErrGrpc := make(chan error, 1)
 
-	go grpc.Init(chanErrGrpc)
+	go asdGrpc.Init(chanErrGrpc)
 
 	//go func(errGrpc chan<- error) {
 	//	// create a listener on TCP port 7777
