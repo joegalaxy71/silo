@@ -5,6 +5,7 @@ import (
 	"asd/common/helpers"
 	"context"
 	"github.com/mistifyio/go-zfs"
+	"github.com/spf13/viper"
 )
 
 func (s *Server) Init(ctx context.Context, in *api.Pool) (*api.Outcome, error) {
@@ -20,7 +21,16 @@ func (s *Server) Init(ctx context.Context, in *api.Pool) (*api.Outcome, error) {
 		return &apiOutcome, err
 	}
 
-	println("Created zfs volume" + in.Name + "/asd")
+	_log.Info("Created zfs volume" + in.Name + "/asd")
+
+	viper.Set("pool", in.Name)
+	err = viper.WriteConfig()
+	if err != nil {
+		_log.Error("Error persisting configuration")
+		apiOutcome.Error = true
+		apiOutcome.Message = "Error persisting configuration"
+		return &apiOutcome, err
+	}
 
 	return &apiOutcome, nil
 }

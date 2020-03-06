@@ -47,7 +47,7 @@ var (
 	})
 )
 
-const CONFIGDIR = "/etc/asd"
+const CONFIGDIR = "/etc/asd/"
 const CONFIGFILE = "/etc/asd/config.yaml"
 
 // =====================================================================================================================
@@ -85,8 +85,9 @@ func run() error {
 	//╚██████╗╚██████╔╝██║ ╚████║██║     ██║╚██████╔╝
 	//╚═════╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝     ╚═╝ ╚═════╝
 
-	viper.SetConfigName("config.yaml") // name of config file (without extension)
-	viper.AddConfigPath("/etc/asd/")   // path to look for the config file in
+	viper.SetConfigName("config")  // name of config file (without extension)
+	viper.SetConfigType("yaml")    // REQUIRED if the config file does not have the extension in the name
+	viper.AddConfigPath(CONFIGDIR) // path to look for the config file in
 
 	// get CONFIGDIR info
 	_, err := os.Stat(CONFIGDIR)
