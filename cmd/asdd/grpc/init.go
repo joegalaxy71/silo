@@ -15,22 +15,28 @@ func (s *Server) Init(ctx context.Context, in *api.Pool) (*api.Outcome, error) {
 
 	_, err := zfs.CreateFilesystem(in.Name+"/asd", nil)
 	if err != nil {
-		_log.Error("Error creating initial dataset " + in.Name + "/asd")
+		message := "Error creating initial dataset " + in.Name + "/asd"
+		_log.Error(message)
 		apiOutcome.Error = true
-		apiOutcome.Message = "Error creating initial dataset " + in.Name + "/asd"
+		apiOutcome.Message = message
 		return &apiOutcome, err
+	} else {
+		message := "Created root dataset " + in.Name + "/asd"
+		_log.Info(message)
+		apiOutcome.Error = false
+		apiOutcome.Message = message
 	}
 
-	_log.Info("Created zfs volume" + in.Name + "/asd")
+	_log.Info()
 
 	viper.Set("pool", in.Name)
 	err = viper.WriteConfig()
 	if err != nil {
-		_log.Error("Error persisting configuration")
+		message := "Error persisting configuration"
+		_log.Error(message)
 		apiOutcome.Error = true
-		apiOutcome.Message = "Error persisting configuration"
+		apiOutcome.Message = message
 		return &apiOutcome, err
 	}
-
 	return &apiOutcome, nil
 }

@@ -31,6 +31,5 @@ func Init(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	_log.Infof("Outcome message:%s\n", apiOutcome.Message)
-
+	_log.Infof(apiOutcome.Message)
 }
