@@ -4,6 +4,7 @@ import (
 	"asd/common/api"
 	"asd/common/helpers"
 	"context"
+	"github.com/mistifyio/go-zfs"
 )
 
 func (s *Server) Create(ctx context.Context, in *api.Solution) (*api.Outcome, error) {
@@ -11,8 +12,13 @@ func (s *Server) Create(ctx context.Context, in *api.Solution) (*api.Outcome, er
 	_log.Debug("gRPC call: Create")
 	var apiOutcome api.Outcome
 
-	// create a new datased, children of main dataset asd
-	// and populate with a template unit
+	_, err := zfs.CreateFilesystem(in.Name+"/asd", nil)
+	if err != nil {
+		_log.Error("Error creating initial dataset " + in.Name + "/asd")
+		apiOutcome.Error = true
+		apiOutcome.Message = "Error creating initial dataset " + in.Name + "/asd"
+		return &apiOutcome, err
+	}
 
 	return &apiOutcome, nil
 }

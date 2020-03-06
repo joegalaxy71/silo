@@ -103,11 +103,12 @@ func run() error {
 	//}
 
 	var cmdVersion = &cobra.Command{
-		Use:   "version",
-		Short: "Prints version information",
-		Long:  "Prints the git commit number as build version and build date",
-		Args:  cobra.MinimumNArgs(0),
-		Run:   commands.Version,
+		Use:     "version",
+		Aliases: []string{"ver"},
+		Short:   "Prints version information",
+		Long:    "Prints the git commit number as build version and build date",
+		Args:    cobra.MinimumNArgs(0),
+		Run:     commands.Version,
 	}
 
 	var cmdInit = &cobra.Command{
@@ -118,10 +119,18 @@ func run() error {
 		Run:   commands.Init,
 	}
 
+	var cmdCreate = &cobra.Command{
+		Use:   "create",
+		Short: "Create a solution",
+		Long:  "Creates a solution with the given name",
+		Args:  cobra.ExactArgs(1),
+		Run:   commands.Create,
+	}
+
 	var verbose bool
 	var rootCmd = &cobra.Command{Use: "asd"}
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "verbose output")
-	rootCmd.AddCommand(cmdVersion, cmdInit)
+	rootCmd.AddCommand(cmdVersion, cmdInit, cmdCreate)
 	//cmdAccount.AddCommand(cmdAccountInfo, cmdAccountCreate, cmdAccountLogin)
 	//cmdAccount.AddCommand(cmdAccountPassword)
 	//cmdAccountPassword.AddCommand(cmdAccountPasswordChange, cmdAccountPasswordRecover, cmdAccountPasswordReset)

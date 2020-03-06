@@ -14,9 +14,11 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/robfig/cron"
+	"github.com/spf13/viper"
 	"log"
 	"net/http"
 	_ "net/http/pprof"
+	"os"
 )
 
 // =====================================================================================================================
@@ -45,6 +47,9 @@ var (
 	})
 )
 
+const CONFIGDIR = "/etc/asd"
+const CONFIGFILE = "/etc/asd/config.yaml"
+
 // =====================================================================================================================
 // main
 func main() {
@@ -72,6 +77,72 @@ func run() error {
 
 	_log = helpers.InitLogs(true)
 	_log.Debug("Log: initialized")
+
+	//██████╗ ██████╗ ███╗   ██╗███████╗██╗ ██████╗
+	//██╔════╝██╔═══██╗████╗  ██║██╔════╝██║██╔════╝
+	//██║     ██║   ██║██╔██╗ ██║█████╗  ██║██║  ███╗
+	//██║     ██║   ██║██║╚██╗██║██╔══╝  ██║██║   ██║
+	//╚██████╗╚██████╔╝██║ ╚████║██║     ██║╚██████╔╝
+	//╚═════╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝     ╚═╝ ╚═════╝
+
+	viper.SetConfigName("config.yaml") // name of config file (without extension)
+	viper.AddConfigPath("/etc/asd/")   // path to look for the config file in
+
+	// get CONFIGDIR info
+	_, err := os.Stat(CONFIGDIR)
+
+	// if does't exists
+	if os.IsNotExist(err) {
+		// create it
+		errDir := os.MkdirAll(CONFIGDIR, 0755)
+		// if create error
+		if errDir != nil {
+			_log.Errorf("unable to create config directory %s\n", CONFIGDIR)
+			return err
+		}
+	}
+
+	// get CONFIGDIR info
+	_, err = os.Stat(CONFIGFILE)
+
+	// if does't exists
+	if os.IsNotExist(err) {
+		// create it
+		_, errFile := os.Create(CONFIGFILE)
+		// if file create error
+		if errFile != nil {
+			_log.Errorf("unable to create config file %s\n", CONFIGFILE)
+			return err
+		} else {
+			//file created, setting defaults
+			// correctly created dir
+			defaults := map[string]interface{}{
+				"pool": "undefined",
+				"auth": map[string]string{
+					"username": "none",
+					"password": "unset",
+				},
+			}
+
+			for key, value := range defaults {
+				viper.SetDefault(key, value)
+			}
+
+			viper.WriteConfig()
+		}
+	} else {
+		if err := viper.ReadInConfig(); err != nil {
+			if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+				// Config file not found; ignore error if desired
+				_log.Error("config file " + CONFIGFILE + " not found")
+				return err
+			} else {
+				// Config file was found but another error was produced
+				_log.Error("error reading config file " + CONFIGFILE)
+				return err
+			}
+		}
+	}
 
 	//███████╗██╗ ██████╗ ███╗   ██╗ █████╗ ██╗     ███████╗
 	//██╔════╝██║██╔════╝ ████╗  ██║██╔══██╗██║     ██╔════╝
@@ -152,7 +223,7 @@ func run() error {
 	//╚═════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═══╝
 
 	cronTab := cron.New()
-	err := cronTab.AddFunc("0 * * * * *", worker) //every minute
+	err = cronTab.AddFunc("0 * * * * *", worker) //every minute
 	if err != nil {
 		errors.Wrap(err, "Unable to initialize CRON subsystem (worker)")
 		return err
