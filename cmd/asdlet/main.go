@@ -1,7 +1,7 @@
 package main
 
 import (
-	asddGrpc "asd/cmd/asdd/grpc"
+	asdletGrpc "asd/cmd/asdlet/grpc"
 	"asd/common/helpers"
 	_ "expvar"
 	"fmt"
@@ -47,8 +47,8 @@ var (
 	})
 )
 
-const CONFIGDIR = "/etc/asd/"
-const CONFIGFILE = "/etc/asd/config.yaml"
+const CONFIGDIR = "/etc/asdlet/"
+const CONFIGFILE = "/etc/asdlet/config.yaml"
 
 // =====================================================================================================================
 // main
@@ -161,7 +161,7 @@ func run() error {
 	//╚██████╔╝██║ ╚████║██║╚██████╔╝╚██████╔╝███████╗
 	//╚═════╝ ╚═╝  ╚═══╝╚═╝ ╚══▀▀═╝  ╚═════╝ ╚══════╝
 
-	s := single.New("asdd")
+	s := single.New("asdlet")
 	if err := s.CheckLock(); err != nil && err == single.ErrAlreadyRunning {
 		_log.Errorf("another instance of the app is already running, exiting")
 		return err
@@ -245,7 +245,7 @@ func run() error {
 	// goroutine for the standard grpc server
 	chanErrGrpc := make(chan error, 1)
 
-	go asddGrpc.Init(chanErrGrpc)
+	go asdletGrpc.Init(chanErrGrpc)
 
 	//go func(errGrpc chan<- error) {
 	//	// create a listener on TCP port 7777
@@ -306,7 +306,7 @@ func run() error {
 	//╚████╔╝ ███████╗██║  ██║███████║██║╚██████╔╝██║ ╚████║
 	//╚═══╝  ╚══════╝╚═╝  ╚═╝╚══════╝╚═╝ ╚═════╝ ╚═╝  ╚═══╝
 
-	_log.Debugf("asd: Version %s started", Version)
+	_log.Debugf("asdlet: Version %s started", Version)
 
 	//--------------------------------------------------------------------------------------
 	// vait for channels and return eventual errors

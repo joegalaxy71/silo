@@ -21,7 +21,7 @@ func Init(cmd *cobra.Command, args []string) {
 		return
 	}
 	defer conn.Close()
-	c := api.NewAsdClient(conn)
+	c := api.NewAsddClient(conn)
 	var apiPool api.Pool
 	apiPool.Name = args[0]
 	apiOutcome, err := c.Init(context.Background(), &apiPool)

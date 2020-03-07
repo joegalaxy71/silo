@@ -21,7 +21,7 @@ func Create(cmd *cobra.Command, args []string) {
 		return
 	}
 	defer conn.Close()
-	c := api.NewAsdClient(conn)
+	c := api.NewAsddClient(conn)
 	var apiSolution api.Solution
 	apiSolution.Name = args[0]
 	apiOutcome, err := c.Create(context.Background(), &apiSolution)

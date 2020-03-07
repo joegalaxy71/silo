@@ -127,10 +127,43 @@ func run() error {
 		Run:   commands.Create,
 	}
 
+	var cmdNode = &cobra.Command{
+		Use:   "node",
+		Short: "Manage adding and removing nodes",
+		Long:  "Add a new node, remove and purge added ones",
+		Args:  cobra.MinimumNArgs(0),
+		Run:   commands.Node,
+	}
+
+	var cmdNodeAdd = &cobra.Command{
+		Use:   "node add [node_ip]",
+		Short: "Add an ADS node",
+		Long:  "Add a new node, initalialyzing datasets if needed",
+		Args:  cobra.ExactArgs(1),
+		Run:   commands.NodeAdd,
+	}
+
+	var cmdNodeRem = &cobra.Command{
+		Use:   "node remove [node_ip]",
+		Short: "Remove an ADS node",
+		Long:  "Remove an existing node, leave all solution data in place",
+		Args:  cobra.ExactArgs(1),
+		Run:   commands.NodeRemove,
+	}
+
+	var cmdNodePurge = &cobra.Command{
+		Use:   "node purge [node_ip]",
+		Short: "Purge an ADS node",
+		Long:  "Remove an existing node, destroys all solution data",
+		Args:  cobra.ExactArgs(1),
+		Run:   commands.NodePurge,
+	}
+
 	var verbose bool
 	var rootCmd = &cobra.Command{Use: "asd"}
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "verbose output")
-	rootCmd.AddCommand(cmdVersion, cmdInit, cmdCreate)
+	rootCmd.AddCommand(cmdVersion, cmdInit, cmdCreate, cmdNode)
+	cmdNode.AddCommand(cmdNodeAdd, cmdNodeRem, cmdNodePurge)
 	//cmdAccount.AddCommand(cmdAccountInfo, cmdAccountCreate, cmdAccountLogin)
 	//cmdAccount.AddCommand(cmdAccountPassword)
 	//cmdAccountPassword.AddCommand(cmdAccountPasswordChange, cmdAccountPasswordRecover, cmdAccountPasswordReset)

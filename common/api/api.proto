@@ -14,6 +14,16 @@ message Info {
     repeated UnitInfo Units = 2;
 }
 
+message Node {
+    string Ip = 1;
+}
+
+message NodeInfo {
+    Outcome Outcome = 1;
+    string Hostname = 2;
+    string Ip = 3;
+}
+
 message Solution {
     string Name = 1;
 }
@@ -33,26 +43,35 @@ message Outcome {
 
 // services
 
-service Asd {
-    rpc Version(Void) returns (Outcome) {} //specify only a dataset full name
-
-    rpc Init(Pool) returns (Outcome) {} //specify only a dataset full name
-
+service Asdd {
+    rpc Version(Void) returns (Outcome) {}
+    rpc Init(Pool) returns (Outcome) {}
+    rpc NodeAdd(Node) returns (Outcome) {}
+    rpc NodeRemove(Node) returns (Outcome) {}
+    rpc NodePurge(Node) returns (Outcome) {}
     rpc Create(Solution) returns (Outcome) {} //+1 -> available
     rpc Destroy(Solution) returns (Outcome) {} //-1 ->missing
-
     rpc Backup(Solution) returns (Outcome) {}
     rpc Restore(Solution) returns (Outcome) {}
-
     rpc Deploy(Solution) returns (Outcome) {} //+1 -> deployed
     rpc Retreat(Solution) returns (Outcome) {} //-1 -> available
-
     rpc Start(Solution) returns (Outcome) {} //+1 -> started
     rpc Stop(Solution) returns (Outcome) {} //-1 -> deployed
-
     rpc Expose(Solution) returns (Outcome) {} //+1 -> exposed
     rpc Contain(Solution) returns (Outcome) {} //-1 ->started
-
     rpc Snapshot(Solution) returns (Outcome) {}
     rpc Rollback(Solution) returns (Outcome) {}
+}
+
+service AsdLet {
+    rpc Version(Void) returns (Outcome) {}
+    rpc NodeAdd(Node) returns (NodeInfo) {}
+    rpc NodeRemove(Node) returns (Outcome) {}
+    rpc NodePurge(Node) returns (Outcome) {}
+    rpc Deploy(Solution) returns (Outcome) {} //+1 -> deployed
+    rpc Retreat(Solution) returns (Outcome) {} //-1 -> available
+    rpc Start(Solution) returns (Outcome) {} //+1 -> started
+    rpc Stop(Solution) returns (Outcome) {} //-1 -> deployed
+    rpc Expose(Solution) returns (Outcome) {} //+1 -> exposed
+    rpc Contain(Solution) returns (Outcome) {} //-1 ->started
 }

@@ -28,7 +28,7 @@ func Version(cmd *cobra.Command, args []string) {
 		return
 	}
 	defer conn.Close()
-	c := api.NewAsdClient(conn)
+	c := api.NewAsddClient(conn)
 	var apiVoid api.Void
 	apiOutcome, err := c.Version(context.Background(), &apiVoid)
 	if err != nil {

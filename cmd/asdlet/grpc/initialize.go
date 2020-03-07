@@ -27,7 +27,7 @@ func Init(errGrpc chan<- error) {
 	// create a gRPC server object
 	grpcServer := grpc.NewServer()
 	// attach the Ping service to the server
-	api.RegisterAsddServer(grpcServer, &s)
+	api.RegisterAsdLetServer(grpcServer, &s)
 	// start the server
 	_log.Debugf("listening for grpc connections on port: 7777")
 	if err := grpcServer.Serve(lis); err != nil {
