@@ -24,311 +24,6 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
-type UnitInfo struct {
-	Name                 string   `protobuf:"bytes,1,opt,name=Name,proto3" json:"Name,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *UnitInfo) Reset()         { *m = UnitInfo{} }
-func (m *UnitInfo) String() string { return proto.CompactTextString(m) }
-func (*UnitInfo) ProtoMessage()    {}
-func (*UnitInfo) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{0}
-}
-
-func (m *UnitInfo) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_UnitInfo.Unmarshal(m, b)
-}
-func (m *UnitInfo) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_UnitInfo.Marshal(b, m, deterministic)
-}
-func (m *UnitInfo) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_UnitInfo.Merge(m, src)
-}
-func (m *UnitInfo) XXX_Size() int {
-	return xxx_messageInfo_UnitInfo.Size(m)
-}
-func (m *UnitInfo) XXX_DiscardUnknown() {
-	xxx_messageInfo_UnitInfo.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_UnitInfo proto.InternalMessageInfo
-
-func (m *UnitInfo) GetName() string {
-	if m != nil {
-		return m.Name
-	}
-	return ""
-}
-
-type Info struct {
-	Name                 string      `protobuf:"bytes,1,opt,name=Name,proto3" json:"Name,omitempty"`
-	Units                []*UnitInfo `protobuf:"bytes,2,rep,name=Units,proto3" json:"Units,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}    `json:"-"`
-	XXX_unrecognized     []byte      `json:"-"`
-	XXX_sizecache        int32       `json:"-"`
-}
-
-func (m *Info) Reset()         { *m = Info{} }
-func (m *Info) String() string { return proto.CompactTextString(m) }
-func (*Info) ProtoMessage()    {}
-func (*Info) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{1}
-}
-
-func (m *Info) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Info.Unmarshal(m, b)
-}
-func (m *Info) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Info.Marshal(b, m, deterministic)
-}
-func (m *Info) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Info.Merge(m, src)
-}
-func (m *Info) XXX_Size() int {
-	return xxx_messageInfo_Info.Size(m)
-}
-func (m *Info) XXX_DiscardUnknown() {
-	xxx_messageInfo_Info.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Info proto.InternalMessageInfo
-
-func (m *Info) GetName() string {
-	if m != nil {
-		return m.Name
-	}
-	return ""
-}
-
-func (m *Info) GetUnits() []*UnitInfo {
-	if m != nil {
-		return m.Units
-	}
-	return nil
-}
-
-type Node struct {
-	Host                 string   `protobuf:"bytes,1,opt,name=Host,proto3" json:"Host,omitempty"`
-	Ip                   string   `protobuf:"bytes,2,opt,name=Ip,proto3" json:"Ip,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *Node) Reset()         { *m = Node{} }
-func (m *Node) String() string { return proto.CompactTextString(m) }
-func (*Node) ProtoMessage()    {}
-func (*Node) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{2}
-}
-
-func (m *Node) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Node.Unmarshal(m, b)
-}
-func (m *Node) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Node.Marshal(b, m, deterministic)
-}
-func (m *Node) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Node.Merge(m, src)
-}
-func (m *Node) XXX_Size() int {
-	return xxx_messageInfo_Node.Size(m)
-}
-func (m *Node) XXX_DiscardUnknown() {
-	xxx_messageInfo_Node.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Node proto.InternalMessageInfo
-
-func (m *Node) GetHost() string {
-	if m != nil {
-		return m.Host
-	}
-	return ""
-}
-
-func (m *Node) GetIp() string {
-	if m != nil {
-		return m.Ip
-	}
-	return ""
-}
-
-type NodeInfo struct {
-	Outcome              *Outcome `protobuf:"bytes,1,opt,name=Outcome,proto3" json:"Outcome,omitempty"`
-	Hostname             string   `protobuf:"bytes,2,opt,name=Hostname,proto3" json:"Hostname,omitempty"`
-	Ip                   string   `protobuf:"bytes,3,opt,name=Ip,proto3" json:"Ip,omitempty"`
-	Poolname             string   `protobuf:"bytes,4,opt,name=Poolname,proto3" json:"Poolname,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *NodeInfo) Reset()         { *m = NodeInfo{} }
-func (m *NodeInfo) String() string { return proto.CompactTextString(m) }
-func (*NodeInfo) ProtoMessage()    {}
-func (*NodeInfo) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{3}
-}
-
-func (m *NodeInfo) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_NodeInfo.Unmarshal(m, b)
-}
-func (m *NodeInfo) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_NodeInfo.Marshal(b, m, deterministic)
-}
-func (m *NodeInfo) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_NodeInfo.Merge(m, src)
-}
-func (m *NodeInfo) XXX_Size() int {
-	return xxx_messageInfo_NodeInfo.Size(m)
-}
-func (m *NodeInfo) XXX_DiscardUnknown() {
-	xxx_messageInfo_NodeInfo.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_NodeInfo proto.InternalMessageInfo
-
-func (m *NodeInfo) GetOutcome() *Outcome {
-	if m != nil {
-		return m.Outcome
-	}
-	return nil
-}
-
-func (m *NodeInfo) GetHostname() string {
-	if m != nil {
-		return m.Hostname
-	}
-	return ""
-}
-
-func (m *NodeInfo) GetIp() string {
-	if m != nil {
-		return m.Ip
-	}
-	return ""
-}
-
-func (m *NodeInfo) GetPoolname() string {
-	if m != nil {
-		return m.Poolname
-	}
-	return ""
-}
-
-type Solution struct {
-	Name                 string   `protobuf:"bytes,1,opt,name=Name,proto3" json:"Name,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *Solution) Reset()         { *m = Solution{} }
-func (m *Solution) String() string { return proto.CompactTextString(m) }
-func (*Solution) ProtoMessage()    {}
-func (*Solution) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{4}
-}
-
-func (m *Solution) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Solution.Unmarshal(m, b)
-}
-func (m *Solution) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Solution.Marshal(b, m, deterministic)
-}
-func (m *Solution) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Solution.Merge(m, src)
-}
-func (m *Solution) XXX_Size() int {
-	return xxx_messageInfo_Solution.Size(m)
-}
-func (m *Solution) XXX_DiscardUnknown() {
-	xxx_messageInfo_Solution.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Solution proto.InternalMessageInfo
-
-func (m *Solution) GetName() string {
-	if m != nil {
-		return m.Name
-	}
-	return ""
-}
-
-type Pool struct {
-	Name                 string   `protobuf:"bytes,1,opt,name=Name,proto3" json:"Name,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *Pool) Reset()         { *m = Pool{} }
-func (m *Pool) String() string { return proto.CompactTextString(m) }
-func (*Pool) ProtoMessage()    {}
-func (*Pool) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{5}
-}
-
-func (m *Pool) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Pool.Unmarshal(m, b)
-}
-func (m *Pool) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Pool.Marshal(b, m, deterministic)
-}
-func (m *Pool) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Pool.Merge(m, src)
-}
-func (m *Pool) XXX_Size() int {
-	return xxx_messageInfo_Pool.Size(m)
-}
-func (m *Pool) XXX_DiscardUnknown() {
-	xxx_messageInfo_Pool.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Pool proto.InternalMessageInfo
-
-func (m *Pool) GetName() string {
-	if m != nil {
-		return m.Name
-	}
-	return ""
-}
-
-type Void struct {
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *Void) Reset()         { *m = Void{} }
-func (m *Void) String() string { return proto.CompactTextString(m) }
-func (*Void) ProtoMessage()    {}
-func (*Void) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{6}
-}
-
-func (m *Void) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Void.Unmarshal(m, b)
-}
-func (m *Void) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Void.Marshal(b, m, deterministic)
-}
-func (m *Void) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Void.Merge(m, src)
-}
-func (m *Void) XXX_Size() int {
-	return xxx_messageInfo_Void.Size(m)
-}
-func (m *Void) XXX_DiscardUnknown() {
-	xxx_messageInfo_Void.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Void proto.InternalMessageInfo
-
 type Outcome struct {
 	Error                bool     `protobuf:"varint,1,opt,name=error,proto3" json:"error,omitempty"`
 	Message              string   `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
@@ -341,7 +36,7 @@ func (m *Outcome) Reset()         { *m = Outcome{} }
 func (m *Outcome) String() string { return proto.CompactTextString(m) }
 func (*Outcome) ProtoMessage()    {}
 func (*Outcome) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{7}
+	return fileDescriptor_00212fb1f9d3bf1c, []int{0}
 }
 
 func (m *Outcome) XXX_Unmarshal(b []byte) error {
@@ -376,50 +71,372 @@ func (m *Outcome) GetMessage() string {
 	return ""
 }
 
+type Unit struct {
+	Name                 string   `protobuf:"bytes,1,opt,name=Name,proto3" json:"Name,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Unit) Reset()         { *m = Unit{} }
+func (m *Unit) String() string { return proto.CompactTextString(m) }
+func (*Unit) ProtoMessage()    {}
+func (*Unit) Descriptor() ([]byte, []int) {
+	return fileDescriptor_00212fb1f9d3bf1c, []int{1}
+}
+
+func (m *Unit) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Unit.Unmarshal(m, b)
+}
+func (m *Unit) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Unit.Marshal(b, m, deterministic)
+}
+func (m *Unit) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Unit.Merge(m, src)
+}
+func (m *Unit) XXX_Size() int {
+	return xxx_messageInfo_Unit.Size(m)
+}
+func (m *Unit) XXX_DiscardUnknown() {
+	xxx_messageInfo_Unit.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Unit proto.InternalMessageInfo
+
+func (m *Unit) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+type Units struct {
+	Unit                 []*Units `protobuf:"bytes,1,rep,name=Unit,proto3" json:"Unit,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Units) Reset()         { *m = Units{} }
+func (m *Units) String() string { return proto.CompactTextString(m) }
+func (*Units) ProtoMessage()    {}
+func (*Units) Descriptor() ([]byte, []int) {
+	return fileDescriptor_00212fb1f9d3bf1c, []int{2}
+}
+
+func (m *Units) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Units.Unmarshal(m, b)
+}
+func (m *Units) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Units.Marshal(b, m, deterministic)
+}
+func (m *Units) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Units.Merge(m, src)
+}
+func (m *Units) XXX_Size() int {
+	return xxx_messageInfo_Units.Size(m)
+}
+func (m *Units) XXX_DiscardUnknown() {
+	xxx_messageInfo_Units.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Units proto.InternalMessageInfo
+
+func (m *Units) GetUnit() []*Units {
+	if m != nil {
+		return m.Unit
+	}
+	return nil
+}
+
+type Node struct {
+	Outcome              *Outcome `protobuf:"bytes,1,opt,name=Outcome,proto3" json:"Outcome,omitempty"`
+	Hostname             string   `protobuf:"bytes,2,opt,name=Hostname,proto3" json:"Hostname,omitempty"`
+	Ip                   string   `protobuf:"bytes,3,opt,name=Ip,proto3" json:"Ip,omitempty"`
+	Poolname             string   `protobuf:"bytes,4,opt,name=Poolname,proto3" json:"Poolname,omitempty"`
+	Type                 string   `protobuf:"bytes,5,opt,name=Type,proto3" json:"Type,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Node) Reset()         { *m = Node{} }
+func (m *Node) String() string { return proto.CompactTextString(m) }
+func (*Node) ProtoMessage()    {}
+func (*Node) Descriptor() ([]byte, []int) {
+	return fileDescriptor_00212fb1f9d3bf1c, []int{3}
+}
+
+func (m *Node) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Node.Unmarshal(m, b)
+}
+func (m *Node) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Node.Marshal(b, m, deterministic)
+}
+func (m *Node) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Node.Merge(m, src)
+}
+func (m *Node) XXX_Size() int {
+	return xxx_messageInfo_Node.Size(m)
+}
+func (m *Node) XXX_DiscardUnknown() {
+	xxx_messageInfo_Node.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Node proto.InternalMessageInfo
+
+func (m *Node) GetOutcome() *Outcome {
+	if m != nil {
+		return m.Outcome
+	}
+	return nil
+}
+
+func (m *Node) GetHostname() string {
+	if m != nil {
+		return m.Hostname
+	}
+	return ""
+}
+
+func (m *Node) GetIp() string {
+	if m != nil {
+		return m.Ip
+	}
+	return ""
+}
+
+func (m *Node) GetPoolname() string {
+	if m != nil {
+		return m.Poolname
+	}
+	return ""
+}
+
+func (m *Node) GetType() string {
+	if m != nil {
+		return m.Type
+	}
+	return ""
+}
+
+type Nodes struct {
+	Outcome              *Outcome `protobuf:"bytes,1,opt,name=Outcome,proto3" json:"Outcome,omitempty"`
+	Node                 []*Nodes `protobuf:"bytes,2,rep,name=Node,proto3" json:"Node,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Nodes) Reset()         { *m = Nodes{} }
+func (m *Nodes) String() string { return proto.CompactTextString(m) }
+func (*Nodes) ProtoMessage()    {}
+func (*Nodes) Descriptor() ([]byte, []int) {
+	return fileDescriptor_00212fb1f9d3bf1c, []int{4}
+}
+
+func (m *Nodes) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Nodes.Unmarshal(m, b)
+}
+func (m *Nodes) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Nodes.Marshal(b, m, deterministic)
+}
+func (m *Nodes) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Nodes.Merge(m, src)
+}
+func (m *Nodes) XXX_Size() int {
+	return xxx_messageInfo_Nodes.Size(m)
+}
+func (m *Nodes) XXX_DiscardUnknown() {
+	xxx_messageInfo_Nodes.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Nodes proto.InternalMessageInfo
+
+func (m *Nodes) GetOutcome() *Outcome {
+	if m != nil {
+		return m.Outcome
+	}
+	return nil
+}
+
+func (m *Nodes) GetNode() []*Nodes {
+	if m != nil {
+		return m.Node
+	}
+	return nil
+}
+
+type Solution struct {
+	Outcome              *Outcome `protobuf:"bytes,1,opt,name=Outcome,proto3" json:"Outcome,omitempty"`
+	Name                 string   `protobuf:"bytes,2,opt,name=Name,proto3" json:"Name,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Solution) Reset()         { *m = Solution{} }
+func (m *Solution) String() string { return proto.CompactTextString(m) }
+func (*Solution) ProtoMessage()    {}
+func (*Solution) Descriptor() ([]byte, []int) {
+	return fileDescriptor_00212fb1f9d3bf1c, []int{5}
+}
+
+func (m *Solution) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Solution.Unmarshal(m, b)
+}
+func (m *Solution) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Solution.Marshal(b, m, deterministic)
+}
+func (m *Solution) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Solution.Merge(m, src)
+}
+func (m *Solution) XXX_Size() int {
+	return xxx_messageInfo_Solution.Size(m)
+}
+func (m *Solution) XXX_DiscardUnknown() {
+	xxx_messageInfo_Solution.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Solution proto.InternalMessageInfo
+
+func (m *Solution) GetOutcome() *Outcome {
+	if m != nil {
+		return m.Outcome
+	}
+	return nil
+}
+
+func (m *Solution) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+type Solutions struct {
+	Outcome              *Outcome     `protobuf:"bytes,1,opt,name=Outcome,proto3" json:"Outcome,omitempty"`
+	Solution             []*Solutions `protobuf:"bytes,2,rep,name=Solution,proto3" json:"Solution,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}     `json:"-"`
+	XXX_unrecognized     []byte       `json:"-"`
+	XXX_sizecache        int32        `json:"-"`
+}
+
+func (m *Solutions) Reset()         { *m = Solutions{} }
+func (m *Solutions) String() string { return proto.CompactTextString(m) }
+func (*Solutions) ProtoMessage()    {}
+func (*Solutions) Descriptor() ([]byte, []int) {
+	return fileDescriptor_00212fb1f9d3bf1c, []int{6}
+}
+
+func (m *Solutions) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Solutions.Unmarshal(m, b)
+}
+func (m *Solutions) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Solutions.Marshal(b, m, deterministic)
+}
+func (m *Solutions) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Solutions.Merge(m, src)
+}
+func (m *Solutions) XXX_Size() int {
+	return xxx_messageInfo_Solutions.Size(m)
+}
+func (m *Solutions) XXX_DiscardUnknown() {
+	xxx_messageInfo_Solutions.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Solutions proto.InternalMessageInfo
+
+func (m *Solutions) GetOutcome() *Outcome {
+	if m != nil {
+		return m.Outcome
+	}
+	return nil
+}
+
+func (m *Solutions) GetSolution() []*Solutions {
+	if m != nil {
+		return m.Solution
+	}
+	return nil
+}
+
+type Void struct {
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Void) Reset()         { *m = Void{} }
+func (m *Void) String() string { return proto.CompactTextString(m) }
+func (*Void) ProtoMessage()    {}
+func (*Void) Descriptor() ([]byte, []int) {
+	return fileDescriptor_00212fb1f9d3bf1c, []int{7}
+}
+
+func (m *Void) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Void.Unmarshal(m, b)
+}
+func (m *Void) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Void.Marshal(b, m, deterministic)
+}
+func (m *Void) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Void.Merge(m, src)
+}
+func (m *Void) XXX_Size() int {
+	return xxx_messageInfo_Void.Size(m)
+}
+func (m *Void) XXX_DiscardUnknown() {
+	xxx_messageInfo_Void.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Void proto.InternalMessageInfo
+
 func init() {
-	proto.RegisterType((*UnitInfo)(nil), "api.UnitInfo")
-	proto.RegisterType((*Info)(nil), "api.Info")
-	proto.RegisterType((*Node)(nil), "api.Node")
-	proto.RegisterType((*NodeInfo)(nil), "api.NodeInfo")
-	proto.RegisterType((*Solution)(nil), "api.Solution")
-	proto.RegisterType((*Pool)(nil), "api.Pool")
-	proto.RegisterType((*Void)(nil), "api.Void")
 	proto.RegisterType((*Outcome)(nil), "api.Outcome")
+	proto.RegisterType((*Unit)(nil), "api.Unit")
+	proto.RegisterType((*Units)(nil), "api.Units")
+	proto.RegisterType((*Node)(nil), "api.Node")
+	proto.RegisterType((*Nodes)(nil), "api.Nodes")
+	proto.RegisterType((*Solution)(nil), "api.Solution")
+	proto.RegisterType((*Solutions)(nil), "api.Solutions")
+	proto.RegisterType((*Void)(nil), "api.Void")
 }
 
 func init() { proto.RegisterFile("api.proto", fileDescriptor_00212fb1f9d3bf1c) }
 
 var fileDescriptor_00212fb1f9d3bf1c = []byte{
-	// 452 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe4, 0x94, 0x41, 0x6f, 0xd3, 0x30,
-	0x14, 0x80, 0x59, 0xeb, 0x26, 0xe9, 0x1b, 0xe3, 0x60, 0x71, 0xa8, 0x7a, 0x40, 0x23, 0x6c, 0x5d,
-	0xe1, 0xb0, 0x43, 0x38, 0x71, 0x42, 0x65, 0x43, 0xa2, 0x12, 0x1a, 0x53, 0x22, 0x76, 0xf7, 0x1a,
-	0x33, 0xa2, 0xa5, 0x79, 0x96, 0xed, 0x20, 0xe0, 0xaf, 0xf0, 0x43, 0xf8, 0x7b, 0xe8, 0x39, 0x71,
-	0x25, 0xd4, 0xd2, 0xe4, 0xc2, 0x69, 0x37, 0x3f, 0xbf, 0xaf, 0x9f, 0x9f, 0x9f, 0x5f, 0x03, 0x63,
-	0xa1, 0x8a, 0x73, 0xa5, 0xd1, 0x22, 0x1f, 0x0a, 0x55, 0xc4, 0xcf, 0x20, 0xfa, 0x5c, 0x15, 0x76,
-	0x59, 0x7d, 0x41, 0xce, 0x81, 0x5d, 0x89, 0xb5, 0x9c, 0x1c, 0x1c, 0x1f, 0xcc, 0xc7, 0xa9, 0x5b,
-	0xc7, 0x6f, 0x81, 0xfd, 0x2b, 0xc7, 0x5f, 0xc0, 0x88, 0x7e, 0x6b, 0x26, 0x83, 0xe3, 0xe1, 0xfc,
-	0x30, 0x39, 0x3a, 0x27, 0xb7, 0xb7, 0xa5, 0x4d, 0x2e, 0x7e, 0x05, 0xec, 0x0a, 0x73, 0x49, 0x82,
-	0x0f, 0x68, 0xac, 0x17, 0xd0, 0x9a, 0x3f, 0x81, 0xc1, 0x52, 0x4d, 0x06, 0x6e, 0x67, 0xb0, 0x54,
-	0xf1, 0x4f, 0x88, 0x88, 0x75, 0x07, 0xce, 0x20, 0xfc, 0x54, 0xdb, 0x15, 0xb6, 0x67, 0x1e, 0x26,
-	0x8f, 0x9d, 0xbe, 0xdd, 0x4b, 0x7d, 0x92, 0x4f, 0x21, 0x22, 0x57, 0x45, 0xc5, 0x35, 0xa6, 0x4d,
-	0xdc, 0xfa, 0x87, 0xde, 0x4f, 0xec, 0x35, 0x62, 0xe9, 0x58, 0xd6, 0xb0, 0x3e, 0xa6, 0x46, 0x64,
-	0x58, 0xd6, 0xb6, 0xc0, 0x6a, 0x67, 0x23, 0xa6, 0xc0, 0x88, 0xdd, 0x99, 0x0b, 0x80, 0xdd, 0x60,
-	0x91, 0xc7, 0x6f, 0x36, 0x35, 0xf3, 0xa7, 0x30, 0x92, 0x5a, 0xa3, 0x76, 0x5c, 0x94, 0x36, 0x01,
-	0x9f, 0x40, 0xb8, 0x96, 0xc6, 0x88, 0x3b, 0x5f, 0xab, 0x0f, 0x93, 0xdf, 0x23, 0x60, 0x0b, 0x93,
-	0xe7, 0xfc, 0x04, 0xc2, 0x1b, 0xa9, 0x0d, 0x95, 0x31, 0x76, 0x37, 0x26, 0xf3, 0xf4, 0xaf, 0xcb,
-	0xc7, 0x8f, 0xf8, 0x73, 0x7a, 0x96, 0xc2, 0xb6, 0x08, 0x15, 0xb6, 0x85, 0x9c, 0x40, 0x48, 0xcd,
-	0x5c, 0xe4, 0x79, 0x4b, 0x51, 0xb4, 0x45, 0x9d, 0x01, 0xd0, 0x7e, 0x2a, 0xd7, 0xf8, 0x4d, 0xee,
-	0x03, 0x67, 0x30, 0xa6, 0xfd, 0xeb, 0x5a, 0xdf, 0xc9, 0xfd, 0xc2, 0xe0, 0x42, 0x4b, 0x61, 0x25,
-	0x6f, 0xe6, 0xc1, 0x37, 0x75, 0x0b, 0x9c, 0x43, 0x78, 0x29, 0x8d, 0xd5, 0xf8, 0xa3, 0x8b, 0x3c,
-	0x83, 0xe0, 0x9d, 0x58, 0xdd, 0xd7, 0xaa, 0x87, 0x32, 0x95, 0xc6, 0xa2, 0x96, 0x3d, 0x94, 0x97,
-	0x52, 0x95, 0xdd, 0x67, 0x3b, 0xa5, 0xa5, 0x0b, 0x75, 0x91, 0x33, 0x18, 0x65, 0x56, 0xe8, 0x4e,
-	0xee, 0x14, 0x58, 0x66, 0x51, 0xf5, 0xa8, 0xf0, 0xfd, 0x77, 0x85, 0xa6, 0x4f, 0x1f, 0x2f, 0xb0,
-	0xb2, 0xa2, 0xa8, 0xba, 0xc8, 0x97, 0x10, 0x65, 0x95, 0x50, 0xe6, 0x2b, 0xda, 0x1e, 0x68, 0x8a,
-	0x65, 0x79, 0x2b, 0x56, 0xf7, 0x1d, 0x68, 0xf2, 0x6b, 0x08, 0xc1, 0xc2, 0xe4, 0x1f, 0xa5, 0xed,
-	0x39, 0xbb, 0xa7, 0x3b, 0x07, 0xf3, 0x68, 0xb3, 0xa4, 0xbf, 0xff, 0x7f, 0x9a, 0xcc, 0x07, 0xf7,
-	0xe6, 0xb7, 0x81, 0xfb, 0xd6, 0xbf, 0xfe, 0x13, 0x00, 0x00, 0xff, 0xff, 0x2c, 0xe2, 0x9e, 0x4d,
-	0xf8, 0x05, 0x00, 0x00,
+	// 477 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe4, 0x95, 0xcd, 0x6e, 0xd3, 0x40,
+	0x10, 0xc7, 0x6b, 0xc7, 0x1f, 0xf1, 0x14, 0x7a, 0x58, 0x71, 0xb0, 0x7c, 0xa8, 0xc2, 0x52, 0xb5,
+	0x86, 0x43, 0x0f, 0xe1, 0xc4, 0x31, 0xb4, 0x20, 0x22, 0xa1, 0xb6, 0xda, 0x40, 0xaf, 0x68, 0x1b,
+	0xaf, 0x8a, 0x55, 0xc7, 0xb3, 0xda, 0xdd, 0x20, 0xfa, 0x0a, 0xbc, 0x00, 0x8f, 0xc2, 0xeb, 0xa1,
+	0x5d, 0x37, 0x6e, 0x73, 0x88, 0xbc, 0x27, 0x2e, 0xdc, 0xe6, 0xe3, 0xe7, 0xff, 0xfc, 0x67, 0x33,
+	0x52, 0x20, 0xe3, 0xb2, 0x3e, 0x95, 0x0a, 0x0d, 0x92, 0x11, 0x97, 0x35, 0x7d, 0x07, 0xe9, 0xe5,
+	0xda, 0x2c, 0x71, 0x25, 0xc8, 0x0b, 0x88, 0x85, 0x52, 0xa8, 0xf2, 0x60, 0x12, 0x94, 0x63, 0xd6,
+	0x25, 0x24, 0x87, 0x74, 0x25, 0xb4, 0xe6, 0xb7, 0x22, 0x0f, 0x27, 0x41, 0x99, 0xb1, 0x4d, 0x4a,
+	0x0b, 0x88, 0xbe, 0xb6, 0xb5, 0x21, 0x04, 0xa2, 0x0b, 0xbe, 0x12, 0xee, 0xb3, 0x8c, 0xb9, 0x98,
+	0x9e, 0x40, 0x6c, 0x7b, 0x9a, 0x1c, 0x76, 0x50, 0x1e, 0x4c, 0x46, 0xe5, 0xfe, 0x14, 0x4e, 0xed,
+	0x78, 0xd7, 0x61, 0xae, 0x4e, 0x7f, 0x05, 0x10, 0x5d, 0x60, 0x25, 0xc8, 0x71, 0x6f, 0xc4, 0x09,
+	0xed, 0x4f, 0x9f, 0x39, 0xf6, 0xa1, 0xc6, 0x7a, 0x97, 0x05, 0x8c, 0x3f, 0xa1, 0x36, 0xad, 0x9d,
+	0xd8, 0x19, 0xea, 0x73, 0x72, 0x00, 0xe1, 0x5c, 0xe6, 0x23, 0x57, 0x0d, 0xe7, 0xd2, 0xb2, 0x57,
+	0x88, 0x8d, 0x63, 0xa3, 0x8e, 0xdd, 0xe4, 0xd6, 0xf5, 0x97, 0x7b, 0x29, 0xf2, 0xb8, 0x73, 0x6d,
+	0x63, 0x7a, 0x09, 0xb1, 0xf5, 0xa2, 0xbd, 0xcd, 0x1c, 0x76, 0xe6, 0xf3, 0xf0, 0xc9, 0x76, 0x4e,
+	0x81, 0xb9, 0x3a, 0xfd, 0x08, 0xe3, 0x05, 0x36, 0x6b, 0x53, 0x63, 0xeb, 0xad, 0xb9, 0x79, 0xce,
+	0xf0, 0xc9, 0x73, 0x7e, 0x83, 0x6c, 0xa3, 0xe3, 0x6f, 0xee, 0xcd, 0xe3, 0xf0, 0x07, 0x83, 0x07,
+	0x0e, 0xec, 0x95, 0x58, 0xdf, 0xa7, 0x09, 0x44, 0xd7, 0x58, 0x57, 0xd3, 0x3f, 0x31, 0x44, 0x33,
+	0x5d, 0x55, 0xe4, 0x08, 0xd2, 0x6b, 0xa1, 0xb4, 0x35, 0x9e, 0xb9, 0xaf, 0x6c, 0xbb, 0xd8, 0x9a,
+	0x44, 0xf7, 0xec, 0xfe, 0x73, 0x7b, 0x02, 0x59, 0xbf, 0x79, 0xf1, 0x18, 0xd2, 0x3d, 0xf2, 0x12,
+	0x52, 0x1b, 0xcd, 0xaa, 0x6a, 0x27, 0x72, 0x04, 0x60, 0x23, 0x26, 0x56, 0xf8, 0x43, 0xec, 0xa4,
+	0x5e, 0x41, 0x66, 0xa3, 0xab, 0xb5, 0xba, 0xdd, 0x0d, 0x95, 0x90, 0x9c, 0x29, 0xc1, 0x8d, 0x20,
+	0xcf, 0xb7, 0x16, 0x2d, 0xb6, 0x53, 0xba, 0x47, 0x5e, 0x43, 0x7a, 0x2e, 0xb4, 0x51, 0x78, 0x3f,
+	0x88, 0x96, 0x90, 0xbc, 0xe7, 0xcb, 0xbb, 0xb5, 0xf4, 0x11, 0x65, 0x42, 0x1b, 0x54, 0xc2, 0x47,
+	0xf4, 0x5c, 0xc8, 0xc6, 0x63, 0xbc, 0x13, 0x35, 0x76, 0xab, 0x41, 0xf4, 0x04, 0xe2, 0x85, 0xe1,
+	0x6a, 0x18, 0x3c, 0x86, 0x68, 0x61, 0x50, 0xfa, 0xb8, 0xfc, 0xf0, 0x53, 0xa2, 0xf6, 0x7a, 0xcf,
+	0x33, 0x6c, 0x0d, 0xaf, 0xdb, 0x41, 0xd4, 0x5e, 0x65, 0xcb, 0xa5, 0xfe, 0x8e, 0xc6, 0x87, 0x65,
+	0xd8, 0x34, 0x37, 0x7c, 0x79, 0x37, 0xc4, 0x4e, 0x7f, 0x8f, 0x20, 0x99, 0xe9, 0xea, 0xb3, 0x30,
+	0x9e, 0xb7, 0xfb, 0xcf, 0x6f, 0xf3, 0x3f, 0xfd, 0xc5, 0x6f, 0x12, 0xf7, 0x77, 0xf3, 0xf6, 0x6f,
+	0x00, 0x00, 0x00, 0xff, 0xff, 0xf6, 0xd9, 0xf1, 0xe9, 0x7b, 0x06, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -435,22 +452,22 @@ const _ = grpc.SupportPackageIsVersion4
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type AsddClient interface {
 	Version(ctx context.Context, in *Void, opts ...grpc.CallOption) (*Outcome, error)
-	Init(ctx context.Context, in *Pool, opts ...grpc.CallOption) (*Outcome, error)
-	NodeAdd(ctx context.Context, in *Node, opts ...grpc.CallOption) (*Outcome, error)
-	NodeRemove(ctx context.Context, in *Node, opts ...grpc.CallOption) (*Outcome, error)
-	NodePurge(ctx context.Context, in *Node, opts ...grpc.CallOption) (*Outcome, error)
-	Create(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Outcome, error)
-	Destroy(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Outcome, error)
-	Backup(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Outcome, error)
-	Restore(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Outcome, error)
-	Deploy(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Outcome, error)
-	Retreat(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Outcome, error)
-	Start(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Outcome, error)
-	Stop(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Outcome, error)
-	Expose(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Outcome, error)
-	Contain(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Outcome, error)
-	Snapshot(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Outcome, error)
-	Rollback(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Outcome, error)
+	Init(ctx context.Context, in *Node, opts ...grpc.CallOption) (*Node, error)
+	NodeAdd(ctx context.Context, in *Node, opts ...grpc.CallOption) (*Node, error)
+	NodeRemove(ctx context.Context, in *Node, opts ...grpc.CallOption) (*Node, error)
+	NodePurge(ctx context.Context, in *Node, opts ...grpc.CallOption) (*Node, error)
+	Create(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Solution, error)
+	Destroy(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Solution, error)
+	Backup(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Solution, error)
+	Restore(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Solution, error)
+	Deploy(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Solution, error)
+	Retreat(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Solution, error)
+	Start(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Solution, error)
+	Stop(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Solution, error)
+	Expose(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Solution, error)
+	Contain(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Solution, error)
+	Snapshot(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Solution, error)
+	Rollback(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Solution, error)
 }
 
 type asddClient struct {
@@ -470,8 +487,8 @@ func (c *asddClient) Version(ctx context.Context, in *Void, opts ...grpc.CallOpt
 	return out, nil
 }
 
-func (c *asddClient) Init(ctx context.Context, in *Pool, opts ...grpc.CallOption) (*Outcome, error) {
-	out := new(Outcome)
+func (c *asddClient) Init(ctx context.Context, in *Node, opts ...grpc.CallOption) (*Node, error) {
+	out := new(Node)
 	err := c.cc.Invoke(ctx, "/api.Asdd/Init", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -479,8 +496,8 @@ func (c *asddClient) Init(ctx context.Context, in *Pool, opts ...grpc.CallOption
 	return out, nil
 }
 
-func (c *asddClient) NodeAdd(ctx context.Context, in *Node, opts ...grpc.CallOption) (*Outcome, error) {
-	out := new(Outcome)
+func (c *asddClient) NodeAdd(ctx context.Context, in *Node, opts ...grpc.CallOption) (*Node, error) {
+	out := new(Node)
 	err := c.cc.Invoke(ctx, "/api.Asdd/NodeAdd", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -488,8 +505,8 @@ func (c *asddClient) NodeAdd(ctx context.Context, in *Node, opts ...grpc.CallOpt
 	return out, nil
 }
 
-func (c *asddClient) NodeRemove(ctx context.Context, in *Node, opts ...grpc.CallOption) (*Outcome, error) {
-	out := new(Outcome)
+func (c *asddClient) NodeRemove(ctx context.Context, in *Node, opts ...grpc.CallOption) (*Node, error) {
+	out := new(Node)
 	err := c.cc.Invoke(ctx, "/api.Asdd/NodeRemove", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -497,8 +514,8 @@ func (c *asddClient) NodeRemove(ctx context.Context, in *Node, opts ...grpc.Call
 	return out, nil
 }
 
-func (c *asddClient) NodePurge(ctx context.Context, in *Node, opts ...grpc.CallOption) (*Outcome, error) {
-	out := new(Outcome)
+func (c *asddClient) NodePurge(ctx context.Context, in *Node, opts ...grpc.CallOption) (*Node, error) {
+	out := new(Node)
 	err := c.cc.Invoke(ctx, "/api.Asdd/NodePurge", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -506,8 +523,8 @@ func (c *asddClient) NodePurge(ctx context.Context, in *Node, opts ...grpc.CallO
 	return out, nil
 }
 
-func (c *asddClient) Create(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Outcome, error) {
-	out := new(Outcome)
+func (c *asddClient) Create(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Solution, error) {
+	out := new(Solution)
 	err := c.cc.Invoke(ctx, "/api.Asdd/Create", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -515,8 +532,8 @@ func (c *asddClient) Create(ctx context.Context, in *Solution, opts ...grpc.Call
 	return out, nil
 }
 
-func (c *asddClient) Destroy(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Outcome, error) {
-	out := new(Outcome)
+func (c *asddClient) Destroy(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Solution, error) {
+	out := new(Solution)
 	err := c.cc.Invoke(ctx, "/api.Asdd/Destroy", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -524,8 +541,8 @@ func (c *asddClient) Destroy(ctx context.Context, in *Solution, opts ...grpc.Cal
 	return out, nil
 }
 
-func (c *asddClient) Backup(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Outcome, error) {
-	out := new(Outcome)
+func (c *asddClient) Backup(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Solution, error) {
+	out := new(Solution)
 	err := c.cc.Invoke(ctx, "/api.Asdd/Backup", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -533,8 +550,8 @@ func (c *asddClient) Backup(ctx context.Context, in *Solution, opts ...grpc.Call
 	return out, nil
 }
 
-func (c *asddClient) Restore(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Outcome, error) {
-	out := new(Outcome)
+func (c *asddClient) Restore(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Solution, error) {
+	out := new(Solution)
 	err := c.cc.Invoke(ctx, "/api.Asdd/Restore", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -542,8 +559,8 @@ func (c *asddClient) Restore(ctx context.Context, in *Solution, opts ...grpc.Cal
 	return out, nil
 }
 
-func (c *asddClient) Deploy(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Outcome, error) {
-	out := new(Outcome)
+func (c *asddClient) Deploy(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Solution, error) {
+	out := new(Solution)
 	err := c.cc.Invoke(ctx, "/api.Asdd/Deploy", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -551,8 +568,8 @@ func (c *asddClient) Deploy(ctx context.Context, in *Solution, opts ...grpc.Call
 	return out, nil
 }
 
-func (c *asddClient) Retreat(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Outcome, error) {
-	out := new(Outcome)
+func (c *asddClient) Retreat(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Solution, error) {
+	out := new(Solution)
 	err := c.cc.Invoke(ctx, "/api.Asdd/Retreat", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -560,8 +577,8 @@ func (c *asddClient) Retreat(ctx context.Context, in *Solution, opts ...grpc.Cal
 	return out, nil
 }
 
-func (c *asddClient) Start(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Outcome, error) {
-	out := new(Outcome)
+func (c *asddClient) Start(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Solution, error) {
+	out := new(Solution)
 	err := c.cc.Invoke(ctx, "/api.Asdd/Start", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -569,8 +586,8 @@ func (c *asddClient) Start(ctx context.Context, in *Solution, opts ...grpc.CallO
 	return out, nil
 }
 
-func (c *asddClient) Stop(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Outcome, error) {
-	out := new(Outcome)
+func (c *asddClient) Stop(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Solution, error) {
+	out := new(Solution)
 	err := c.cc.Invoke(ctx, "/api.Asdd/Stop", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -578,8 +595,8 @@ func (c *asddClient) Stop(ctx context.Context, in *Solution, opts ...grpc.CallOp
 	return out, nil
 }
 
-func (c *asddClient) Expose(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Outcome, error) {
-	out := new(Outcome)
+func (c *asddClient) Expose(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Solution, error) {
+	out := new(Solution)
 	err := c.cc.Invoke(ctx, "/api.Asdd/Expose", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -587,8 +604,8 @@ func (c *asddClient) Expose(ctx context.Context, in *Solution, opts ...grpc.Call
 	return out, nil
 }
 
-func (c *asddClient) Contain(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Outcome, error) {
-	out := new(Outcome)
+func (c *asddClient) Contain(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Solution, error) {
+	out := new(Solution)
 	err := c.cc.Invoke(ctx, "/api.Asdd/Contain", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -596,8 +613,8 @@ func (c *asddClient) Contain(ctx context.Context, in *Solution, opts ...grpc.Cal
 	return out, nil
 }
 
-func (c *asddClient) Snapshot(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Outcome, error) {
-	out := new(Outcome)
+func (c *asddClient) Snapshot(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Solution, error) {
+	out := new(Solution)
 	err := c.cc.Invoke(ctx, "/api.Asdd/Snapshot", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -605,8 +622,8 @@ func (c *asddClient) Snapshot(ctx context.Context, in *Solution, opts ...grpc.Ca
 	return out, nil
 }
 
-func (c *asddClient) Rollback(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Outcome, error) {
-	out := new(Outcome)
+func (c *asddClient) Rollback(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Solution, error) {
+	out := new(Solution)
 	err := c.cc.Invoke(ctx, "/api.Asdd/Rollback", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -617,22 +634,22 @@ func (c *asddClient) Rollback(ctx context.Context, in *Solution, opts ...grpc.Ca
 // AsddServer is the server API for Asdd service.
 type AsddServer interface {
 	Version(context.Context, *Void) (*Outcome, error)
-	Init(context.Context, *Pool) (*Outcome, error)
-	NodeAdd(context.Context, *Node) (*Outcome, error)
-	NodeRemove(context.Context, *Node) (*Outcome, error)
-	NodePurge(context.Context, *Node) (*Outcome, error)
-	Create(context.Context, *Solution) (*Outcome, error)
-	Destroy(context.Context, *Solution) (*Outcome, error)
-	Backup(context.Context, *Solution) (*Outcome, error)
-	Restore(context.Context, *Solution) (*Outcome, error)
-	Deploy(context.Context, *Solution) (*Outcome, error)
-	Retreat(context.Context, *Solution) (*Outcome, error)
-	Start(context.Context, *Solution) (*Outcome, error)
-	Stop(context.Context, *Solution) (*Outcome, error)
-	Expose(context.Context, *Solution) (*Outcome, error)
-	Contain(context.Context, *Solution) (*Outcome, error)
-	Snapshot(context.Context, *Solution) (*Outcome, error)
-	Rollback(context.Context, *Solution) (*Outcome, error)
+	Init(context.Context, *Node) (*Node, error)
+	NodeAdd(context.Context, *Node) (*Node, error)
+	NodeRemove(context.Context, *Node) (*Node, error)
+	NodePurge(context.Context, *Node) (*Node, error)
+	Create(context.Context, *Solution) (*Solution, error)
+	Destroy(context.Context, *Solution) (*Solution, error)
+	Backup(context.Context, *Solution) (*Solution, error)
+	Restore(context.Context, *Solution) (*Solution, error)
+	Deploy(context.Context, *Solution) (*Solution, error)
+	Retreat(context.Context, *Solution) (*Solution, error)
+	Start(context.Context, *Solution) (*Solution, error)
+	Stop(context.Context, *Solution) (*Solution, error)
+	Expose(context.Context, *Solution) (*Solution, error)
+	Contain(context.Context, *Solution) (*Solution, error)
+	Snapshot(context.Context, *Solution) (*Solution, error)
+	Rollback(context.Context, *Solution) (*Solution, error)
 }
 
 // UnimplementedAsddServer can be embedded to have forward compatible implementations.
@@ -642,52 +659,52 @@ type UnimplementedAsddServer struct {
 func (*UnimplementedAsddServer) Version(ctx context.Context, req *Void) (*Outcome, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Version not implemented")
 }
-func (*UnimplementedAsddServer) Init(ctx context.Context, req *Pool) (*Outcome, error) {
+func (*UnimplementedAsddServer) Init(ctx context.Context, req *Node) (*Node, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Init not implemented")
 }
-func (*UnimplementedAsddServer) NodeAdd(ctx context.Context, req *Node) (*Outcome, error) {
+func (*UnimplementedAsddServer) NodeAdd(ctx context.Context, req *Node) (*Node, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method NodeAdd not implemented")
 }
-func (*UnimplementedAsddServer) NodeRemove(ctx context.Context, req *Node) (*Outcome, error) {
+func (*UnimplementedAsddServer) NodeRemove(ctx context.Context, req *Node) (*Node, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method NodeRemove not implemented")
 }
-func (*UnimplementedAsddServer) NodePurge(ctx context.Context, req *Node) (*Outcome, error) {
+func (*UnimplementedAsddServer) NodePurge(ctx context.Context, req *Node) (*Node, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method NodePurge not implemented")
 }
-func (*UnimplementedAsddServer) Create(ctx context.Context, req *Solution) (*Outcome, error) {
+func (*UnimplementedAsddServer) Create(ctx context.Context, req *Solution) (*Solution, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
 }
-func (*UnimplementedAsddServer) Destroy(ctx context.Context, req *Solution) (*Outcome, error) {
+func (*UnimplementedAsddServer) Destroy(ctx context.Context, req *Solution) (*Solution, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Destroy not implemented")
 }
-func (*UnimplementedAsddServer) Backup(ctx context.Context, req *Solution) (*Outcome, error) {
+func (*UnimplementedAsddServer) Backup(ctx context.Context, req *Solution) (*Solution, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Backup not implemented")
 }
-func (*UnimplementedAsddServer) Restore(ctx context.Context, req *Solution) (*Outcome, error) {
+func (*UnimplementedAsddServer) Restore(ctx context.Context, req *Solution) (*Solution, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Restore not implemented")
 }
-func (*UnimplementedAsddServer) Deploy(ctx context.Context, req *Solution) (*Outcome, error) {
+func (*UnimplementedAsddServer) Deploy(ctx context.Context, req *Solution) (*Solution, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Deploy not implemented")
 }
-func (*UnimplementedAsddServer) Retreat(ctx context.Context, req *Solution) (*Outcome, error) {
+func (*UnimplementedAsddServer) Retreat(ctx context.Context, req *Solution) (*Solution, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Retreat not implemented")
 }
-func (*UnimplementedAsddServer) Start(ctx context.Context, req *Solution) (*Outcome, error) {
+func (*UnimplementedAsddServer) Start(ctx context.Context, req *Solution) (*Solution, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Start not implemented")
 }
-func (*UnimplementedAsddServer) Stop(ctx context.Context, req *Solution) (*Outcome, error) {
+func (*UnimplementedAsddServer) Stop(ctx context.Context, req *Solution) (*Solution, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Stop not implemented")
 }
-func (*UnimplementedAsddServer) Expose(ctx context.Context, req *Solution) (*Outcome, error) {
+func (*UnimplementedAsddServer) Expose(ctx context.Context, req *Solution) (*Solution, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Expose not implemented")
 }
-func (*UnimplementedAsddServer) Contain(ctx context.Context, req *Solution) (*Outcome, error) {
+func (*UnimplementedAsddServer) Contain(ctx context.Context, req *Solution) (*Solution, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Contain not implemented")
 }
-func (*UnimplementedAsddServer) Snapshot(ctx context.Context, req *Solution) (*Outcome, error) {
+func (*UnimplementedAsddServer) Snapshot(ctx context.Context, req *Solution) (*Solution, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Snapshot not implemented")
 }
-func (*UnimplementedAsddServer) Rollback(ctx context.Context, req *Solution) (*Outcome, error) {
+func (*UnimplementedAsddServer) Rollback(ctx context.Context, req *Solution) (*Solution, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Rollback not implemented")
 }
 
@@ -714,7 +731,7 @@ func _Asdd_Version_Handler(srv interface{}, ctx context.Context, dec func(interf
 }
 
 func _Asdd_Init_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Pool)
+	in := new(Node)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -726,7 +743,7 @@ func _Asdd_Init_Handler(srv interface{}, ctx context.Context, dec func(interface
 		FullMethod: "/api.Asdd/Init",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AsddServer).Init(ctx, req.(*Pool))
+		return srv.(AsddServer).Init(ctx, req.(*Node))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1083,15 +1100,15 @@ var _Asdd_serviceDesc = grpc.ServiceDesc{
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type AsdLetClient interface {
 	Version(ctx context.Context, in *Void, opts ...grpc.CallOption) (*Outcome, error)
-	NodeAdd(ctx context.Context, in *Node, opts ...grpc.CallOption) (*NodeInfo, error)
-	NodeRemove(ctx context.Context, in *Node, opts ...grpc.CallOption) (*Outcome, error)
-	NodePurge(ctx context.Context, in *Node, opts ...grpc.CallOption) (*Outcome, error)
-	Deploy(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Outcome, error)
-	Retreat(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Outcome, error)
-	Start(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Outcome, error)
-	Stop(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Outcome, error)
-	Expose(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Outcome, error)
-	Contain(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Outcome, error)
+	NodeAdd(ctx context.Context, in *Node, opts ...grpc.CallOption) (*Node, error)
+	NodeRemove(ctx context.Context, in *Node, opts ...grpc.CallOption) (*Node, error)
+	NodePurge(ctx context.Context, in *Node, opts ...grpc.CallOption) (*Node, error)
+	Deploy(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Solution, error)
+	Retreat(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Solution, error)
+	Start(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Solution, error)
+	Stop(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Solution, error)
+	Expose(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Solution, error)
+	Contain(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Solution, error)
 }
 
 type asdLetClient struct {
@@ -1111,8 +1128,8 @@ func (c *asdLetClient) Version(ctx context.Context, in *Void, opts ...grpc.CallO
 	return out, nil
 }
 
-func (c *asdLetClient) NodeAdd(ctx context.Context, in *Node, opts ...grpc.CallOption) (*NodeInfo, error) {
-	out := new(NodeInfo)
+func (c *asdLetClient) NodeAdd(ctx context.Context, in *Node, opts ...grpc.CallOption) (*Node, error) {
+	out := new(Node)
 	err := c.cc.Invoke(ctx, "/api.AsdLet/NodeAdd", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -1120,8 +1137,8 @@ func (c *asdLetClient) NodeAdd(ctx context.Context, in *Node, opts ...grpc.CallO
 	return out, nil
 }
 
-func (c *asdLetClient) NodeRemove(ctx context.Context, in *Node, opts ...grpc.CallOption) (*Outcome, error) {
-	out := new(Outcome)
+func (c *asdLetClient) NodeRemove(ctx context.Context, in *Node, opts ...grpc.CallOption) (*Node, error) {
+	out := new(Node)
 	err := c.cc.Invoke(ctx, "/api.AsdLet/NodeRemove", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -1129,8 +1146,8 @@ func (c *asdLetClient) NodeRemove(ctx context.Context, in *Node, opts ...grpc.Ca
 	return out, nil
 }
 
-func (c *asdLetClient) NodePurge(ctx context.Context, in *Node, opts ...grpc.CallOption) (*Outcome, error) {
-	out := new(Outcome)
+func (c *asdLetClient) NodePurge(ctx context.Context, in *Node, opts ...grpc.CallOption) (*Node, error) {
+	out := new(Node)
 	err := c.cc.Invoke(ctx, "/api.AsdLet/NodePurge", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -1138,8 +1155,8 @@ func (c *asdLetClient) NodePurge(ctx context.Context, in *Node, opts ...grpc.Cal
 	return out, nil
 }
 
-func (c *asdLetClient) Deploy(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Outcome, error) {
-	out := new(Outcome)
+func (c *asdLetClient) Deploy(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Solution, error) {
+	out := new(Solution)
 	err := c.cc.Invoke(ctx, "/api.AsdLet/Deploy", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -1147,8 +1164,8 @@ func (c *asdLetClient) Deploy(ctx context.Context, in *Solution, opts ...grpc.Ca
 	return out, nil
 }
 
-func (c *asdLetClient) Retreat(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Outcome, error) {
-	out := new(Outcome)
+func (c *asdLetClient) Retreat(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Solution, error) {
+	out := new(Solution)
 	err := c.cc.Invoke(ctx, "/api.AsdLet/Retreat", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -1156,8 +1173,8 @@ func (c *asdLetClient) Retreat(ctx context.Context, in *Solution, opts ...grpc.C
 	return out, nil
 }
 
-func (c *asdLetClient) Start(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Outcome, error) {
-	out := new(Outcome)
+func (c *asdLetClient) Start(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Solution, error) {
+	out := new(Solution)
 	err := c.cc.Invoke(ctx, "/api.AsdLet/Start", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -1165,8 +1182,8 @@ func (c *asdLetClient) Start(ctx context.Context, in *Solution, opts ...grpc.Cal
 	return out, nil
 }
 
-func (c *asdLetClient) Stop(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Outcome, error) {
-	out := new(Outcome)
+func (c *asdLetClient) Stop(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Solution, error) {
+	out := new(Solution)
 	err := c.cc.Invoke(ctx, "/api.AsdLet/Stop", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -1174,8 +1191,8 @@ func (c *asdLetClient) Stop(ctx context.Context, in *Solution, opts ...grpc.Call
 	return out, nil
 }
 
-func (c *asdLetClient) Expose(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Outcome, error) {
-	out := new(Outcome)
+func (c *asdLetClient) Expose(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Solution, error) {
+	out := new(Solution)
 	err := c.cc.Invoke(ctx, "/api.AsdLet/Expose", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -1183,8 +1200,8 @@ func (c *asdLetClient) Expose(ctx context.Context, in *Solution, opts ...grpc.Ca
 	return out, nil
 }
 
-func (c *asdLetClient) Contain(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Outcome, error) {
-	out := new(Outcome)
+func (c *asdLetClient) Contain(ctx context.Context, in *Solution, opts ...grpc.CallOption) (*Solution, error) {
+	out := new(Solution)
 	err := c.cc.Invoke(ctx, "/api.AsdLet/Contain", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -1195,15 +1212,15 @@ func (c *asdLetClient) Contain(ctx context.Context, in *Solution, opts ...grpc.C
 // AsdLetServer is the server API for AsdLet service.
 type AsdLetServer interface {
 	Version(context.Context, *Void) (*Outcome, error)
-	NodeAdd(context.Context, *Node) (*NodeInfo, error)
-	NodeRemove(context.Context, *Node) (*Outcome, error)
-	NodePurge(context.Context, *Node) (*Outcome, error)
-	Deploy(context.Context, *Solution) (*Outcome, error)
-	Retreat(context.Context, *Solution) (*Outcome, error)
-	Start(context.Context, *Solution) (*Outcome, error)
-	Stop(context.Context, *Solution) (*Outcome, error)
-	Expose(context.Context, *Solution) (*Outcome, error)
-	Contain(context.Context, *Solution) (*Outcome, error)
+	NodeAdd(context.Context, *Node) (*Node, error)
+	NodeRemove(context.Context, *Node) (*Node, error)
+	NodePurge(context.Context, *Node) (*Node, error)
+	Deploy(context.Context, *Solution) (*Solution, error)
+	Retreat(context.Context, *Solution) (*Solution, error)
+	Start(context.Context, *Solution) (*Solution, error)
+	Stop(context.Context, *Solution) (*Solution, error)
+	Expose(context.Context, *Solution) (*Solution, error)
+	Contain(context.Context, *Solution) (*Solution, error)
 }
 
 // UnimplementedAsdLetServer can be embedded to have forward compatible implementations.
@@ -1213,31 +1230,31 @@ type UnimplementedAsdLetServer struct {
 func (*UnimplementedAsdLetServer) Version(ctx context.Context, req *Void) (*Outcome, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Version not implemented")
 }
-func (*UnimplementedAsdLetServer) NodeAdd(ctx context.Context, req *Node) (*NodeInfo, error) {
+func (*UnimplementedAsdLetServer) NodeAdd(ctx context.Context, req *Node) (*Node, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method NodeAdd not implemented")
 }
-func (*UnimplementedAsdLetServer) NodeRemove(ctx context.Context, req *Node) (*Outcome, error) {
+func (*UnimplementedAsdLetServer) NodeRemove(ctx context.Context, req *Node) (*Node, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method NodeRemove not implemented")
 }
-func (*UnimplementedAsdLetServer) NodePurge(ctx context.Context, req *Node) (*Outcome, error) {
+func (*UnimplementedAsdLetServer) NodePurge(ctx context.Context, req *Node) (*Node, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method NodePurge not implemented")
 }
-func (*UnimplementedAsdLetServer) Deploy(ctx context.Context, req *Solution) (*Outcome, error) {
+func (*UnimplementedAsdLetServer) Deploy(ctx context.Context, req *Solution) (*Solution, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Deploy not implemented")
 }
-func (*UnimplementedAsdLetServer) Retreat(ctx context.Context, req *Solution) (*Outcome, error) {
+func (*UnimplementedAsdLetServer) Retreat(ctx context.Context, req *Solution) (*Solution, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Retreat not implemented")
 }
-func (*UnimplementedAsdLetServer) Start(ctx context.Context, req *Solution) (*Outcome, error) {
+func (*UnimplementedAsdLetServer) Start(ctx context.Context, req *Solution) (*Solution, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Start not implemented")
 }
-func (*UnimplementedAsdLetServer) Stop(ctx context.Context, req *Solution) (*Outcome, error) {
+func (*UnimplementedAsdLetServer) Stop(ctx context.Context, req *Solution) (*Solution, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Stop not implemented")
 }
-func (*UnimplementedAsdLetServer) Expose(ctx context.Context, req *Solution) (*Outcome, error) {
+func (*UnimplementedAsdLetServer) Expose(ctx context.Context, req *Solution) (*Solution, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Expose not implemented")
 }
-func (*UnimplementedAsdLetServer) Contain(ctx context.Context, req *Solution) (*Outcome, error) {
+func (*UnimplementedAsdLetServer) Contain(ctx context.Context, req *Solution) (*Solution, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Contain not implemented")
 }
 

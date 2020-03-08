@@ -51,33 +51,33 @@ message Void {
 
 service Asdd {
     rpc Version(Void) returns (Outcome) {}
-    rpc Init(Pool) returns (Outcome) {}
-    rpc NodeAdd(Node) returns (Outcome) {}
-    rpc NodeRemove(Node) returns (Outcome) {}
-    rpc NodePurge(Node) returns (Outcome) {}
-    rpc Create(Solution) returns (Outcome) {} //+1 -> available
-    rpc Destroy(Solution) returns (Outcome) {} //-1 ->missing
-    rpc Backup(Solution) returns (Outcome) {}
-    rpc Restore(Solution) returns (Outcome) {}
-    rpc Deploy(Solution) returns (Outcome) {} //+1 -> deployed
-    rpc Retreat(Solution) returns (Outcome) {} //-1 -> available
-    rpc Start(Solution) returns (Outcome) {} //+1 -> started
-    rpc Stop(Solution) returns (Outcome) {} //-1 -> deployed
-    rpc Expose(Solution) returns (Outcome) {} //+1 -> exposed
-    rpc Contain(Solution) returns (Outcome) {} //-1 ->started
-    rpc Snapshot(Solution) returns (Outcome) {}
-    rpc Rollback(Solution) returns (Outcome) {}
+    rpc Init(Node) returns (Node) {}
+    rpc NodeAdd(Node) returns (Node) {}
+    rpc NodeRemove(Node) returns (Node) {}
+    rpc NodePurge(Node) returns (Node) {}
+    rpc Create(Solution) returns (Solution) {} //+1 -> available
+    rpc Destroy(Solution) returns (Solution) {} //-1 ->missing
+    rpc Backup(Solution) returns (Solution) {}
+    rpc Restore(Solution) returns (Solution) {}
+    rpc Deploy(Solution) returns (Solution) {} //+1 -> deployed
+    rpc Retreat(Solution) returns (Solution) {} //-1 -> available
+    rpc Start(Solution) returns (Solution) {} //+1 -> started
+    rpc Stop(Solution) returns (Solution) {} //-1 -> deployed
+    rpc Expose(Solution) returns (Solution) {} //+1 -> exposed
+    rpc Contain(Solution) returns (Solution) {} //-1 ->started
+    rpc Snapshot(Solution) returns (Solution) {}
+    rpc Rollback(Solution) returns (Solution) {}
 }
 
 service AsdLet {
     rpc Version(Void) returns (Outcome) {}
-    rpc NodeAdd(Node) returns (NodeInfo) {}
-    rpc NodeRemove(Node) returns (Outcome) {}
-    rpc NodePurge(Node) returns (Outcome) {}
-    rpc Deploy(Solution) returns (Outcome) {} //+1 -> deployed
-    rpc Retreat(Solution) returns (Outcome) {} //-1 -> available
-    rpc Start(Solution) returns (Outcome) {} //+1 -> started
-    rpc Stop(Solution) returns (Outcome) {} //-1 -> deployed
-    rpc Expose(Solution) returns (Outcome) {} //+1 -> exposed
-    rpc Contain(Solution) returns (Outcome) {} //-1 ->started
+    rpc NodeAdd(Node) returns (Node) {}
+    rpc NodeRemove(Node) returns (Node) {}
+    rpc NodePurge(Node) returns (Node) {}
+    rpc Deploy(Solution) returns (Solution) {} //+1 -> deployed
+    rpc Retreat(Solution) returns (Solution) {} //-1 -> available
+    rpc Start(Solution) returns (Solution) {} //+1 -> started
+    rpc Stop(Solution) returns (Solution) {} //-1 -> deployed
+    rpc Expose(Solution) returns (Solution) {} //+1 -> exposed
+    rpc Contain(Solution) returns (Solution) {} //-1 ->started
 }
