@@ -15,7 +15,8 @@ message Info {
 }
 
 message Node {
-    string Ip = 1;
+    string Host = 1;
+    string Ip = 2;
 }
 
 message NodeInfo {
