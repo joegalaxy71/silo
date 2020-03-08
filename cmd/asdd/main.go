@@ -3,6 +3,7 @@ package main
 import (
 	asddGrpc "asd/cmd/asdd/grpc"
 	"asd/common/helpers"
+	"asd/common/version"
 	_ "expvar"
 	"fmt"
 	"github.com/gorilla/mux"
@@ -65,8 +66,7 @@ func run() error {
 
 	// =====================================================================================================================
 	// set version, build number
-	Version = "0.3.0-3a"
-	Build = 0_3_0
+	Version = version.VERSION
 
 	//██╗      ██████╗  ██████╗ ███████╗
 	//██║     ██╔═══██╗██╔════╝ ██╔════╝

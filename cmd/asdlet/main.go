@@ -4,8 +4,6 @@ import (
 	asdletGrpc "asd/cmd/asdlet/grpc"
 	"asd/common/helpers"
 	_ "expvar"
-	"fmt"
-	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
 	"github.com/marcsauter/single"
 	"github.com/op/go-logging"
@@ -66,7 +64,6 @@ func run() error {
 	// =====================================================================================================================
 	// set version, build number
 	Version = "0.3.0-3a"
-	Build = 0_3_0
 
 	//██╗      ██████╗  ██████╗ ███████╗
 	//██║     ██╔═══██╗██╔════╝ ██╔════╝
@@ -247,58 +244,6 @@ func run() error {
 
 	go asdletGrpc.Init(chanErrGrpc)
 
-	//go func(errGrpc chan<- error) {
-	//	// create a listener on TCP port 7777
-	//	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", 9000))
-	//	if err != nil {
-	//		err = errors.Wrap(err, "trying to listen on tcp")
-	//		errGrpc <- err
-	//		return
-	//	}
-	//	// create a server instance
-	//	s := Server{}
-	//	// create a gRPC server object
-	//	grpcServer := grpc.NewServer()
-	//	// attach the Ping service to the server
-	//	api.RegisterAsdServer(grpcServer, &s)
-	//	// start the server
-	//	_log.Debugf("listening for grpc connections on port: 7777")
-	//	if err := grpcServer.Serve(lis); err != nil {
-	//		err = errors.Wrap(err, "failed to serve gRPC")
-	//		errGrpc <- err
-	//		return
-	//	}
-	//}(chanErrGrpc)
-
-	//--------------------------------------------------------------------------------------
-	// goroutine for the grpc<->http reverse proxy
-	chanErrHttp := make(chan error, 1)
-	go func(errHttp chan<- error) {
-
-		// http server
-		port := 8080
-
-		router := mux.NewRouter()
-
-		// pages
-		//router.HandleFunc("/readall", readAll).Methods("GET")
-		//router.HandleFunc("/create", create).Methods("POST")
-		//router.HandleFunc("/update", update).Methods("POST")
-		//router.HandleFunc("/delete", delete).Methods("POST")
-		//router.HandleFunc("/getallresults", getAllResults).Methods("GET")
-		//router.HandleFunc("/getalljobs", getAllJobs).Methods("GET")
-		//router.HandleFunc("/getallgps", getAllGps).Methods("GET")
-
-		http.Handle("/", router)
-		// start the web server (blocking)
-		_log.Debugf("listening for http connections on port: %v", port)
-		if err := http.ListenAndServe(fmt.Sprint(":", port), router); err != nil {
-			err = errors.Wrap(err, "failed to serve http<-->gRPC")
-			errHttp <- err
-			return
-		}
-	}(chanErrHttp)
-
 	//██╗   ██╗███████╗██████╗ ███████╗██╗ ██████╗ ███╗   ██╗
 	//██║   ██║██╔════╝██╔══██╗██╔════╝██║██╔═══██╗████╗  ██║
 	//██║   ██║█████╗  ██████╔╝███████╗██║██║   ██║██╔██╗ ██║
@@ -310,15 +255,12 @@ func run() error {
 
 	//--------------------------------------------------------------------------------------
 	// vait for channels and return eventual errors
-	var errGrpc, errHttp error
+	var errGrpc error
 
 	select {
 	case errGrpc = <-chanErrGrpc:
 		_log.Error(errGrpc)
 		return errGrpc
-	case errHttp = <-chanErrHttp:
-		_log.Error(errHttp)
-		return errHttp
 	}
 
 }

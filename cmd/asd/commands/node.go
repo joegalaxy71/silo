@@ -9,6 +9,14 @@ import (
 	"google.golang.org/grpc"
 )
 
+func Node(cmd *cobra.Command, args []string) {
+
+	_log = helpers.InitLogs(true)
+	_log.Debug("Command:Node")
+
+	_log.Error("Please call 'node' with more parameters")
+}
+
 func NodeAdd(cmd *cobra.Command, args []string) {
 
 	_log = helpers.InitLogs(true)
@@ -23,9 +31,9 @@ func NodeAdd(cmd *cobra.Command, args []string) {
 	defer conn.Close()
 
 	c := api.NewAsddClient(conn)
-	var apiSolution api.Solution
-	apiSolution.Name = args[0]
-	apiOutcome, err := c.Create(context.Background(), &apiSolution)
+	var apiNode api.Node
+	apiNode.Ip = args[0]
+	apiOutcome, err := c.NodeAdd(context.Background(), &apiNode)
 	if err != nil {
 		_log.Error("Unable to add the specified node, detailed error message follows")
 		_log.Error(err)

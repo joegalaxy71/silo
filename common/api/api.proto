@@ -5,42 +5,47 @@ package api;
 
 // messages
 
-message UnitInfo {
+message Outcome {
+    bool error = 1;
+    string message = 2;
+}
+
+message Unit {
     string Name = 1;
 }
 
-message Info {
-    string Name = 1;
-    repeated UnitInfo Units = 2;
+message Units {
+    repeated Units Unit = 1;
 }
 
 message Node {
-    string Host = 1;
-    string Ip = 2;
-}
-
-message NodeInfo {
     Outcome Outcome = 1;
     string Hostname = 2;
     string Ip = 3;
+    string Poolname = 4;
+    string Type = 5; //M=master W=worker
+}
+
+message Nodes {
+    Outcome Outcome = 1;
+    repeated Nodes Node = 2;
 }
 
 message Solution {
-    string Name = 1;
+    Outcome Outcome = 1;
+    string Name = 2;
 }
 
-message Pool {
-    string Name = 1;
+message Solutions {
+    Outcome Outcome = 1;
+    repeated Solutions Solution = 2;
 }
 
 message Void {
 
 }
 
-message Outcome {
-    bool error = 1;
-    string message = 2;
-}
+
 
 // services
 

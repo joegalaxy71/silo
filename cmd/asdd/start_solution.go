@@ -1,5 +1,6 @@
 package main
 
+/*
 import (
 	"fmt"
 	"github.com/mitchellh/go-ps"
@@ -145,3 +146,4 @@ func child() {
 		fmt.Println(err)
 	}
 }
+*/

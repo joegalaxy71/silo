@@ -136,7 +136,7 @@ func run() error {
 	}
 
 	var cmdNodeAdd = &cobra.Command{
-		Use:   "node add [node_ip]",
+		Use:   "add",
 		Short: "Add an ADS node",
 		Long:  "Add a new node, initalialyzing datasets if needed",
 		Args:  cobra.ExactArgs(1),
@@ -144,7 +144,7 @@ func run() error {
 	}
 
 	var cmdNodeRem = &cobra.Command{
-		Use:   "node remove [node_ip]",
+		Use:   "remove",
 		Short: "Remove an ADS node",
 		Long:  "Remove an existing node, leave all solution data in place",
 		Args:  cobra.ExactArgs(1),
@@ -152,7 +152,7 @@ func run() error {
 	}
 
 	var cmdNodePurge = &cobra.Command{
-		Use:   "node purge [node_ip]",
+		Use:   "purge",
 		Short: "Purge an ADS node",
 		Long:  "Remove an existing node, destroys all solution data",
 		Args:  cobra.ExactArgs(1),
