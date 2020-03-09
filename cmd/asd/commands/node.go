@@ -31,16 +31,17 @@ func NodeAdd(cmd *cobra.Command, args []string) {
 	defer conn.Close()
 
 	c := api.NewAsddClient(conn)
-	var apiNode api.Node
+	var apiNodeVal api.Node
+	apiNode := &apiNodeVal
 	apiNode.Ip = args[0]
-	apiOutcome, err := c.NodeAdd(context.Background(), &apiNode)
+	apiNode, err = c.NodeAdd(context.Background(), apiNode)
 	if err != nil {
 		_log.Error("Unable to add the specified node, detailed error message follows")
 		_log.Error(err)
 		return
 	}
 
-	_log.Info(apiOutcome.Message)
+	_log.Info(apiNode.Outcome.Message)
 }
 
 func NodeRemove(cmd *cobra.Command, args []string) {
@@ -56,16 +57,17 @@ func NodeRemove(cmd *cobra.Command, args []string) {
 	defer conn.Close()
 
 	c := api.NewAsddClient(conn)
-	var apiNode api.Node
+	var apiNodeVal api.Node
+	apiNode := &apiNodeVal
 	apiNode.Ip = args[0]
-	apiOutcome, err := c.NodeRemove(context.Background(), &apiNode)
+	apiNode, err = c.NodeRemove(context.Background(), apiNode)
 	if err != nil {
 		_log.Error("Unable to remove the specified node, detailed error message follows")
 		_log.Error(err)
 		return
 	}
 
-	_log.Info(apiOutcome.Message)
+	_log.Info(apiNode.Outcome.Message)
 }
 
 func NodePurge(cmd *cobra.Command, args []string) {
@@ -82,14 +84,15 @@ func NodePurge(cmd *cobra.Command, args []string) {
 	defer conn.Close()
 
 	c := api.NewAsddClient(conn)
-	var apiNode api.Node
+	var apiNodeVal api.Node
+	apiNode := &apiNodeVal
 	apiNode.Ip = args[0]
-	apiOutcome, err := c.NodePurge(context.Background(), &apiNode)
+	apiNode, err = c.NodePurge(context.Background(), apiNode)
 	if err != nil {
 		_log.Error("Unable to purge the specified node, detailed error message follows")
 		_log.Error(err)
 		return
 	}
 
-	_log.Info(apiOutcome.Message)
+	_log.Info(apiNode.Outcome.Message)
 }

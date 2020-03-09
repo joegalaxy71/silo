@@ -22,14 +22,17 @@ func Init(cmd *cobra.Command, args []string) {
 	}
 	defer conn.Close()
 	c := api.NewAsddClient(conn)
-	var apiPool api.Pool
-	apiPool.Name = args[0]
-	apiOutcome, err := c.Init(context.Background(), &apiPool)
+
+	var apiNodeVal api.Node
+	apiNode := &apiNodeVal
+
+	apiNode.Poolname = args[0]
+	apiNode, err = c.Init(context.Background(), apiNode)
 	if err != nil {
 		_log.Error("Unable to call ASDD gRPC server")
 		_log.Error(err)
 		return
 	}
 
-	_log.Infof(apiOutcome.Message)
+	_log.Infof(apiNode.Outcome.Message)
 }
