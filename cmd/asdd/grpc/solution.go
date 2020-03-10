@@ -9,21 +9,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-func (s *Server) Version(ctx context.Context, in *api.Void) (*api.Outcome, error) {
-	_log := helpers.InitLogs(true)
-	_log.Debug("gRPC call: Version")
-
-	//should
-	// create the config
-	// create the main dataset: asd
-
-	var apiOutcome api.Outcome
-	apiOutcome.Error = false
-	apiOutcome.Message = version.VERSION
-
-	return &apiOutcome, nil
-}
-
 func (s *Server) Create(ctx context.Context, in *api.Solution) (*api.Outcome, error) {
 	_log := helpers.InitLogs(true)
 	_log.Debug("gRPC call: Create")
