@@ -116,16 +116,16 @@ func run() error {
 
 	var cmdMaster = &cobra.Command{
 		Use:   "master",
-		Short: "Manage ASD daemon",
+		Short: "Manage master node",
 		Long:  "Group all master subcommands",
 		Args:  cobra.ExactArgs(1),
 		Run:   commands.Master,
 	}
 
 	var cmdMasterInit = &cobra.Command{
-		Use:   "create",
-		Short: "Create a solution",
-		Long:  "Creates a solution with the given name",
+		Use:   "init [pool_name]",
+		Short: "Initialize the master",
+		Long:  "Initialize the master by creating config file, dataset and k/v store",
 		Args:  cobra.ExactArgs(1),
 		Run:   commands.MasterInit,
 	}
@@ -134,19 +134,21 @@ func run() error {
 	// solution
 
 	var cmdSolution = &cobra.Command{
-		Use:   "solution",
-		Short: "Create a solution",
-		Long:  "Creates a solution with the given name",
-		Args:  cobra.ExactArgs(1),
-		Run:   commands.SolutionCreate,
+		Use:     "solution",
+		Aliases: []string{"sol"},
+		Short:   "Create a solution",
+		Long:    "Creates a solution with the given name",
+		Args:    cobra.ExactArgs(1),
+		Run:     commands.SolutionCreate,
 	}
 
 	var cmdSolutionCreate = &cobra.Command{
-		Use:   "create",
-		Short: "Create a solution",
-		Long:  "Creates a solution with the given name",
-		Args:  cobra.ExactArgs(1),
-		Run:   commands.SolutionCreate,
+		Use:     "create",
+		Example: "asd solution create [solution_unique_name]",
+		Short:   "Create a solution",
+		Long:    "Creates a solution with the given name",
+		Args:    cobra.ExactArgs(1),
+		Run:     commands.SolutionCreate,
 	}
 
 	//////////////////////////////
@@ -154,23 +156,23 @@ func run() error {
 
 	var cmdNode = &cobra.Command{
 		Use:   "node",
-		Short: "Manage adding and removing nodes",
+		Short: "Manage simple nodes",
 		Long:  "Add a new node, remove and purge added ones",
-		Args:  cobra.MinimumNArgs(0),
+		Args:  cobra.MinimumNArgs(1),
 		Run:   commands.Node,
 	}
 
 	var cmdNodeAdd = &cobra.Command{
 		Use:   "add",
-		Short: "Add an ADS node",
-		Long:  "Add a new node, initalialyzing datasets if needed",
+		Short: "Adds a node",
+		Long:  "Adds a new node, initializing dataset if needed",
 		Args:  cobra.ExactArgs(1),
 		Run:   commands.NodeAdd,
 	}
 
 	var cmdNodeRem = &cobra.Command{
 		Use:   "remove",
-		Short: "Remove an ADS node",
+		Short: "Remove a node",
 		Long:  "Remove an existing node, leave all solution data in place",
 		Args:  cobra.ExactArgs(1),
 		Run:   commands.NodeRemove,
@@ -178,7 +180,7 @@ func run() error {
 
 	var cmdNodePurge = &cobra.Command{
 		Use:   "purge",
-		Short: "Purge an ADS node",
+		Short: "Purge a node",
 		Long:  "Remove an existing node, destroys all solution data",
 		Args:  cobra.ExactArgs(1),
 		Run:   commands.NodePurge,
