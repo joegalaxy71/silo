@@ -139,7 +139,16 @@ func run() error {
 		Short:   "Create a solution",
 		Long:    "Creates a solution with the given name",
 		Args:    cobra.ExactArgs(1),
-		Run:     commands.SolutionCreate,
+		Run:     commands.Solution,
+	}
+
+	var cmdSolutionList = &cobra.Command{
+		Use:     "list",
+		Example: "list available solutions",
+		Short:   "List all solutions",
+		Long:    "Lists all solution with detailed info",
+		Args:    cobra.ExactArgs(1),
+		Run:     commands.SolutionList,
 	}
 
 	var cmdSolutionCreate = &cobra.Command{
@@ -160,6 +169,14 @@ func run() error {
 		Long:  "Add a new node, remove and purge added ones",
 		Args:  cobra.MinimumNArgs(1),
 		Run:   commands.Node,
+	}
+
+	var cmdNodeList = &cobra.Command{
+		Use:   "list",
+		Short: "Lists all nodes",
+		Long:  "Lists all nodes with detailed info",
+		Args:  cobra.ExactArgs(1),
+		Run:   commands.NodeAdd,
 	}
 
 	var cmdNodeAdd = &cobra.Command{
@@ -191,8 +208,8 @@ func run() error {
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "verbose output")
 	rootCmd.AddCommand(cmdVersion, cmdMaster, cmdNode, cmdSolution)
 	cmdMaster.AddCommand(cmdMasterInit)
-	cmdNode.AddCommand(cmdNodeAdd, cmdNodeRem, cmdNodePurge)
-	cmdSolution.AddCommand(cmdSolutionCreate)
+	cmdNode.AddCommand(cmdNodeList, cmdNodeAdd, cmdNodeRem, cmdNodePurge)
+	cmdSolution.AddCommand(cmdSolutionList, cmdSolutionCreate)
 	rootCmd.Execute()
 	return nil
 }

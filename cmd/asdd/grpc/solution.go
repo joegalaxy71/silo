@@ -4,10 +4,84 @@ import (
 	"asd/common/api"
 	"asd/common/helpers"
 	"context"
+	"fmt"
+	"github.com/boltdb/bolt"
 	"github.com/mistifyio/go-zfs"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
+	"time"
 )
+
+func (s *Server) SolutionList(ctx context.Context, in *api.Void) (*api.Solutions, error) {
+	_log := helpers.InitLogs(true)
+	_log.Debug("gRPC call: SolutionList")
+
+	var apiSolutions *api.Solutions
+
+	// get pool name from config
+	pool := viper.GetString("pool")
+	if pool == "" {
+		message := "Init config value is empty for master pool"
+		_log.Error(message)
+		err := errors.New(message)
+		return apiSolutions, err
+	}
+
+	// create default master dataset name and get it via zfs wrap
+	dataset, err := zfs.GetDataset(pool + "/asd")
+	if err != nil {
+		message := "Unable to locate the master dataset: did you run 'asd master init'?"
+		_log.Error(message)
+		_log.Error(err)
+		return apiSolutions, err
+	}
+
+	// get the actual mountpoint
+	mountpoint, err := dataset.GetProperty("mountpoint")
+	if err != nil {
+		message := "Unable to locate the mountpoint of the master dataset"
+		_log.Error(message)
+		_log.Error(err)
+		return apiSolutions, err
+	}
+
+	// open or create the k/v db
+	db, err := bolt.Open(mountpoint+"/asd.db", 0600, &bolt.Options{Timeout: 3 * time.Second})
+	if err != nil {
+		message := "Unable to open the master db for persisting node info"
+		_log.Error(message)
+		_log.Error(err)
+		return apiSolutions, err
+	}
+	defer db.Close()
+
+	// add node info to the k/v db
+	err = db.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte("solutions"))
+		c := b.Cursor()
+
+		for k, _ := c.First(); k != nil; k, _ = c.Next() {
+			var apiSolutionVal api.Solution
+			apiSolution := &apiSolutionVal
+			apiSolution.Name = fmt.Sprint(k)
+
+			apiSolutions.Solutions = append(apiSolutions.Solutions, apiSolution)
+		}
+		return nil
+	})
+	if err != nil {
+		message := "Unable to list solutions from k/v db"
+		_log.Error(message)
+		_log.Error(err)
+		apiSolutions.Outcome.Message = message
+		return apiSolutions, err
+	}
+
+	message := "Succesfully obtained solution list"
+	_log.Info(message)
+	apiSolutions.Outcome.Message = message
+	return apiSolutions, nil
+}
 
 func (s *Server) SolutionCreate(ctx context.Context, in *api.Solution) (*api.Solution, error) {
 	_log := helpers.InitLogs(true)

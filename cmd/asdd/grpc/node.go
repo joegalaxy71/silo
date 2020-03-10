@@ -61,7 +61,6 @@ func (s *Server) NodeList(ctx context.Context, in *api.Void) (*api.Nodes, error)
 	err = db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte("nodes"))
 		c := b.Cursor()
-		deleted := false
 
 		for k, v := c.First(); k != nil; k, v = c.Next() {
 			var apiNodeVal api.Node

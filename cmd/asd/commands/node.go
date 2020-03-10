@@ -17,6 +17,31 @@ func Node(cmd *cobra.Command, args []string) {
 	_log.Error("Please call 'node' with more parameters")
 }
 
+func NodeList(cmd *cobra.Command, args []string) {
+
+	_log = helpers.InitLogs(true)
+	_log.Debug("Command:NodeList")
+
+	conn, err := grpc.Dial("0.0.0.0:9000", grpc.WithInsecure())
+	if err != nil {
+		log.Error("error dialing grpc server on asdd")
+		log.Error(err)
+		return
+	}
+	defer conn.Close()
+
+	c := api.NewAsddClient(conn)
+	var apiVoid api.Void
+	apiNodes, err := c.NodeList(context.Background(), apiVoid)
+	if err != nil {
+		_log.Error("Unable to list available nodes, detailed error message follows")
+		_log.Error(err)
+		return
+	}
+
+	_log.Info(apiNodes.Outcome.Message)
+}
+
 func NodeAdd(cmd *cobra.Command, args []string) {
 
 	_log = helpers.InitLogs(true)

@@ -44,7 +44,7 @@ message Solution {
 
 message Solutions {
     Outcome Outcome = 1;
-    repeated Solutions Solution = 2;
+    repeated Solution Solutions = 2;
 }
 
 message Void {
