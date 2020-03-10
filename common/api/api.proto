@@ -27,7 +27,7 @@ message Node {
 
 message Nodes {
     Outcome Outcome = 1;
-    repeated Nodes Node = 2;
+    repeated Node Nodes = 2;
 }
 
 message Master {
@@ -58,9 +58,11 @@ message Void {
 service Asdd {
     rpc Version(Void) returns (Outcome) {}
     rpc MasterInit(Master) returns (Master) {}
+    rpc NodeList(Void) returns (Nodes) {}
     rpc NodeAdd(Node) returns (Node) {}
     rpc NodeRemove(Node) returns (Node) {}
     rpc NodePurge(Node) returns (Node) {}
+    rpc SolutionList(Void) returns (Solutions) {}
     rpc SolutionCreate(Solution) returns (Solution) {} //+1 -> available
     rpc SolutionDestroy(Solution) returns (Solution) {} //-1 ->missing
     rpc SolutionBackup(Solution) returns (Solution) {}

@@ -244,7 +244,7 @@ func run() error {
 	// goroutine for the standard grpc server
 	chanErrGrpc := make(chan error, 1)
 
-	go asddGrpc.Init(chanErrGrpc)
+	go asddGrpc.InitGrpc(chanErrGrpc)
 
 	//go func(errGrpc chan<- error) {
 	//	// create a listener on TCP port 7777

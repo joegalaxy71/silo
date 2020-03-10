@@ -14,6 +14,80 @@ import (
 	"time"
 )
 
+func (s *Server) NodeList(ctx context.Context, in *api.Void) (*api.Nodes, error) {
+	_log := helpers.InitLogs(true)
+	_log.Debug("gRPC call: NodeList")
+
+	var apiNodes *api.Nodes
+
+	// get pool name from config
+	pool := viper.GetString("pool")
+	if pool == "" {
+		message := "Init config value is empty for master pool"
+		_log.Error(message)
+		err := errors.New(message)
+		return apiNodes, err
+	}
+
+	// create default master dataset name and get it via zfs wrap
+	dataset, err := zfs.GetDataset(pool + "/asd")
+	if err != nil {
+		message := "Unable to locate the master dataset: did you run 'asd master init'?"
+		_log.Error(message)
+		_log.Error(err)
+		return apiNodes, err
+	}
+
+	// get the actual mountpoint
+	mountpoint, err := dataset.GetProperty("mountpoint")
+	if err != nil {
+		message := "Unable to locate the mountpoint of the master dataset"
+		_log.Error(message)
+		_log.Error(err)
+		return apiNodes, err
+	}
+
+	// open or create the k/v db
+	db, err := bolt.Open(mountpoint+"/asd.db", 0600, &bolt.Options{Timeout: 3 * time.Second})
+	if err != nil {
+		message := "Unable to open the master db for persisting node info"
+		_log.Error(message)
+		_log.Error(err)
+		return apiNodes, err
+	}
+	defer db.Close()
+
+	// add node info to the k/v db
+	err = db.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte("nodes"))
+		c := b.Cursor()
+		deleted := false
+
+		for k, v := c.First(); k != nil; k, v = c.Next() {
+			var apiNodeVal api.Node
+			apiNode := &apiNodeVal
+			apiNode.Hostname = fmt.Sprint(k)
+			apiNode.Ip = fmt.Sprint(v)
+
+			apiNodes.Nodes = append(apiNodes.Nodes, apiNode)
+		}
+		return nil
+	})
+	if err != nil {
+		message := "Unable to list nodes from k/v db"
+		_log.Error(message)
+		_log.Error(err)
+		apiNodes.Outcome.Message = message
+		return apiNodes, err
+	}
+
+	message := "Succesfully obtained node list"
+	_log.Info(message)
+	apiNodes.Outcome.Message = message
+	return apiNodes, nil
+
+}
+
 func (s *Server) NodeAdd(ctx context.Context, in *api.Node) (*api.Node, error) {
 	_log := helpers.InitLogs(true)
 	_log.Debug("gRPC call: NodeAdd")

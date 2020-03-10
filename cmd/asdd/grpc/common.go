@@ -12,7 +12,7 @@ import (
 type Server struct {
 }
 
-func Init(errGrpc chan<- error) {
+func InitGrpc(errGrpc chan<- error) {
 
 	_log := helpers.InitLogs(true)
 	// create a listener on TCP port 7777

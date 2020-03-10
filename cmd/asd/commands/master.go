@@ -20,7 +20,7 @@ func Master(cmd *cobra.Command, args []string) {
 func MasterInit(cmd *cobra.Command, args []string) {
 
 	_log = helpers.InitLogs(true)
-	_log.Debug("Command:Init")
+	_log.Debug("Command:InitGrpc")
 
 	conn, err := grpc.Dial("0.0.0.0:9000", grpc.WithInsecure())
 	if err != nil {
