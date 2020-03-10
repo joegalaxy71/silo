@@ -66,7 +66,7 @@ service Asdd {
     rpc SolutionBackup(Solution) returns (Solution) {}
     rpc SolutionRestore(Solution) returns (Solution) {}
     rpc SolutionDeploy(Solution) returns (Solution) {} //+1 -> deployed
-    rpc SolutionRetreat(Solution) returns (Solution) {} //-1 -> available
+    rpc SolutionRetire(Solution) returns (Solution) {} //-1 -> available
     rpc SolutionStart(Solution) returns (Solution) {} //+1 -> started
     rpc SolutionStop(Solution) returns (Solution) {} //-1 -> deployed
     rpc SolutionExpose(Solution) returns (Solution) {} //+1 -> exposed

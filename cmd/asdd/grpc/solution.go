@@ -3,143 +3,186 @@ package grpc
 import (
 	"asd/common/api"
 	"asd/common/helpers"
-	"asd/common/version"
 	"context"
 	"github.com/mistifyio/go-zfs"
+	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 )
 
-func (s *Server) Create(ctx context.Context, in *api.Solution) (*api.Outcome, error) {
+func (s *Server) SolutionCreate(ctx context.Context, in *api.Solution) (*api.Solution, error) {
 	_log := helpers.InitLogs(true)
 	_log.Debug("gRPC call: Create")
 
+	apiSolution := in
+
 	var pool string
 	pool = viper.GetString("pool")
-	var apiOutcome api.Outcome
+	if pool == "" {
+		message := "The master pool is unconfigured"
+		_log.Error(message)
+		apiSolution.Outcome.Error = true
+		apiSolution.Outcome.Message = message
+		err := errors.New(message)
+		return apiSolution, err
+	}
 
-	datasetName := pool + "/asd/" + in.Name
+	datasetName := pool + "/asd/" + apiSolution.Name
 
 	_, err := zfs.CreateFilesystem(datasetName, nil)
 	if err != nil {
-		_log.Error("Error creating solution " + datasetName)
-		apiOutcome.Error = true
-		apiOutcome.Message = "Error creating solution " + datasetName
-		return &apiOutcome, err
+		message := "Error creating dataset for new solutions" + datasetName
+		_log.Error(message)
+		apiSolution.Outcome.Error = true
+		apiSolution.Outcome.Message = message
+		return apiSolution, err
 	} else {
-		apiOutcome.Error = false
-		apiOutcome.Message = "Succesfully created solution " + datasetName
-		return &apiOutcome, nil
+		message := "Succesfully created new solutions with dataset:" + datasetName
+		_log.Error(message)
+		apiSolution.Outcome.Error = false
+		apiSolution.Outcome.Message = message
+		return apiSolution, nil
 	}
-
 }
 
-func (s *Server) Destroy(ctx context.Context, in *api.Solution) (*api.Outcome, error) {
+func (s *Server) SolutionDestroy(ctx context.Context, in *api.Solution) (*api.Solution, error) {
 	_log := helpers.InitLogs(true)
 	_log.Debug("gRPC call: Destroy")
 
-	var apiOutcome api.Outcome
+	apiSolution := in
 
+	err := errors.New("not implemented")
 	// destroy a solution datased, with ALL backups, snapshots
 
-	return &apiOutcome, nil
+	err = errors.Wrap(err, "really not")
+	return apiSolution, err
 }
 
-func (s *Server) Deploy(ctx context.Context, in *api.Solution) (*api.Outcome, error) {
+func (s *Server) SolutionDeploy(ctx context.Context, in *api.Solution) (*api.Solution, error) {
 	_log := helpers.InitLogs(true)
 	_log.Debug("gRPC call: Deploy")
 
-	// create var to build up api response
-	var apiOutcome api.Outcome
+	apiSolution := in
 
-	return &apiOutcome, nil
+	err := errors.New("not implemented")
+	// destroy a solution datased, with ALL backups, snapshots
+
+	err = errors.Wrap(err, "really not")
+	return apiSolution, err
 }
 
-func (s *Server) Retire(ctx context.Context, in *api.Solution) (*api.Outcome, error) {
+func (s *Server) SolutionRetire(ctx context.Context, in *api.Solution) (*api.Solution, error) {
 	_log := helpers.InitLogs(true)
 	_log.Debug("gRPC call: Retreat")
 
-	// create var to build up api response
-	var apiOutcome api.Outcome
+	apiSolution := in
 
-	return &apiOutcome, nil
+	err := errors.New("not implemented")
+	// destroy a solution datased, with ALL backups, snapshots
+
+	err = errors.Wrap(err, "really not")
+	return apiSolution, err
 }
 
-func (s *Server) Start(ctx context.Context, in *api.Solution) (*api.Outcome, error) {
+func (s *Server) SolutionStart(ctx context.Context, in *api.Solution) (*api.Solution, error) {
 	_log := helpers.InitLogs(true)
 	_log.Debug("gRPC call: Start")
 
-	// create var to build up api response
-	var apiOutcome api.Outcome
+	apiSolution := in
 
-	return &apiOutcome, nil
+	err := errors.New("not implemented")
+	// destroy a solution datased, with ALL backups, snapshots
+
+	err = errors.Wrap(err, "really not")
+	return apiSolution, err
 }
 
-func (s *Server) Stop(ctx context.Context, in *api.Solution) (*api.Outcome, error) {
+func (s *Server) SolutionStop(ctx context.Context, in *api.Solution) (*api.Solution, error) {
 	_log := helpers.InitLogs(true)
 	_log.Debug("gRPC call: Stop")
 
-	// create var to build up api response
-	var apiOutcome api.Outcome
+	apiSolution := in
 
-	return &apiOutcome, nil
+	err := errors.New("not implemented")
+	// destroy a solution datased, with ALL backups, snapshots
+
+	err = errors.Wrap(err, "really not")
+	return apiSolution, err
 }
 
-func (s *Server) Snapshot(ctx context.Context, in *api.Solution) (*api.Outcome, error) {
+func (s *Server) SolutionSnapshot(ctx context.Context, in *api.Solution) (*api.Solution, error) {
 	_log := helpers.InitLogs(true)
 	_log.Debug("gRPC call: Snapshot")
 
-	// create var to build up api response
-	var apiOutcome api.Outcome
+	apiSolution := in
 
-	return &apiOutcome, nil
+	err := errors.New("not implemented")
+	// destroy a solution datased, with ALL backups, snapshots
+
+	err = errors.Wrap(err, "really not")
+	return apiSolution, err
 }
 
-func (s *Server) Rollback(ctx context.Context, in *api.Solution) (*api.Outcome, error) {
+func (s *Server) SolutionRollback(ctx context.Context, in *api.Solution) (*api.Solution, error) {
 	_log := helpers.InitLogs(true)
 	_log.Debug("gRPC call: Rollback")
 
-	// create var to build up api response
-	var apiOutcome api.Outcome
+	apiSolution := in
 
-	return &apiOutcome, nil
+	err := errors.New("not implemented")
+	// destroy a solution datased, with ALL backups, snapshots
+
+	err = errors.Wrap(err, "really not")
+	return apiSolution, err
 }
 
-func (s *Server) Backup(ctx context.Context, in *api.Solution) (*api.Outcome, error) {
+func (s *Server) SolutionBackup(ctx context.Context, in *api.Solution) (*api.Solution, error) {
 	_log := helpers.InitLogs(true)
 	_log.Debug("gRPC call: Backup")
 
-	// create var to build up api response
-	var apiOutcome api.Outcome
+	apiSolution := in
 
-	return &apiOutcome, nil
+	err := errors.New("not implemented")
+	// destroy a solution datased, with ALL backups, snapshots
+
+	err = errors.Wrap(err, "really not")
+	return apiSolution, err
 }
 
-func (s *Server) Restore(ctx context.Context, in *api.Solution) (*api.Outcome, error) {
+func (s *Server) SolutionRestore(ctx context.Context, in *api.Solution) (*api.Solution, error) {
 	_log := helpers.InitLogs(true)
 	_log.Debug("gRPC call: Restore")
 
-	// create var to build up api response
-	var apiOutcome api.Outcome
+	apiSolution := in
 
-	return &apiOutcome, nil
+	err := errors.New("not implemented")
+	// destroy a solution datased, with ALL backups, snapshots
+
+	err = errors.Wrap(err, "really not")
+	return apiSolution, err
 }
 
-func (s *Server) Expose(ctx context.Context, in *api.Solution) (*api.Outcome, error) {
+func (s *Server) SolutionExpose(ctx context.Context, in *api.Solution) (*api.Solution, error) {
 	_log := helpers.InitLogs(true)
 	_log.Debug("gRPC call: Expose")
 
-	// create var to build up api response
-	var apiOutcome api.Outcome
+	apiSolution := in
 
-	return &apiOutcome, nil
+	err := errors.New("not implemented")
+	// destroy a solution datased, with ALL backups, snapshots
+
+	err = errors.Wrap(err, "really not")
+	return apiSolution, err
 }
 
-func (s *Server) Contain(ctx context.Context, in *api.Solution) (*api.Outcome, error) {
+func (s *Server) SolutionContain(ctx context.Context, in *api.Solution) (*api.Solution, error) {
 	_log := helpers.InitLogs(true)
 	_log.Debug("gRPC call: Contain")
 
-	// create var to build up api response
-	var apiOutcome api.Outcome
+	apiSolution := in
 
-	return &apiOutcome, nil
+	err := errors.New("not implemented")
+	// destroy a solution datased, with ALL backups, snapshots
+
+	err = errors.Wrap(err, "really not")
+	return apiSolution, err
 }
