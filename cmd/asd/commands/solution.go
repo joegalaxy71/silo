@@ -31,7 +31,8 @@ func SolutionList(cmd *cobra.Command, args []string) {
 	defer conn.Close()
 
 	c := api.NewAsddClient(conn)
-	var apiVoid api.Void
+	var apiVoidVal api.Void
+	apiVoid := &apiVoidVal
 	apiSolutions, err := c.SolutionList(context.Background(), apiVoid)
 	if err != nil {
 		_log.Error("Unable to list available solutions, detailed error message follows")

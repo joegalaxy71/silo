@@ -167,7 +167,7 @@ func run() error {
 		Use:   "node",
 		Short: "Manage simple nodes",
 		Long:  "Add a new node, remove and purge added ones",
-		Args:  cobra.MinimumNArgs(1),
+		Args:  cobra.ExactArgs(1),
 		Run:   commands.Node,
 	}
 
@@ -175,8 +175,8 @@ func run() error {
 		Use:   "list",
 		Short: "Lists all nodes",
 		Long:  "Lists all nodes with detailed info",
-		Args:  cobra.ExactArgs(1),
-		Run:   commands.NodeAdd,
+		Args:  cobra.NoArgs,
+		Run:   commands.NodeList,
 	}
 
 	var cmdNodeAdd = &cobra.Command{
