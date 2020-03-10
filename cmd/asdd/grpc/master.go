@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-func (s *Server) Init(ctx context.Context, in *api.Pool) (*api.Outcome, error) {
+func (s *Server) MasterInit(ctx context.Context, in *api.Pool) (*api.Outcome, error) {
 	var apiOutcome api.Outcome
 	_log := helpers.InitLogs(true)
 	_log.Debugf("gRPC call: Init(%s)\n", in.Name)
