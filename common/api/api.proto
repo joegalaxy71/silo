@@ -23,12 +23,18 @@ message Node {
     string Hostname = 2;
     string Ip = 3;
     string Poolname = 4;
-    string Type = 5; //M=master W=worker
 }
 
 message Nodes {
     Outcome Outcome = 1;
     repeated Nodes Node = 2;
+}
+
+message Master {
+    Outcome Outcome = 1;
+    string Hostname = 2;
+    string Ip = 3;
+    string Poolname = 4;
 }
 
 message Solution {
@@ -51,22 +57,22 @@ message Void {
 
 service Asdd {
     rpc Version(Void) returns (Outcome) {}
-    rpc Init(Node) returns (Node) {}
+    rpc MasterInit(Master) returns (Master) {}
     rpc NodeAdd(Node) returns (Node) {}
     rpc NodeRemove(Node) returns (Node) {}
     rpc NodePurge(Node) returns (Node) {}
-    rpc Create(Solution) returns (Solution) {} //+1 -> available
-    rpc Destroy(Solution) returns (Solution) {} //-1 ->missing
-    rpc Backup(Solution) returns (Solution) {}
-    rpc Restore(Solution) returns (Solution) {}
-    rpc Deploy(Solution) returns (Solution) {} //+1 -> deployed
-    rpc Retreat(Solution) returns (Solution) {} //-1 -> available
-    rpc Start(Solution) returns (Solution) {} //+1 -> started
-    rpc Stop(Solution) returns (Solution) {} //-1 -> deployed
-    rpc Expose(Solution) returns (Solution) {} //+1 -> exposed
-    rpc Contain(Solution) returns (Solution) {} //-1 ->started
-    rpc Snapshot(Solution) returns (Solution) {}
-    rpc Rollback(Solution) returns (Solution) {}
+    rpc SolutionCreate(Solution) returns (Solution) {} //+1 -> available
+    rpc SolutionDestroy(Solution) returns (Solution) {} //-1 ->missing
+    rpc SolutionBackup(Solution) returns (Solution) {}
+    rpc SolutionRestore(Solution) returns (Solution) {}
+    rpc SolutionDeploy(Solution) returns (Solution) {} //+1 -> deployed
+    rpc SolutionRetreat(Solution) returns (Solution) {} //-1 -> available
+    rpc SolutionStart(Solution) returns (Solution) {} //+1 -> started
+    rpc SolutionStop(Solution) returns (Solution) {} //-1 -> deployed
+    rpc SolutionExpose(Solution) returns (Solution) {} //+1 -> exposed
+    rpc SolutionContain(Solution) returns (Solution) {} //-1 ->started
+    rpc SolutionSnapshot(Solution) returns (Solution) {}
+    rpc SolutionRollback(Solution) returns (Solution) {}
 }
 
 service AsdLet {
@@ -74,10 +80,10 @@ service AsdLet {
     rpc NodeAdd(Node) returns (Node) {}
     rpc NodeRemove(Node) returns (Node) {}
     rpc NodePurge(Node) returns (Node) {}
-    rpc Deploy(Solution) returns (Solution) {} //+1 -> deployed
-    rpc Retreat(Solution) returns (Solution) {} //-1 -> available
-    rpc Start(Solution) returns (Solution) {} //+1 -> started
-    rpc Stop(Solution) returns (Solution) {} //-1 -> deployed
-    rpc Expose(Solution) returns (Solution) {} //+1 -> exposed
-    rpc Contain(Solution) returns (Solution) {} //-1 ->started
+    rpc SolutionDeploy(Solution) returns (Solution) {} //+1 -> deployed
+    rpc SolutionRetreat(Solution) returns (Solution) {} //-1 -> available
+    rpc SolutionStart(Solution) returns (Solution) {} //+1 -> started
+    rpc SolutionStop(Solution) returns (Solution) {} //-1 -> deployed
+    rpc SolutionExpose(Solution) returns (Solution) {} //+1 -> exposed
+    rpc SolutionContain(Solution) returns (Solution) {} //-1 ->started
 }

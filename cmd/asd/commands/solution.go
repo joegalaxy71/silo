@@ -9,10 +9,10 @@ import (
 	"google.golang.org/grpc"
 )
 
-func Init(cmd *cobra.Command, args []string) {
+func SolutionCreate(cmd *cobra.Command, args []string) {
 
 	_log = helpers.InitLogs(true)
-	_log.Debug("Command:Init")
+	_log.Debug("Command:SolutionCreate")
 
 	conn, err := grpc.Dial("0.0.0.0:9000", grpc.WithInsecure())
 	if err != nil {
@@ -22,17 +22,15 @@ func Init(cmd *cobra.Command, args []string) {
 	}
 	defer conn.Close()
 	c := api.NewAsddClient(conn)
-
-	var apiNodeVal api.Node
-	apiNode := &apiNodeVal
-
-	apiNode.Poolname = args[0]
-	apiNode, err = c.Init(context.Background(), apiNode)
+	var apiSolutionVal api.Solution
+	apiSolution := &apiSolutionVal
+	apiSolution.Name = args[0]
+	apiSolution, err = c.SolutionCreate(context.Background(), apiSolution)
 	if err != nil {
 		_log.Error("Unable to call ASDD gRPC server")
 		_log.Error(err)
 		return
 	}
 
-	_log.Infof(apiNode.Outcome.Message)
+	_log.Infof("Outcome message:%s\n", apiSolution.Outcome.Message)
 }

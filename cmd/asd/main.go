@@ -111,21 +111,46 @@ func run() error {
 		Run:     commands.Version,
 	}
 
-	var cmdInit = &cobra.Command{
-		Use:   "init",
-		Short: "Initialize ASD",
-		Long:  "Creates necessary datasets and config for ASD",
+	///////////////////
+	// master
+
+	var cmdMaster = &cobra.Command{
+		Use:   "master",
+		Short: "Manage ASD daemon",
+		Long:  "Group all master subcommands",
 		Args:  cobra.ExactArgs(1),
-		Run:   commands.Init,
+		Run:   commands.Master,
 	}
 
-	var cmdCreate = &cobra.Command{
+	var cmdMasterInit = &cobra.Command{
 		Use:   "create",
 		Short: "Create a solution",
 		Long:  "Creates a solution with the given name",
 		Args:  cobra.ExactArgs(1),
-		Run:   commands.Create,
+		Run:   commands.MasterInit,
 	}
+
+	///////////////////////
+	// solution
+
+	var cmdSolution = &cobra.Command{
+		Use:   "solution",
+		Short: "Create a solution",
+		Long:  "Creates a solution with the given name",
+		Args:  cobra.ExactArgs(1),
+		Run:   commands.SolutionCreate,
+	}
+
+	var cmdSolutionCreate = &cobra.Command{
+		Use:   "create",
+		Short: "Create a solution",
+		Long:  "Creates a solution with the given name",
+		Args:  cobra.ExactArgs(1),
+		Run:   commands.SolutionCreate,
+	}
+
+	//////////////////////////////
+	// node
 
 	var cmdNode = &cobra.Command{
 		Use:   "node",
@@ -162,12 +187,10 @@ func run() error {
 	var verbose bool
 	var rootCmd = &cobra.Command{Use: "asd"}
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "verbose output")
-	rootCmd.AddCommand(cmdVersion, cmdInit, cmdCreate, cmdNode)
+	rootCmd.AddCommand(cmdVersion, cmdMaster, cmdNode, cmdSolution)
+	cmdMaster.AddCommand(cmdMasterInit)
 	cmdNode.AddCommand(cmdNodeAdd, cmdNodeRem, cmdNodePurge)
-	//cmdAccount.AddCommand(cmdAccountInfo, cmdAccountCreate, cmdAccountLogin)
-	//cmdAccount.AddCommand(cmdAccountPassword)
-	//cmdAccountPassword.AddCommand(cmdAccountPasswordChange, cmdAccountPasswordRecover, cmdAccountPasswordReset)
+	cmdSolution.AddCommand(cmdSolutionCreate)
 	rootCmd.Execute()
-
 	return nil
 }
