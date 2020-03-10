@@ -81,7 +81,7 @@ service AsdLet {
     rpc NodeRemove(Node) returns (Node) {}
     rpc NodePurge(Node) returns (Node) {}
     rpc SolutionDeploy(Solution) returns (Solution) {} //+1 -> deployed
-    rpc SolutionRetreat(Solution) returns (Solution) {} //-1 -> available
+    rpc SolutionRetire(Solution) returns (Solution) {} //-1 -> available
     rpc SolutionStart(Solution) returns (Solution) {} //+1 -> started
     rpc SolutionStop(Solution) returns (Solution) {} //-1 -> deployed
     rpc SolutionExpose(Solution) returns (Solution) {} //+1 -> exposed

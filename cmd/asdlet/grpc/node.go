@@ -51,7 +51,7 @@ func (s *Server) NodeRemove(ctx context.Context, in *api.Node) (*api.Node, error
 
 	err := errors.New(apiNode.Outcome.Message)
 
-	return apiNode, nil
+	return apiNode, err
 }
 
 func (s *Server) NodePurge(ctx context.Context, in *api.Node) (*api.Node, error) {
@@ -63,5 +63,5 @@ func (s *Server) NodePurge(ctx context.Context, in *api.Node) (*api.Node, error)
 
 	err := errors.New(apiNode.Outcome.Message)
 
-	return apiNode, nil
+	return apiNode, err
 }
