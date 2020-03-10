@@ -14,38 +14,34 @@ import (
 	"time"
 )
 
-func (s *Server) NodeAdd(ctx context.Context, in *api.Node) (*api.Outcome, error) {
+func (s *Server) NodeAdd(ctx context.Context, in *api.Node) (*api.Node, error) {
 	_log := helpers.InitLogs(true)
 	_log.Debug("gRPC call: NodeAdd")
 
-	var outcome api.Outcome
-	apiOutcome := &outcome
-
-	var nodeInfo api.NodeInfo
-	apiNodeInfo := &nodeInfo
+	apiNode := in
 
 	// a gRPC method calling another gRPC method
 	conn, err := grpc.Dial(in.Ip+":9000", grpc.WithInsecure())
 	if err != nil {
-		message := "error dialing grpc server on asdlet on ip:" + in.Ip
+		message := "error dialing grpc server on asdlet on ip:" + apiNode.Ip
 		log.Error(message)
 		log.Error(err)
-		apiOutcome.Error = true
-		apiOutcome.Message = message
-		return apiOutcome, err
+		apiNode.Outcome.Error = true
+		apiNode.Outcome.Message = message
+		return apiNode, err
 	}
 	defer conn.Close()
 
 	c := api.NewAsdLetClient(conn)
 	asdletCtx, _ := context.WithTimeout(context.Background(), 1000*time.Millisecond)
-	apiNodeInfo, err = c.NodeAdd(asdletCtx, in)
+	apiNode, err = c.NodeAdd(asdletCtx, in)
 	if err != nil {
-		message := "error calling grpc:NodeAdd on asdlet on ip:" + in.Ip
+		message := "error calling grpc:NodeAdd on asdlet on ip:" + apiNode.Ip
 		log.Error(message)
 		log.Error(err)
-		apiOutcome.Error = true
-		apiOutcome.Message = message
-		return apiOutcome, err
+		apiNode.Outcome.Error = true
+		apiNode.Outcome.Message = message
+		return apiNode, err
 	} else {
 		// node succesfully initilized
 		// proceed to add it to the k/v db
@@ -57,18 +53,18 @@ func (s *Server) NodeAdd(ctx context.Context, in *api.Node) (*api.Outcome, error
 			message := "Init config value is empty for master pool"
 			_log.Error(message)
 			_log.Error(err)
-			apiOutcome.Message = message
-			return apiOutcome, err
+			apiNode.Outcome.Message = message
+			return apiNode, err
 		}
 
 		// create default master dataset name and get it via zfs wrap
 		dataset, err := zfs.GetDataset(pool + "/asd")
 		if err != nil {
-			message := "Unable to locate the master dataset: did you run init?"
+			message := "Unable to locate the master dataset: did you run 'asd master init'?"
 			_log.Error(message)
 			_log.Error(err)
-			apiOutcome.Message = message
-			return apiOutcome, err
+			apiNode.Outcome.Message = message
+			return apiNode, err
 		}
 
 		// get the actual mountpoint
@@ -77,8 +73,8 @@ func (s *Server) NodeAdd(ctx context.Context, in *api.Node) (*api.Outcome, error
 			message := "Unable to locate the mountpoint of the master dataset"
 			_log.Error(message)
 			_log.Error(err)
-			apiOutcome.Message = message
-			return apiOutcome, err
+			apiNode.Outcome.Message = message
+			return apiNode, err
 		}
 
 		// open or create the k/v db
@@ -87,8 +83,8 @@ func (s *Server) NodeAdd(ctx context.Context, in *api.Node) (*api.Outcome, error
 			message := "Unable to open the master db for persisting node info"
 			_log.Error(message)
 			_log.Error(err)
-			apiOutcome.Message = message
-			return apiOutcome, err
+			apiNode.Outcome.Message = message
+			return apiNode, err
 		}
 		defer db.Close()
 
@@ -99,7 +95,7 @@ func (s *Server) NodeAdd(ctx context.Context, in *api.Node) (*api.Outcome, error
 				return fmt.Errorf("create bucket: %s", err)
 			}
 			db.Update(func(tx *bolt.Tx) error {
-				err := b.Put([]byte(apiNodeInfo.Hostname), []byte(apiNodeInfo.Ip))
+				err := b.Put([]byte(apiNode.Hostname), []byte(apiNode.Ip))
 				return err
 			})
 			return nil
@@ -108,23 +104,22 @@ func (s *Server) NodeAdd(ctx context.Context, in *api.Node) (*api.Outcome, error
 			message := "Unable to update db to persist node info"
 			_log.Error(message)
 			_log.Error(err)
-			apiOutcome.Message = message
-			return apiOutcome, err
+			apiNode.Outcome.Message = message
+			return apiNode, err
 		}
 
 		message := "Succesfully added ADS node"
 		_log.Info(message)
-		apiOutcome.Message = message
-		return apiOutcome, nil
+		apiNode.Outcome.Message = message
+		return apiNode, nil
 	}
 }
 
-func (s *Server) NodeRemove(ctx context.Context, in *api.Node) (*api.Outcome, error) {
+func (s *Server) NodeRemove(ctx context.Context, in *api.Node) (*api.Node, error) {
 	_log := helpers.InitLogs(true)
 	_log.Debug("gRPC call: NodeRemove")
 
-	var outcome api.Outcome
-	apiOutcome := &outcome
+	apiNode := in
 
 	// proceed to remove node (by host name) it to the k/v db
 	var err error
@@ -135,8 +130,8 @@ func (s *Server) NodeRemove(ctx context.Context, in *api.Node) (*api.Outcome, er
 		message := "Init config value is empty for master pool"
 		_log.Error(message)
 		_log.Error(err)
-		apiOutcome.Message = message
-		return apiOutcome, err
+		apiNode.Outcome.Message = message
+		return apiNode, err
 	}
 
 	dataset, err := zfs.GetDataset(pool + "/asd")
@@ -144,8 +139,8 @@ func (s *Server) NodeRemove(ctx context.Context, in *api.Node) (*api.Outcome, er
 		message := "Unable to locate the master dataset: did you run init?"
 		_log.Error(message)
 		_log.Error(err)
-		apiOutcome.Message = message
-		return apiOutcome, err
+		apiNode.Outcome.Message = message
+		return apiNode, err
 	}
 
 	// get the actual mountpoint
@@ -154,8 +149,8 @@ func (s *Server) NodeRemove(ctx context.Context, in *api.Node) (*api.Outcome, er
 		message := "Unable to locate the mountpoint of the master dataset"
 		_log.Error(message)
 		_log.Error(err)
-		apiOutcome.Message = message
-		return apiOutcome, err
+		apiNode.Outcome.Message = message
+		return apiNode, err
 	}
 
 	// open or create the k/v db
@@ -164,8 +159,8 @@ func (s *Server) NodeRemove(ctx context.Context, in *api.Node) (*api.Outcome, er
 		message := "Unable to open the master db to remove node"
 		_log.Error(message)
 		_log.Error(err)
-		apiOutcome.Message = message
-		return apiOutcome, err
+		apiNode.Outcome.Message = message
+		return apiNode, err
 	}
 	defer db.Close()
 
@@ -181,7 +176,7 @@ func (s *Server) NodeRemove(ctx context.Context, in *api.Node) (*api.Outcome, er
 
 		for k, _ := c.First(); k != nil; k, _ = c.Next() {
 			key := fmt.Sprint(k)
-			if key == in.Host {
+			if key == apiNode.Hostname {
 				c.Delete()
 				deleted = true
 			}
@@ -199,22 +194,21 @@ func (s *Server) NodeRemove(ctx context.Context, in *api.Node) (*api.Outcome, er
 		message := "Unable to update db to persist node info"
 		_log.Error(message)
 		_log.Error(err)
-		apiOutcome.Message = message
-		return apiOutcome, err
+		apiNode.Outcome.Message = message
+		return apiNode, err
 	}
 
 	message := "Succesfully removed ADS node"
 	_log.Info(message)
-	apiOutcome.Message = message
-	return apiOutcome, nil
+	apiNode.Outcome.Message = message
+	return apiNode, err
 }
 
-func (s *Server) NodePurge(ctx context.Context, in *api.Node) (*api.Outcome, error) {
+func (s *Server) NodePurge(ctx context.Context, in *api.Node) (*api.Node, error) {
 	_log := helpers.InitLogs(true)
 	_log.Debug("gRPC call: NodePurge")
 
-	var outcome api.Outcome
-	apiOutcome := &outcome
+	apiNode := in
 
 	// proceed to remove node (by host name) it to the k/v db
 	var err error
@@ -225,8 +219,8 @@ func (s *Server) NodePurge(ctx context.Context, in *api.Node) (*api.Outcome, err
 		message := "Init config value is empty for master pool"
 		_log.Error(message)
 		_log.Error(err)
-		apiOutcome.Message = message
-		return apiOutcome, err
+		apiNode.Outcome.Message = message
+		return apiNode, err
 	}
 
 	dataset, err := zfs.GetDataset(pool + "/asd")
@@ -234,8 +228,8 @@ func (s *Server) NodePurge(ctx context.Context, in *api.Node) (*api.Outcome, err
 		message := "Unable to locate the master dataset: did you run init?"
 		_log.Error(message)
 		_log.Error(err)
-		apiOutcome.Message = message
-		return apiOutcome, err
+		apiNode.Outcome.Message = message
+		return apiNode, err
 	}
 
 	// get the actual mountpoint
@@ -244,18 +238,18 @@ func (s *Server) NodePurge(ctx context.Context, in *api.Node) (*api.Outcome, err
 		message := "Unable to locate the mountpoint of the master dataset"
 		_log.Error(message)
 		_log.Error(err)
-		apiOutcome.Message = message
-		return apiOutcome, err
+		apiNode.Outcome.Message = message
+		return apiNode, err
 	}
 
 	// open or create the k/v db
 	db, err := bolt.Open(mountpoint+"/asd.db", 0600, &bolt.Options{Timeout: 3 * time.Second})
 	if err != nil {
-		message := "Unable to open the master db to remove node"
+		message := "Unable to open the master db to purge node"
 		_log.Error(message)
 		_log.Error(err)
-		apiOutcome.Message = message
-		return apiOutcome, err
+		apiNode.Outcome.Message = message
+		return apiNode, err
 	}
 	defer db.Close()
 
@@ -271,12 +265,12 @@ func (s *Server) NodePurge(ctx context.Context, in *api.Node) (*api.Outcome, err
 
 		for k, _ := c.First(); k != nil; k, _ = c.Next() {
 			key := fmt.Sprint(k)
-			if key == in.Host {
+			if key == apiNode.Hostname {
 				c.Delete()
 				deleted = true
 			}
 			if deleted == false {
-				message := "node to purge not found"
+				message := "node not found"
 				_log.Error(message)
 				err := errors.New(message)
 				return err
@@ -289,12 +283,12 @@ func (s *Server) NodePurge(ctx context.Context, in *api.Node) (*api.Outcome, err
 		message := "Unable to update db to persist node info"
 		_log.Error(message)
 		_log.Error(err)
-		apiOutcome.Message = message
-		return apiOutcome, err
+		apiNode.Outcome.Message = message
+		return apiNode, err
 	}
 
-	message := "Succesfully removed ADS node"
+	message := "Succesfully purged ADS node"
 	_log.Info(message)
-	apiOutcome.Message = message
-	return apiOutcome, nil
+	apiNode.Outcome.Message = message
+	return apiNode, err
 }
