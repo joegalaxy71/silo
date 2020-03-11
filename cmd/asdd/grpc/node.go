@@ -7,7 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/boltdb/bolt"
-	"github.com/mistifyio/go-zfs"
+	"github.com/joegalaxy71/go-zfs"
 	"github.com/prometheus/common/log"
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"

@@ -4,16 +4,21 @@ import (
 	"asd/common/api"
 	"asd/common/helpers"
 	"context"
-	"github.com/mistifyio/go-zfs"
+	"github.com/boltdb/bolt"
+	"github.com/joegalaxy71/go-zfs"
 	"github.com/spf13/viper"
+	"time"
 )
 
 func (s *Server) MasterInit(ctx context.Context, in *api.Master) (*api.Master, error) {
 	apiMaster := in
+	var apiOutcomeVal api.Outcome
+	apiOutcome := &apiOutcomeVal
+	apiMaster.Outcome = apiOutcome
 	_log := helpers.InitLogs(true)
 	_log.Debug("gRPC call: MasterInit(%s)\n")
 
-	_, err := zfs.CreateFilesystem(apiMaster.Poolname+"/asd", nil)
+	dataset, err := zfs.CreateFilesystem(apiMaster.Poolname+"/asd", nil)
 	if err != nil {
 		message := "Error creating initial dataset " + apiMaster.Poolname + "/asd"
 		_log.Error(message)
@@ -27,7 +32,26 @@ func (s *Server) MasterInit(ctx context.Context, in *api.Master) (*api.Master, e
 		apiMaster.Outcome.Message = message
 	}
 
-	_log.Info()
+	// get the actual mountpoint
+	mountpoint, err := dataset.GetProperty("mountpoint")
+	if err != nil {
+		message := "Unable to locate the mountpoint of the master dataset"
+		_log.Error(message)
+		_log.Error(err)
+		return apiMaster, err
+	}
+
+	_log.Debugf("mountpoint:%s\n", mountpoint)
+
+	// open or create the k/v db
+	db, err := bolt.Open(mountpoint+"/asd.db", 0600, &bolt.Options{Timeout: 20 * time.Second})
+	if err != nil {
+		message := "Unable to open/create the master db for persisting node info"
+		_log.Error(message)
+		_log.Error(err)
+		return apiMaster, err
+	}
+	defer db.Close()
 
 	viper.Set("pool", apiMaster.Poolname)
 	err = viper.WriteConfig()
@@ -38,5 +62,6 @@ func (s *Server) MasterInit(ctx context.Context, in *api.Master) (*api.Master, e
 		apiMaster.Outcome.Message = message
 		return apiMaster, err
 	}
+
 	return apiMaster, nil
 }

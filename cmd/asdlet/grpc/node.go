@@ -5,7 +5,7 @@ import (
 	"asd/common/helpers"
 	"context"
 	"errors"
-	"github.com/mistifyio/go-zfs"
+	"github.com/joegalaxy71/go-zfs"
 	"github.com/spf13/viper"
 )
 

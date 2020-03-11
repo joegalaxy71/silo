@@ -6,7 +6,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/boltdb/bolt"
-	"github.com/mistifyio/go-zfs"
+	"github.com/joegalaxy71/go-zfs"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 	"time"
