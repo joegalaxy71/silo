@@ -4,8 +4,8 @@ import (
 	"asd/common/api"
 	"asd/common/helpers"
 	"context"
+	"github.com/bicomsystems/go-libzfs"
 	"github.com/boltdb/bolt"
-	"github.com/joegalaxy71/go-zfs"
 	"github.com/spf13/viper"
 	"time"
 )
@@ -18,7 +18,8 @@ func (s *Server) MasterInit(ctx context.Context, in *api.Master) (*api.Master, e
 	_log := helpers.InitLogs(true)
 	_log.Debug("gRPC call: MasterInit(%s)\n")
 
-	dataset, err := zfs.CreateFilesystem(apiMaster.Poolname+"/asd", nil)
+	dataset, err := zfs.DatasetCreate(apiMaster.Poolname+"/asd", zfs.DatasetTypeVolume, nil)
+	//.CreateFilesystem(apiMaster.Poolname+"/asd", nil)
 	if err != nil {
 		message := "Error creating initial dataset " + apiMaster.Poolname + "/asd"
 		_log.Error(message)
@@ -32,16 +33,14 @@ func (s *Server) MasterInit(ctx context.Context, in *api.Master) (*api.Master, e
 		apiMaster.Outcome.Message = message
 	}
 
-	// get the actual mountpoint
-	mountpoint, err := dataset.GetProperty("mountpoint")
+	//get the actual mountpoint
+	mountpoint, err := dataset.GetProperty(zfs.DatasetPropMountpoint)
 	if err != nil {
 		message := "Unable to locate the mountpoint of the master dataset"
 		_log.Error(message)
 		_log.Error(err)
 		return apiMaster, err
 	}
-
-	_log.Debugf("mountpoint:%s\n", mountpoint)
 
 	// open or create the k/v db
 	db, err := bolt.Open(mountpoint+"/asd.db", 0600, &bolt.Options{Timeout: 20 * time.Second})

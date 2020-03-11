@@ -147,7 +147,7 @@ func run() error {
 		Example: "list available solutions",
 		Short:   "List all solutions",
 		Long:    "Lists all solution with detailed info",
-		Args:    cobra.ExactArgs(1),
+		Args:    cobra.NoArgs,
 		Run:     commands.SolutionList,
 	}
 
