@@ -5,6 +5,7 @@ import (
 	"asd/common/helpers"
 	"asd/common/zfs"
 	"context"
+	"fmt"
 	"github.com/boltdb/bolt"
 	"github.com/spf13/viper"
 	"time"
@@ -40,17 +41,12 @@ func (s *Server) MasterInit(ctx context.Context, in *api.Master) (*api.Master, e
 		_log.Error(message)
 		_log.Error(err)
 		return apiMaster, err
+	} else {
+		message := "Got mountpoint property:  " + mountpoint
+		_log.Info(message)
+		apiMaster.Outcome.Error = false
+		apiMaster.Outcome.Message = message
 	}
-
-	// open or create the k/v db
-	db, err := bolt.Open(mountpoint+"/asd.db", 0600, &bolt.Options{Timeout: 20 * time.Second})
-	if err != nil {
-		message := "Unable to open/create the master db for persisting node info"
-		_log.Error(message)
-		_log.Error(err)
-		return apiMaster, err
-	}
-	defer db.Close()
 
 	viper.Set("pool", apiMaster.Poolname)
 	err = viper.WriteConfig()
@@ -60,7 +56,57 @@ func (s *Server) MasterInit(ctx context.Context, in *api.Master) (*api.Master, e
 		apiMaster.Outcome.Error = true
 		apiMaster.Outcome.Message = message
 		return apiMaster, err
+	} else {
+		message := "Configuration updated"
+		_log.Info(message)
+		apiMaster.Outcome.Error = false
+		apiMaster.Outcome.Message = message
 	}
 
+	// open or create the k/v db
+	db, err := bolt.Open(mountpoint+"/asd.db", 0600, &bolt.Options{Timeout: 3 * time.Second})
+	if err != nil {
+		message := "Unable to open the main db for persisting master info"
+		_log.Error(message)
+		_log.Error(err)
+		apiMaster.Outcome.Message = message
+		return apiMaster, err
+	} else {
+		message := "Main db opened succesfully"
+		_log.Info(message)
+		apiMaster.Outcome.Error = false
+		apiMaster.Outcome.Message = message
+	}
+
+	defer db.Close()
+
+	// add node info to the k/v db
+	err = db.Update(func(tx *bolt.Tx) error {
+		b, err := tx.CreateBucketIfNotExists([]byte("masters"))
+		if err != nil {
+			return fmt.Errorf("create bucket: %s", err)
+		}
+		db.Update(func(tx *bolt.Tx) error {
+			err := b.Put([]byte(apiMaster.Hostname), []byte(apiMaster.Ip))
+			return err
+		})
+		return nil
+	})
+	if err != nil {
+		message := "Unable to update db to persist master info"
+		_log.Error(message)
+		_log.Error(err)
+		apiMaster.Outcome.Message = message
+		return apiMaster, err
+	} else {
+		message := "Main db updated with master info"
+		_log.Info(message)
+		_log.Info(err)
+		apiMaster.Outcome.Message = message
+	}
+
+	message := "Succesfully initialized ADS master"
+	_log.Info(message)
+	apiMaster.Outcome.Message = message
 	return apiMaster, nil
 }

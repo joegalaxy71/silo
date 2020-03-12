@@ -135,7 +135,7 @@ func run() error {
 
 	var cmdSolution = &cobra.Command{
 		Use:     "solution",
-		Aliases: []string{"sol"},
+		Aliases: []string{"sol", "so"},
 		Short:   "Create a solution",
 		Long:    "Creates a solution with the given name",
 		Args:    cobra.ExactArgs(1),
@@ -144,6 +144,7 @@ func run() error {
 
 	var cmdSolutionList = &cobra.Command{
 		Use:     "list",
+		Aliases: []string{"ls"},
 		Example: "list available solutions",
 		Short:   "List all solutions",
 		Long:    "Lists all solution with detailed info",
@@ -164,19 +165,21 @@ func run() error {
 	// node
 
 	var cmdNode = &cobra.Command{
-		Use:   "node",
-		Short: "Manage simple nodes",
-		Long:  "Add a new node, remove and purge added ones",
-		Args:  cobra.ExactArgs(1),
-		Run:   commands.Node,
+		Use:     "node",
+		Aliases: []string{"no", "nd"},
+		Short:   "Manage simple nodes",
+		Long:    "Add a new node, remove and purge added ones",
+		Args:    cobra.ExactArgs(1),
+		Run:     commands.Node,
 	}
 
 	var cmdNodeList = &cobra.Command{
-		Use:   "list",
-		Short: "Lists all nodes",
-		Long:  "Lists all nodes with detailed info",
-		Args:  cobra.NoArgs,
-		Run:   commands.NodeList,
+		Use:     "list",
+		Aliases: []string{"ls"},
+		Short:   "Lists all nodes",
+		Long:    "Lists all nodes with detailed info",
+		Args:    cobra.NoArgs,
+		Run:     commands.NodeList,
 	}
 
 	var cmdNodeAdd = &cobra.Command{

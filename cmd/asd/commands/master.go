@@ -20,7 +20,6 @@ func Master(cmd *cobra.Command, args []string) {
 func MasterInit(cmd *cobra.Command, args []string) {
 
 	_log = helpers.InitLogs(true)
-	_log.Debug("Command:InitGrpc")
 
 	conn, err := grpc.Dial("0.0.0.0:9000", grpc.WithInsecure())
 	if err != nil {
@@ -40,7 +39,7 @@ func MasterInit(cmd *cobra.Command, args []string) {
 		_log.Error("master init command failed")
 		_log.Error(err)
 		return
+	} else {
+		_log.Infof(apiMaster.Outcome.Message)
 	}
-
-	_log.Infof(apiMaster.Outcome.Message)
 }
