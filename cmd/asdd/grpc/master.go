@@ -3,8 +3,8 @@ package grpc
 import (
 	"asd/common/api"
 	"asd/common/helpers"
+	"asd/common/zfs"
 	"context"
-	"github.com/bicomsystems/go-libzfs"
 	"github.com/boltdb/bolt"
 	"github.com/spf13/viper"
 	"time"
@@ -18,7 +18,7 @@ func (s *Server) MasterInit(ctx context.Context, in *api.Master) (*api.Master, e
 	_log := helpers.InitLogs(true)
 	_log.Debug("gRPC call: MasterInit(%s)\n")
 
-	dataset, err := zfs.DatasetCreate(apiMaster.Poolname+"/asd", zfs.DatasetTypeVolume, nil)
+	dataset, err := zfs.CreateFilesystem(apiMaster.Poolname+"/asd", nil)
 	//.CreateFilesystem(apiMaster.Poolname+"/asd", nil)
 	if err != nil {
 		message := "Error creating initial dataset " + apiMaster.Poolname + "/asd"
@@ -34,7 +34,7 @@ func (s *Server) MasterInit(ctx context.Context, in *api.Master) (*api.Master, e
 	}
 
 	//get the actual mountpoint
-	mountpoint, err := dataset.GetProperty(zfs.DatasetPropMountpoint)
+	mountpoint, err := dataset.GetProperty("mountpoint")
 	if err != nil {
 		message := "Unable to locate the mountpoint of the master dataset"
 		_log.Error(message)

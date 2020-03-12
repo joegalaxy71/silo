@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"os"
 	"strconv"
 	"strings"
 )
@@ -104,6 +103,7 @@ func SetLogger(l Logger) {
 // zfs is a helper function to wrap typical calls to zfs.
 func zfs(arg ...string) ([][]string, error) {
 	c := command{Command: "zfs"}
+
 	return c.Run(arg...)
 }
 
@@ -260,13 +260,10 @@ func (d *Dataset) SetProperty(key, val string) error {
 // A full list of available ZFS properties may be found here:
 // https://www.freebsd.org/cgi/man.cgi?zfs(8).
 func (d *Dataset) GetProperty(key string) (string, error) {
-	out, err := zfs("get -H ", key, d.Name)
+	out, err := zfs("get", "-Hp", key, d.Name)
 	if err != nil {
 		return "", err
 	}
-
-	fmt.Printf("out:%+v", out)
-	os.Exit(0)
 
 	return out[0][2], nil
 }
