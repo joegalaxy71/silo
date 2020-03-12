@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"github.com/boltdb/bolt"
 	"github.com/spf13/viper"
+	"os"
 	"time"
 )
 
@@ -28,10 +29,7 @@ func (s *Server) MasterInit(ctx context.Context, in *api.Master) (*api.Master, e
 		apiMaster.Outcome.Message = message
 		return apiMaster, err
 	} else {
-		message := "Created root dataset " + apiMaster.Poolname + "/asd"
-		_log.Info(message)
-		apiMaster.Outcome.Error = false
-		apiMaster.Outcome.Message = message
+		_log.Info("Created root dataset " + apiMaster.Poolname + "/asd")
 	}
 
 	//get the actual mountpoint
@@ -42,10 +40,7 @@ func (s *Server) MasterInit(ctx context.Context, in *api.Master) (*api.Master, e
 		_log.Error(err)
 		return apiMaster, err
 	} else {
-		message := "Got mountpoint property:  " + mountpoint
-		_log.Info(message)
-		apiMaster.Outcome.Error = false
-		apiMaster.Outcome.Message = message
+		_log.Info("Got mountpoint property:  " + mountpoint)
 	}
 
 	viper.Set("pool", apiMaster.Poolname)
@@ -57,10 +52,7 @@ func (s *Server) MasterInit(ctx context.Context, in *api.Master) (*api.Master, e
 		apiMaster.Outcome.Message = message
 		return apiMaster, err
 	} else {
-		message := "Configuration updated"
-		_log.Info(message)
-		apiMaster.Outcome.Error = false
-		apiMaster.Outcome.Message = message
+		_log.Info("Configuration updated on " + viper.ConfigFileUsed())
 	}
 
 	// open or create the k/v db
@@ -72,24 +64,33 @@ func (s *Server) MasterInit(ctx context.Context, in *api.Master) (*api.Master, e
 		apiMaster.Outcome.Message = message
 		return apiMaster, err
 	} else {
-		message := "Main db opened succesfully"
-		_log.Info(message)
-		apiMaster.Outcome.Error = false
-		apiMaster.Outcome.Message = message
+		_log.Info("Main db opened succesfully")
 	}
 
 	defer db.Close()
 
+	hostname, err := os.Hostname()
+	if err != nil {
+		message := "Unable to get master hostname"
+		_log.Error(message)
+		_log.Error(err)
+		apiMaster.Outcome.Message = message
+		return apiMaster, err
+	} else {
+		_log.Info("Got master hostname:" + hostname)
+		apiMaster.Hostname = hostname
+	}
+
 	// add node info to the k/v db
 	err = db.Update(func(tx *bolt.Tx) error {
-		b, err := tx.CreateBucketIfNotExists([]byte("masters"))
+		b, err := tx.CreateBucketIfNotExists([]byte("maste"))
 		if err != nil {
 			return fmt.Errorf("create bucket: %s", err)
 		}
-		db.Update(func(tx *bolt.Tx) error {
-			err := b.Put([]byte(apiMaster.Hostname), []byte(apiMaster.Ip))
-			return err
-		})
+		err = b.Put([]byte(apiMaster.Hostname), []byte(apiMaster.Ip))
+		if err != nil {
+			return fmt.Errorf("put: %s", err)
+		}
 		return nil
 	})
 	if err != nil {
@@ -99,13 +100,10 @@ func (s *Server) MasterInit(ctx context.Context, in *api.Master) (*api.Master, e
 		apiMaster.Outcome.Message = message
 		return apiMaster, err
 	} else {
-		message := "Main db updated with master info"
-		_log.Info(message)
-		_log.Info(err)
-		apiMaster.Outcome.Message = message
+		_log.Info("Main db updated with master info")
 	}
 
-	message := "Succesfully initialized ADS master"
+	message := "Succesfully initialized ASD master"
 	_log.Info(message)
 	apiMaster.Outcome.Message = message
 	return apiMaster, nil
