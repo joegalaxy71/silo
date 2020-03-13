@@ -5,6 +5,7 @@ import (
 	"asd/common/helpers"
 	"asd/common/zfs"
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/boltdb/bolt"
 	"github.com/spf13/viper"
@@ -87,7 +88,13 @@ func (s *Server) MasterInit(ctx context.Context, in *api.Master) (*api.Master, e
 		if err != nil {
 			return fmt.Errorf("create bucket: %s", err)
 		}
-		err = b.Put([]byte(apiMaster.Hostname), []byte(apiMaster.Ip))
+
+		encoded, err := json.Marshal(apiMaster)
+		if err != nil {
+			return err
+		}
+
+		err = b.Put([]byte(apiMaster.Hostname), encoded)
 		if err != nil {
 			return fmt.Errorf("put: %s", err)
 		}

@@ -5,6 +5,7 @@ import (
 	"asd/common/helpers"
 	"asd/common/zfs"
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/boltdb/bolt"
 	"github.com/pkg/errors"
@@ -16,7 +17,8 @@ func (s *Server) SolutionList(ctx context.Context, in *api.Void) (*api.Solutions
 	_log := helpers.InitLogs(true)
 	_log.Debug("gRPC call: SolutionList")
 
-	var apiSolutions *api.Solutions
+	var apiSolutionsVal api.Solutions
+	apiSolutions := &apiSolutionsVal
 	var apiOutcome api.Outcome
 	apiSolutions.Outcome = &apiOutcome
 
@@ -66,17 +68,20 @@ func (s *Server) SolutionList(ctx context.Context, in *api.Void) (*api.Solutions
 	defer db.Close()
 
 	// add node info to the k/v db
-	err = db.View(func(tx *bolt.Tx) error {
+	err = db.Update(func(tx *bolt.Tx) error {
 		b, err := tx.CreateBucketIfNotExists([]byte("solutions"))
 		if err != nil {
 			return fmt.Errorf("create bucket: %s", err)
 		}
 		c := b.Cursor()
 
-		for k, _ := c.First(); k != nil; k, _ = c.Next() {
+		for k, v := c.First(); k != nil; k, v = c.Next() {
 			var apiSolutionVal api.Solution
 			apiSolution := &apiSolutionVal
-			apiSolution.Name = fmt.Sprint(k)
+			err = json.Unmarshal(v, apiSolution)
+			if err != nil {
+				return fmt.Errorf("create bucket: %s", err)
+			}
 
 			apiSolutions.Solutions = append(apiSolutions.Solutions, apiSolution)
 		}
@@ -160,7 +165,13 @@ func (s *Server) SolutionCreate(ctx context.Context, in *api.Solution) (*api.Sol
 		if err != nil {
 			return fmt.Errorf("create bucket: %s", err)
 		}
-		err = b.Put([]byte(apiSolution.Name), []byte(""))
+
+		encoded, err := json.Marshal(apiSolution)
+		if err != nil {
+			return err
+		}
+
+		err = b.Put([]byte(apiSolution.Name), encoded)
 		if err != nil {
 			return fmt.Errorf("put: %s", err)
 		}
