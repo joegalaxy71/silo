@@ -61,7 +61,7 @@ func SolutionCreate(cmd *cobra.Command, args []string) {
 	apiSolution.Name = args[0]
 	apiSolution, err = c.SolutionCreate(context.Background(), apiSolution)
 	if err != nil {
-		_log.Error("Unable to call ASDD gRPC server")
+		_log.Error("Adding solution failed")
 		_log.Error(err)
 		return
 	}

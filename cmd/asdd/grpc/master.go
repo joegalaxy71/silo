@@ -18,7 +18,7 @@ func (s *Server) MasterInit(ctx context.Context, in *api.Master) (*api.Master, e
 	apiOutcome := &apiOutcomeVal
 	apiMaster.Outcome = apiOutcome
 	_log := helpers.InitLogs(true)
-	_log.Debug("gRPC call: MasterInit(%s)\n")
+	_log.Debugf("gRPC call: MasterInit(%s)\n", apiMaster.Poolname)
 
 	dataset, err := zfs.CreateFilesystem(apiMaster.Poolname+"/asd", nil)
 	//.CreateFilesystem(apiMaster.Poolname+"/asd", nil)

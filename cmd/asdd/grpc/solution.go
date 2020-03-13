@@ -3,10 +3,10 @@ package grpc
 import (
 	"asd/common/api"
 	"asd/common/helpers"
+	"asd/common/zfs"
 	"context"
 	"fmt"
 	"github.com/boltdb/bolt"
-	"github.com/joegalaxy71/go-zfs"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 	"time"
@@ -17,6 +17,8 @@ func (s *Server) SolutionList(ctx context.Context, in *api.Void) (*api.Solutions
 	_log.Debug("gRPC call: SolutionList")
 
 	var apiSolutions *api.Solutions
+	var apiOutcome api.Outcome
+	apiSolutions.Outcome = &apiOutcome
 
 	// get pool name from config
 	pool := viper.GetString("pool")
@@ -25,6 +27,8 @@ func (s *Server) SolutionList(ctx context.Context, in *api.Void) (*api.Solutions
 		_log.Error(message)
 		err := errors.New(message)
 		return apiSolutions, err
+	} else {
+		_log.Info("got pool from config file:" + pool)
 	}
 
 	// create default master dataset name and get it via zfs wrap
@@ -34,6 +38,8 @@ func (s *Server) SolutionList(ctx context.Context, in *api.Void) (*api.Solutions
 		_log.Error(message)
 		_log.Error(err)
 		return apiSolutions, err
+	} else {
+		_log.Info("Master dataset found:" + dataset.Name)
 	}
 
 	// get the actual mountpoint
@@ -43,21 +49,28 @@ func (s *Server) SolutionList(ctx context.Context, in *api.Void) (*api.Solutions
 		_log.Error(message)
 		_log.Error(err)
 		return apiSolutions, err
+	} else {
+		_log.Info("Got mountpoint: " + mountpoint)
 	}
 
 	// open or create the k/v db
 	db, err := bolt.Open(mountpoint+"/asd.db", 0600, &bolt.Options{Timeout: 3 * time.Second})
 	if err != nil {
-		message := "Unable to open the master db for persisting node info"
+		message := "Unable to open the main db for persisting node info"
 		_log.Error(message)
 		_log.Error(err)
 		return apiSolutions, err
+	} else {
+		_log.Info("succesfully opened main db")
 	}
 	defer db.Close()
 
 	// add node info to the k/v db
 	err = db.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte("solutions"))
+		b, err := tx.CreateBucketIfNotExists([]byte("solutions"))
+		if err != nil {
+			return fmt.Errorf("create bucket: %s", err)
+		}
 		c := b.Cursor()
 
 		for k, _ := c.First(); k != nil; k, _ = c.Next() {
@@ -88,6 +101,8 @@ func (s *Server) SolutionCreate(ctx context.Context, in *api.Solution) (*api.Sol
 	_log.Debug("gRPC call: Create")
 
 	apiSolution := in
+	var apiOutcome api.Outcome
+	apiSolution.Outcome = &apiOutcome
 
 	var pool string
 	pool = viper.GetString("pool")
@@ -102,7 +117,7 @@ func (s *Server) SolutionCreate(ctx context.Context, in *api.Solution) (*api.Sol
 
 	datasetName := pool + "/asd/" + apiSolution.Name
 
-	_, err := zfs.CreateFilesystem(datasetName, nil)
+	dataset, err := zfs.CreateFilesystem(datasetName, nil)
 	if err != nil {
 		message := "Error creating dataset for new solutions" + datasetName
 		_log.Error(message)
@@ -110,12 +125,62 @@ func (s *Server) SolutionCreate(ctx context.Context, in *api.Solution) (*api.Sol
 		apiSolution.Outcome.Message = message
 		return apiSolution, err
 	} else {
-		message := "Succesfully created new solutions with dataset:" + datasetName
-		_log.Error(message)
-		apiSolution.Outcome.Error = false
-		apiSolution.Outcome.Message = message
-		return apiSolution, nil
+		_log.Info("Succesfully created dataset:" + datasetName)
 	}
+
+	// get the actual mountpoint
+	mountpoint, err := dataset.GetProperty("mountpoint")
+	if err != nil {
+		message := "Unable to locate the mountpoint of the master dataset"
+		_log.Error(message)
+		_log.Error(err)
+		apiSolution.Outcome.Message = message
+		return apiSolution, err
+	} else {
+		_log.Info("Got mountpoint:" + mountpoint)
+	}
+
+	// open or create the k/v db
+	db, err := bolt.Open(mountpoint+"/asd.db", 0600, &bolt.Options{Timeout: 3 * time.Second})
+	if err != nil {
+		message := "Unable to open the main db for persisting master info"
+		_log.Error(message)
+		_log.Error(err)
+		apiSolution.Outcome.Message = message
+		return apiSolution, err
+	} else {
+		_log.Info("Main db opened succesfully")
+	}
+
+	defer db.Close()
+
+	// add node info to the k/v db
+	err = db.Update(func(tx *bolt.Tx) error {
+		b, err := tx.CreateBucketIfNotExists([]byte("solutions"))
+		if err != nil {
+			return fmt.Errorf("create bucket: %s", err)
+		}
+		err = b.Put([]byte(apiSolution.Name), []byte(""))
+		if err != nil {
+			return fmt.Errorf("put: %s", err)
+		}
+		return nil
+	})
+	if err != nil {
+		message := "Unable to update db to persist solution info"
+		_log.Error(message)
+		_log.Error(err)
+		apiSolution.Outcome.Message = message
+		return apiSolution, err
+	} else {
+		_log.Info("Main db updated with master info")
+	}
+
+	message := "Succesfully created new solution" + apiSolution.Name
+	_log.Info(message)
+	apiSolution.Outcome.Error = false
+	apiSolution.Outcome.Message = message
+	return apiSolution, nil
 }
 
 func (s *Server) SolutionDestroy(ctx context.Context, in *api.Solution) (*api.Solution, error) {

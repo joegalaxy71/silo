@@ -185,6 +185,7 @@ func (s *Server) NodeAdd(ctx context.Context, in *api.Node) (*api.Node, error) {
 		_log.Info(message)
 		apiNode.Outcome.Message = message
 		return apiNode, nil
+
 	}
 }
 
