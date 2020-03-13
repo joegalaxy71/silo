@@ -82,7 +82,7 @@ func (s *Server) SolutionList(ctx context.Context, in *api.Void) (*api.Solutions
 			apiSolution := &apiSolutionVal
 			err = proto.Unmarshal(v, apiSolution)
 			if err != nil {
-				return fmt.Errorf("create bucket: %s", err)
+				return fmt.Errorf("unmarshaling solution proto: %s", err)
 			}
 			apiSolutions.Solutions = append(apiSolutions.Solutions, apiSolution)
 		}
@@ -99,6 +99,9 @@ func (s *Server) SolutionList(ctx context.Context, in *api.Void) (*api.Solutions
 	message := "Succesfully obtained solution list"
 	_log.Info(message)
 	apiSolutions.Outcome.Message = message
+	for _, _ = range apiSolutions.Solutions {
+		_log.Notice("entry")
+	}
 	return apiSolutions, nil
 }
 
@@ -114,6 +117,17 @@ func (s *Server) SolutionCreate(ctx context.Context, in *api.Solution) (*api.Sol
 	pool = viper.GetString("pool")
 	if pool == "" {
 		message := "The master pool is unconfigured"
+		_log.Error(message)
+		apiSolution.Outcome.Error = true
+		apiSolution.Outcome.Message = message
+		err := errors.New(message)
+		return apiSolution, err
+	}
+
+	var dbPath string
+	dbPath = viper.GetString("mountpoint") + "/asd.db"
+	if dbPath == "" {
+		message := "The master pool is unconfigured (dbpath)"
 		_log.Error(message)
 		apiSolution.Outcome.Error = true
 		apiSolution.Outcome.Message = message
@@ -160,7 +174,7 @@ func (s *Server) SolutionCreate(ctx context.Context, in *api.Solution) (*api.Sol
 	}
 
 	// open or create the k/v db
-	db, err := bolt.Open(mountpoint+"/asd.db", 0600, &bolt.Options{Timeout: 3 * time.Second})
+	db, err := bolt.Open(dbPath, 0600, &bolt.Options{Timeout: 3 * time.Second})
 	if err != nil {
 		message := "Unable to open the main db for persisting master info"
 		_log.Error(message)
@@ -170,10 +184,9 @@ func (s *Server) SolutionCreate(ctx context.Context, in *api.Solution) (*api.Sol
 	} else {
 		_log.Info("Main db opened succesfully")
 	}
-
 	defer db.Close()
 
-	// add node info to the k/v db
+	// add solution info to the k/v db
 	err = db.Update(func(tx *bolt.Tx) error {
 		b, err := tx.CreateBucketIfNotExists([]byte("solutions"))
 		if err != nil {
@@ -188,11 +201,16 @@ func (s *Server) SolutionCreate(ctx context.Context, in *api.Solution) (*api.Sol
 		if err != nil {
 			return err
 		}
+		_log.Debugf("encoded lenght before put: %v\n", len(encoded))
 
 		err = b.Put([]byte(apiSolution.Name), encoded)
 		if err != nil {
 			return fmt.Errorf("put: %s", err)
 		}
+
+		encoded2 := b.Get([]byte(apiSolution.Name))
+		_log.Debugf("encoded lenght after get: %v\n", len(encoded2))
+
 		return nil
 	})
 	if err != nil {

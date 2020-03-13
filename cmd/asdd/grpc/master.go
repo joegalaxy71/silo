@@ -44,6 +44,18 @@ func (s *Server) MasterInit(ctx context.Context, in *api.Master) (*api.Master, e
 		_log.Info("Got mountpoint property:  " + mountpoint)
 	}
 
+	viper.Set("mountpoint", mountpoint)
+	err = viper.WriteConfig()
+	if err != nil {
+		message := "Error persisting configuration (mountpoint)"
+		_log.Error(message)
+		apiMaster.Outcome.Error = true
+		apiMaster.Outcome.Message = message
+		return apiMaster, err
+	} else {
+		_log.Info("Mountpoint property updated on " + viper.ConfigFileUsed())
+	}
+
 	viper.Set("pool", apiMaster.Poolname)
 	err = viper.WriteConfig()
 	if err != nil {
@@ -53,7 +65,7 @@ func (s *Server) MasterInit(ctx context.Context, in *api.Master) (*api.Master, e
 		apiMaster.Outcome.Message = message
 		return apiMaster, err
 	} else {
-		_log.Info("Configuration updated on " + viper.ConfigFileUsed())
+		_log.Info("Pool property updated on " + viper.ConfigFileUsed())
 	}
 
 	// open or create the k/v db

@@ -117,7 +117,8 @@ func run() error {
 			//file created, setting defaults
 			// correctly created dir
 			defaults := map[string]interface{}{
-				"pool": "undefined",
+				"pool":       "undefined",
+				"mountpoint": "undefined",
 				"auth": map[string]string{
 					"username": "none",
 					"password": "unset",

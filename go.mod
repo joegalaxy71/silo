@@ -3,7 +3,7 @@ module asd
 go 1.14
 
 require (
-	github.com/bicomsystems/go-libzfs v0.3.3
+	github.com/alecthomas/kingpin v2.2.6+incompatible
 	github.com/boltdb/bolt v1.3.1
 	github.com/golang/protobuf v1.3.2
 	github.com/gorilla/mux v1.7.4
@@ -12,6 +12,7 @@ require (
 	github.com/marcsauter/single v0.0.0-20191217065835-82e78df7afac
 	github.com/mistifyio/go-zfs v2.1.1+incompatible // indirect
 	github.com/op/go-logging v0.0.0-20160315200505-970db520ece7
+	github.com/peterh/liner v1.2.0
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.4.1
 	github.com/prometheus/common v0.9.1
