@@ -5,11 +5,12 @@ import (
 	"asd/common/helpers"
 	"asd/common/zfs"
 	"context"
-	"encoding/json"
 	"fmt"
 	"github.com/boltdb/bolt"
+	"github.com/golang/protobuf/proto"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
+	"os"
 	"time"
 )
 
@@ -76,13 +77,13 @@ func (s *Server) SolutionList(ctx context.Context, in *api.Void) (*api.Solutions
 		c := b.Cursor()
 
 		for k, v := c.First(); k != nil; k, v = c.Next() {
+			_log.Debug("solution entry")
 			var apiSolutionVal api.Solution
 			apiSolution := &apiSolutionVal
-			err = json.Unmarshal(v, apiSolution)
+			err = proto.Unmarshal(v, apiSolution)
 			if err != nil {
 				return fmt.Errorf("create bucket: %s", err)
 			}
-
 			apiSolutions.Solutions = append(apiSolutions.Solutions, apiSolution)
 		}
 		return nil
@@ -145,6 +146,19 @@ func (s *Server) SolutionCreate(ctx context.Context, in *api.Solution) (*api.Sol
 		_log.Info("Got mountpoint:" + mountpoint)
 	}
 
+	// hostname
+	hostname, err := os.Hostname()
+	if err != nil {
+		message := "Unable to get master hostname"
+		_log.Error(message)
+		_log.Error(err)
+		apiSolution.Outcome.Message = message
+		return apiSolution, err
+	} else {
+		_log.Info("Got master hostname:" + hostname)
+		apiSolution.Hostname = hostname
+	}
+
 	// open or create the k/v db
 	db, err := bolt.Open(mountpoint+"/asd.db", 0600, &bolt.Options{Timeout: 3 * time.Second})
 	if err != nil {
@@ -166,7 +180,11 @@ func (s *Server) SolutionCreate(ctx context.Context, in *api.Solution) (*api.Sol
 			return fmt.Errorf("create bucket: %s", err)
 		}
 
-		encoded, err := json.Marshal(apiSolution)
+		apiSolution.Hostname = hostname
+		apiSolution.Status = "available"
+
+		var encoded []byte
+		encoded, err = proto.Marshal(apiSolution)
 		if err != nil {
 			return err
 		}

@@ -5,9 +5,9 @@ import (
 	"asd/common/helpers"
 	"asd/common/zfs"
 	"context"
-	"encoding/json"
 	"fmt"
 	"github.com/boltdb/bolt"
+	"github.com/golang/protobuf/proto"
 	"github.com/spf13/viper"
 	"os"
 	"time"
@@ -70,6 +70,7 @@ func (s *Server) MasterInit(ctx context.Context, in *api.Master) (*api.Master, e
 
 	defer db.Close()
 
+	// hostname
 	hostname, err := os.Hostname()
 	if err != nil {
 		message := "Unable to get master hostname"
@@ -89,7 +90,7 @@ func (s *Server) MasterInit(ctx context.Context, in *api.Master) (*api.Master, e
 			return fmt.Errorf("create bucket: %s", err)
 		}
 
-		encoded, err := json.Marshal(apiMaster)
+		encoded, err := proto.Marshal(apiMaster)
 		if err != nil {
 			return err
 		}

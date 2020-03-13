@@ -34,11 +34,15 @@ message Master {
     Outcome Outcome = 1;
     string Hostname = 2;
     string Ip = 3;
+    string Poolname = 4;
 }
 
 message Solution {
     Outcome Outcome = 1;
     string Name = 2;
+    string Hostname = 3;
+    string status = 4;
+
 }
 
 message Solutions {

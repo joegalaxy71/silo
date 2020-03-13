@@ -41,6 +41,10 @@ func SolutionList(cmd *cobra.Command, args []string) {
 	}
 
 	_log.Info(apiSolutions.Outcome.Message)
+	_log.Infof("Solution, host, status")
+	for _, apiSolution := range apiSolutions.Solutions {
+		_log.Infof("%s, %s, %s\n", apiSolution.Name, apiSolution.Hostname, apiSolution.Status)
+	}
 }
 
 func SolutionCreate(cmd *cobra.Command, args []string) {
