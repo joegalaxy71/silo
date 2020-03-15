@@ -77,7 +77,7 @@ func (s *Server) SolutionList(ctx context.Context, in *api.Void) (*api.Solutions
 		c := b.Cursor()
 
 		for k, v := c.First(); k != nil; k, v = c.Next() {
-			_log.Debug("solution entry")
+			//_log.Debug("solution entry")
 			var apiSolutionVal api.Solution
 			apiSolution := &apiSolutionVal
 			err = proto.Unmarshal(v, apiSolution)
@@ -99,9 +99,9 @@ func (s *Server) SolutionList(ctx context.Context, in *api.Void) (*api.Solutions
 	message := "Succesfully obtained solution list"
 	_log.Info(message)
 	apiSolutions.Outcome.Message = message
-	for _, _ = range apiSolutions.Solutions {
-		_log.Notice("entry")
-	}
+	//for _, _ = range apiSolutions.Solutions {
+	//	_log.Notice("entry")
+	//}
 	return apiSolutions, nil
 }
 
