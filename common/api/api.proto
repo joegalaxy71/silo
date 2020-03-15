@@ -68,16 +68,22 @@ service Asdd {
     rpc SolutionList(Void) returns (Solutions) {}
     rpc SolutionCreate(Solution) returns (Solution) {} //+1 -> available
     rpc SolutionDestroy(Solution) returns (Solution) {} //-1 ->missing
+
     rpc SolutionBackup(Solution) returns (Solution) {}
     rpc SolutionRestore(Solution) returns (Solution) {}
-    rpc SolutionDeploy(Solution) returns (Solution) {} //+1 -> deployed
-    rpc SolutionRetire(Solution) returns (Solution) {} //-1 -> available
-    rpc SolutionStart(Solution) returns (Solution) {} //+1 -> started
-    rpc SolutionStop(Solution) returns (Solution) {} //-1 -> deployed
-    rpc SolutionExpose(Solution) returns (Solution) {} //+1 -> exposed
-    rpc SolutionContain(Solution) returns (Solution) {} //-1 ->started
+
     rpc SolutionSnapshot(Solution) returns (Solution) {}
     rpc SolutionRollback(Solution) returns (Solution) {}
+
+    rpc SolutionDeploy(Solution) returns (Solution) {} //+1 -> deployed
+    rpc SolutionRetire(Solution) returns (Solution) {} //-1 -> available
+
+    rpc SolutionStart(Solution) returns (Solution) {} //+1 -> started
+    rpc SolutionStop(Solution) returns (Solution) {} //-1 -> deployed
+
+    rpc SolutionExpose(Solution) returns (Solution) {} //+1 -> exposed
+    rpc SolutionContain(Solution) returns (Solution) {} //-1 ->started
+
 }
 
 service AsdLet {

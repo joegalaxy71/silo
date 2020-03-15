@@ -77,7 +77,6 @@ func (s *Server) SolutionList(ctx context.Context, in *api.Void) (*api.Solutions
 		c := b.Cursor()
 
 		for k, v := c.First(); k != nil; k, v = c.Next() {
-			//_log.Debug("solution entry")
 			var apiSolutionVal api.Solution
 			apiSolution := &apiSolutionVal
 			err = proto.Unmarshal(v, apiSolution)
@@ -99,9 +98,6 @@ func (s *Server) SolutionList(ctx context.Context, in *api.Void) (*api.Solutions
 	message := "Succesfully obtained solution list"
 	_log.Info(message)
 	apiSolutions.Outcome.Message = message
-	//for _, _ = range apiSolutions.Solutions {
-	//	_log.Notice("entry")
-	//}
 	return apiSolutions, nil
 }
 
@@ -235,12 +231,107 @@ func (s *Server) SolutionDestroy(ctx context.Context, in *api.Solution) (*api.So
 	_log.Debug("gRPC call: Destroy")
 
 	apiSolution := in
+	var apiOutcome api.Outcome
+	apiSolution.Outcome = &apiOutcome
 
-	err := errors.New("not implemented")
-	// destroy a solution datased, with ALL backups, snapshots
+	var pool string
+	pool = viper.GetString("pool")
+	if pool == "" {
+		message := "The master pool is unconfigured"
+		_log.Error(message)
+		apiSolution.Outcome.Error = true
+		apiSolution.Outcome.Message = message
+		err := errors.New(message)
+		return apiSolution, err
+	}
 
-	err = errors.Wrap(err, "really not")
-	return apiSolution, err
+	var dbPath string
+	dbPath = viper.GetString("mountpoint") + "/asd.db"
+	if dbPath == "" {
+		message := "The master pool is unconfigured (dbpath)"
+		_log.Error(message)
+		apiSolution.Outcome.Error = true
+		apiSolution.Outcome.Message = message
+		err := errors.New(message)
+		return apiSolution, err
+	}
+
+	datasetName := pool + "/asd/" + apiSolution.Name
+
+	dataset, err := zfs.GetDataset(datasetName)
+	if err != nil {
+		message := "Error getting dataset with the given name:" + datasetName
+		_log.Error(message)
+		apiSolution.Outcome.Error = true
+		apiSolution.Outcome.Message = message
+		return apiSolution, err
+	} else {
+		_log.Info("Succesfully got dataset object for dataset:" + datasetName)
+	}
+
+	// destroy recursively solution
+	err = dataset.Destroy(zfs.DestroyRecursive)
+	if err != nil {
+		message := "Error recursively destroying dataset named:" + datasetName
+		_log.Error(message)
+		apiSolution.Outcome.Error = true
+		apiSolution.Outcome.Message = message
+		return apiSolution, err
+	} else {
+		_log.Info("Succesfully destroyed dataset named:" + datasetName)
+	}
+
+	// open or create the k/v db
+	db, err := bolt.Open(dbPath, 0600, &bolt.Options{Timeout: 3 * time.Second})
+	if err != nil {
+		message := "Unable to open the main db for persisting master info"
+		_log.Error(message)
+		_log.Error(err)
+		apiSolution.Outcome.Message = message
+		return apiSolution, err
+	} else {
+		_log.Info("Main db opened succesfully")
+	}
+	defer db.Close()
+
+	// add solution info to the k/v db
+	err = db.Update(func(tx *bolt.Tx) error {
+		b, err := tx.CreateBucketIfNotExists([]byte("solutions"))
+		if err != nil {
+			return fmt.Errorf("create bucket: %s", err)
+		}
+		c := b.Cursor()
+
+		_log.Debug("Entering delete loop...")
+		_log.Debugf("datasetname=%s\n", datasetName)
+
+		for k, _ := c.First(); k != nil; k, _ = c.Next() {
+			_log.Debugf("key=%s\n", k)
+			if string(k) == apiSolution.Name {
+				_log.Debug("Found")
+				err = c.Delete()
+				if err != nil {
+					return fmt.Errorf("deleting key %s: error: %s", string(k), err)
+				}
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		message := "Unable to update db to delete solution info"
+		_log.Error(message)
+		_log.Error(err)
+		apiSolution.Outcome.Message = message
+		return apiSolution, err
+	} else {
+		_log.Info("Main db updated with master info")
+	}
+
+	message := "Succesfully destroyed solution:" + apiSolution.Name
+	_log.Info(message)
+	apiSolution.Outcome.Error = false
+	apiSolution.Outcome.Message = message
+	return apiSolution, nil
 }
 
 func (s *Server) SolutionDeploy(ctx context.Context, in *api.Solution) (*api.Solution, error) {

@@ -72,3 +72,29 @@ func SolutionCreate(cmd *cobra.Command, args []string) {
 
 	_log.Infof("Outcome message:%s\n", apiSolution.Outcome.Message)
 }
+
+func SolutionDestroy(cmd *cobra.Command, args []string) {
+
+	_log = helpers.InitLogs(true)
+	_log.Debug("Command:SolutionDestroy")
+
+	conn, err := grpc.Dial("0.0.0.0:9000", grpc.WithInsecure())
+	if err != nil {
+		log.Error("error dialing grpc server on asdd")
+		log.Error(err)
+		return
+	}
+	defer conn.Close()
+	c := api.NewAsddClient(conn)
+	var apiSolutionVal api.Solution
+	apiSolution := &apiSolutionVal
+	apiSolution.Name = args[0]
+	apiSolution, err = c.SolutionDestroy(context.Background(), apiSolution)
+	if err != nil {
+		_log.Error("Destroying solution failed")
+		_log.Error(err)
+		return
+	}
+
+	_log.Infof("Outcome message:%s\n", apiSolution.Outcome.Message)
+}

@@ -136,8 +136,8 @@ func run() error {
 	var cmdSolution = &cobra.Command{
 		Use:     "solution",
 		Aliases: []string{"sol", "so"},
-		Short:   "Create a solution",
-		Long:    "Creates a solution with the given name",
+		Short:   "Subcomand for solution management",
+		Long:    "Please specify the operation needed",
 		Args:    cobra.ExactArgs(1),
 		Run:     commands.Solution,
 	}
@@ -159,6 +159,15 @@ func run() error {
 		Long:    "Creates a solution with the given name",
 		Args:    cobra.ExactArgs(1),
 		Run:     commands.SolutionCreate,
+	}
+
+	var cmdSolutionDestroy = &cobra.Command{
+		Use:     "destroy",
+		Example: "asd solution destroy [solution_unique_name]",
+		Short:   "Destroy a solution",
+		Long:    "Destroy a solution with the given name",
+		Args:    cobra.ExactArgs(1),
+		Run:     commands.SolutionDestroy,
 	}
 
 	//////////////////////////////
@@ -212,7 +221,7 @@ func run() error {
 	rootCmd.AddCommand(cmdVersion, cmdMaster, cmdNode, cmdSolution)
 	cmdMaster.AddCommand(cmdMasterInit)
 	cmdNode.AddCommand(cmdNodeList, cmdNodeAdd, cmdNodeRem, cmdNodePurge)
-	cmdSolution.AddCommand(cmdSolutionList, cmdSolutionCreate)
+	cmdSolution.AddCommand(cmdSolutionList, cmdSolutionCreate, cmdSolutionDestroy)
 	rootCmd.Execute()
 	return nil
 }
