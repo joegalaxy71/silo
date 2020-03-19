@@ -161,6 +161,15 @@ func run() error {
 		Run:     commands.SolutionCreate,
 	}
 
+	var cmdSolutionCopy = &cobra.Command{
+		Use:     "copy",
+		Example: "asd solution copy [solution_source] [solution_dest]",
+		Short:   "Copy a solution",
+		Long:    "Creates a copy of a solution",
+		Args:    cobra.ExactArgs(2),
+		Run:     commands.SolutionCopy,
+	}
+
 	var cmdSolutionDestroy = &cobra.Command{
 		Use:     "destroy",
 		Example: "asd solution destroy [solution_unique_name]",
@@ -168,6 +177,15 @@ func run() error {
 		Long:    "Destroy a solution with the given name",
 		Args:    cobra.ExactArgs(1),
 		Run:     commands.SolutionDestroy,
+	}
+
+	var cmdSolutionDeploy = &cobra.Command{
+		Use:     "deploy",
+		Example: "asd solution deploy [solution_unique_name] [host_unique_name]",
+		Short:   "Deploy a solution",
+		Long:    "Deploy a solution with the given name in the indicated host",
+		Args:    cobra.ExactArgs(1),
+		Run:     commands.SolutionDeploy,
 	}
 
 	//////////////////////////////
@@ -221,7 +239,7 @@ func run() error {
 	rootCmd.AddCommand(cmdVersion, cmdMaster, cmdNode, cmdSolution)
 	cmdMaster.AddCommand(cmdMasterInit)
 	cmdNode.AddCommand(cmdNodeList, cmdNodeAdd, cmdNodeRem, cmdNodePurge)
-	cmdSolution.AddCommand(cmdSolutionList, cmdSolutionCreate, cmdSolutionDestroy)
+	cmdSolution.AddCommand(cmdSolutionList, cmdSolutionCreate, cmdSolutionCopy, cmdSolutionDestroy, cmdSolutionDeploy)
 	rootCmd.Execute()
 	return nil
 }

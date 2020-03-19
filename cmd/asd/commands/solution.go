@@ -73,6 +73,33 @@ func SolutionCreate(cmd *cobra.Command, args []string) {
 	_log.Infof("Outcome message:%s\n", apiSolution.Outcome.Message)
 }
 
+func SolutionCopy(cmd *cobra.Command, args []string) {
+
+	_log = helpers.InitLogs(true)
+	_log.Debug("Command:SolutionCopy")
+
+	conn, err := grpc.Dial("0.0.0.0:9000", grpc.WithInsecure())
+	if err != nil {
+		log.Error("error dialing grpc server on asdd")
+		log.Error(err)
+		return
+	}
+	defer conn.Close()
+	c := api.NewAsddClient(conn)
+	var apiCopyArgsVal api.CopyArgs
+	apiCopyArgs := &apiCopyArgsVal
+	apiCopyArgs.Source = args[0]
+	apiCopyArgs.Destination = args[1]
+	apiOutcome, err := c.SolutionCopy(context.Background(), apiCopyArgs)
+	if err != nil {
+		_log.Error("Adding solution failed")
+		_log.Error(err)
+		return
+	}
+
+	_log.Infof("Outcome message:%s\n", apiOutcome.Message)
+}
+
 func SolutionDestroy(cmd *cobra.Command, args []string) {
 
 	_log = helpers.InitLogs(true)
@@ -90,6 +117,33 @@ func SolutionDestroy(cmd *cobra.Command, args []string) {
 	apiSolution := &apiSolutionVal
 	apiSolution.Name = args[0]
 	apiSolution, err = c.SolutionDestroy(context.Background(), apiSolution)
+	if err != nil {
+		_log.Error("Destroying solution failed")
+		_log.Error(err)
+		return
+	}
+
+	_log.Infof("Outcome message:%s\n", apiSolution.Outcome.Message)
+}
+
+func SolutionDeploy(cmd *cobra.Command, args []string) {
+
+	_log = helpers.InitLogs(true)
+	_log.Debug("Command:SolutionDeploy")
+
+	conn, err := grpc.Dial("0.0.0.0:9000", grpc.WithInsecure())
+	if err != nil {
+		log.Error("error dialing grpc server on asdd")
+		log.Error(err)
+		return
+	}
+	defer conn.Close()
+	c := api.NewAsddClient(conn)
+	var apiSolutionVal api.Solution
+	apiSolution := &apiSolutionVal
+	apiSolution.Name = args[0]
+	apiSolution.Hostname = args[1]
+	apiSolution, err = c.SolutionDeploy(context.Background(), apiSolution)
 	if err != nil {
 		_log.Error("Destroying solution failed")
 		_log.Error(err)

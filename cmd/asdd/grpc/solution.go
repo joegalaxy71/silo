@@ -101,6 +101,194 @@ func (s *Server) SolutionList(ctx context.Context, in *api.Void) (*api.Solutions
 	return apiSolutions, nil
 }
 
+func (s *Server) SolutionCopy(ctx context.Context, in *api.CopyArgs) (*api.Outcome, error) {
+	_log := helpers.InitLogs(true)
+	_log.Debug("gRPC call: Copy")
+
+	copyArgs := in
+	var apiOutcomeVal api.Outcome
+	apiOutcome := &apiOutcomeVal
+
+	var pool string
+	pool = viper.GetString("pool")
+	if pool == "" {
+		message := "The master pool is unconfigured"
+		_log.Error(message)
+		apiOutcome.Error = true
+		apiOutcome.Message = message
+		err := errors.New(message)
+		return apiOutcome, err
+	}
+
+	var dbPath string
+	dbPath = viper.GetString("mountpoint") + "/asd.db"
+	if dbPath == "" {
+		message := "The master pool is unconfigured (dbpath)"
+		_log.Error(message)
+		apiOutcome.Error = true
+		apiOutcome.Message = message
+		err := errors.New(message)
+		return apiOutcome, err
+	}
+
+	sourceName := pool + "/asd/" + copyArgs.Source
+	destName := pool + "/asd/" + copyArgs.Destination
+	sourceOrigName := sourceName + ".orig"
+
+	//- [ ]  check if A exists and A.ORIG and B names are available
+
+	sourceDataset, err := zfs.GetDataset(sourceName)
+	if err != nil {
+		message := "Unable to locate the source dataset"
+		_log.Error(message)
+		_log.Error(err)
+		apiOutcome.Message = message
+		apiOutcome.Error = true
+		return apiOutcome, err
+	} else {
+		_log.Info("Source dataset found:" + sourceName)
+	}
+
+	_, err = zfs.GetDataset(destName)
+	if err == nil {
+		message := "The destination dataset exists: " + destName
+		_log.Error(message)
+		_log.Error(err)
+		apiOutcome.Message = message
+		apiOutcome.Error = true
+		return apiOutcome, err
+	} else {
+		_log.Info("Destination dataset not already present:" + destName)
+	}
+
+	_, err = zfs.GetDataset(sourceOrigName)
+	if err == nil {
+		message := "The destination dataset exists: " + sourceOrigName
+		_log.Error(message)
+		_log.Error(err)
+		apiOutcome.Message = message
+		apiOutcome.Error = true
+		return apiOutcome, err
+	} else {
+		_log.Info("Source .origin temporary dataset name not already present:" + sourceName)
+	}
+
+	//- [ ]  snap A@clone
+
+	sourceDataset, err = sourceDataset.Snapshot(sourceName+".clone", false)
+	if err != nil {
+		message := "Unable to snap the source dataset"
+		_log.Error(message)
+		_log.Error(err)
+		apiOutcome.Message = message
+		apiOutcome.Error = true
+		return apiOutcome, err
+	} else {
+		_log.Info("Source dataset snapshot made:" + copyArgs.Source + ".clone")
+	}
+
+	//- [ ]  rename A → A.ORIG
+
+	_, err = zfs.Command("rename", sourceName, destName)
+	if err != nil {
+		message := "Unable to rename the source dataset"
+		_log.Error(message)
+		_log.Error(err)
+		apiOutcome.Message = message
+		apiOutcome.Error = true
+		return apiOutcome, err
+	} else {
+		_log.Info("Source dataset renamed")
+	}
+
+	//- [ ]  clone A.ORIG@clone → A (a get all snapshots)
+
+	_, err = zfs.Command("clone", sourceName, sourceName+".orig")
+	if err != nil {
+		message := "Unable to clone A.ORIG@clone → A"
+		_log.Error(message)
+		_log.Error(err)
+		apiOutcome.Message = message
+		apiOutcome.Error = true
+		return apiOutcome, err
+	} else {
+		_log.Info("Source dataset cloned")
+	}
+
+	//- [ ]  rename A.ORIG → B
+
+	_, err = zfs.Command("rename", sourceName+".orig", destName)
+	if err != nil {
+		message := "Unable to rename A.ORIG → B"
+		_log.Error(message)
+		_log.Error(err)
+		apiOutcome.Message = message
+		apiOutcome.Error = true
+		return apiOutcome, err
+	} else {
+		_log.Info("Source dataset renamed")
+	}
+
+	// open or create the k/v db
+	db, err := bolt.Open(dbPath, 0600, &bolt.Options{Timeout: 3 * time.Second})
+	if err != nil {
+		message := "Unable to open the main db for persisting master info"
+		_log.Error(message)
+		_log.Error(err)
+		apiOutcome.Message = message
+		return apiOutcome, err
+	} else {
+		_log.Info("Main db opened succesfully")
+	}
+	defer db.Close()
+
+	// add solution info to the k/v db
+	err = db.Update(func(tx *bolt.Tx) error {
+		b, err := tx.CreateBucketIfNotExists([]byte("solutions"))
+		if err != nil {
+			return fmt.Errorf("create bucket: %s", err)
+		}
+
+		var apiSolutionVal api.Solution
+		apiSolution := &apiSolutionVal
+		apiSolution.Name = copyArgs.Destination
+		apiSolution.Hostname = "master"
+		apiSolution.Status = "available"
+
+		var encoded []byte
+		encoded, err = proto.Marshal(apiSolution)
+		if err != nil {
+			return err
+		}
+		_log.Debugf("encoded lenght before put: %v\n", len(encoded))
+
+		err = b.Put([]byte(apiSolution.Name), encoded)
+		if err != nil {
+			return fmt.Errorf("put: %s", err)
+		}
+
+		encoded2 := b.Get([]byte(apiSolution.Name))
+		_log.Debugf("encoded lenght after get: %v\n", len(encoded2))
+
+		return nil
+	})
+	if err != nil {
+		message := "Unable to update db to persist solution info"
+		_log.Error(message)
+		_log.Error(err)
+		apiOutcome.Message = message
+		return apiOutcome, err
+	} else {
+		_log.Info("Main db updated with master info")
+	}
+
+	message := "Succesfully copied " + copyArgs.Source + " into " + copyArgs.Destination
+	_log.Info(message)
+	apiOutcome.Error = false
+	apiOutcome.Message = message
+	return apiOutcome, nil
+}
+
 func (s *Server) SolutionCreate(ctx context.Context, in *api.Solution) (*api.Solution, error) {
 	_log := helpers.InitLogs(true)
 	_log.Debug("gRPC call: Create")
@@ -302,13 +490,13 @@ func (s *Server) SolutionDestroy(ctx context.Context, in *api.Solution) (*api.So
 		}
 		c := b.Cursor()
 
-		_log.Debug("Entering delete loop...")
-		_log.Debugf("datasetname=%s\n", datasetName)
+		//_log.Debug("Entering delete loop...")
+		//_log.Debugf("datasetname=%s\n", datasetName)
 
 		for k, _ := c.First(); k != nil; k, _ = c.Next() {
-			_log.Debugf("key=%s\n", k)
+			//_log.Debugf("key=%s\n", k)
 			if string(k) == apiSolution.Name {
-				_log.Debug("Found")
+				//_log.Debug("Found")
 				err = c.Delete()
 				if err != nil {
 					return fmt.Errorf("deleting key %s: error: %s", string(k), err)
