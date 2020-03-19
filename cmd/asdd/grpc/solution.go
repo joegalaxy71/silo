@@ -133,10 +133,8 @@ func (s *Server) SolutionCopy(ctx context.Context, in *api.CopyArgs) (*api.Outco
 
 	sourceName := pool + "/asd/" + copyArgs.Source
 	destName := pool + "/asd/" + copyArgs.Destination
-	sourceOrigName := sourceName + ".orig"
 
 	//- [ ]  check if A exists and A.ORIG and B names are available
-
 	sourceDataset, err := zfs.GetDataset(sourceName)
 	if err != nil {
 		message := "Unable to locate the source dataset"
@@ -148,7 +146,6 @@ func (s *Server) SolutionCopy(ctx context.Context, in *api.CopyArgs) (*api.Outco
 	} else {
 		_log.Info("Source dataset found:" + sourceName)
 	}
-
 	_, err = zfs.GetDataset(destName)
 	if err == nil {
 		message := "The destination dataset exists: " + destName
@@ -160,10 +157,9 @@ func (s *Server) SolutionCopy(ctx context.Context, in *api.CopyArgs) (*api.Outco
 	} else {
 		_log.Info("Destination dataset not already present:" + destName)
 	}
-
-	_, err = zfs.GetDataset(sourceOrigName)
+	_, err = zfs.GetDataset(sourceName + ".orig")
 	if err == nil {
-		message := "The destination dataset exists: " + sourceOrigName
+		message := "The destination dataset exists: " + sourceName + ".orig"
 		_log.Error(message)
 		_log.Error(err)
 		apiOutcome.Message = message
@@ -173,9 +169,8 @@ func (s *Server) SolutionCopy(ctx context.Context, in *api.CopyArgs) (*api.Outco
 		_log.Info("Source .origin temporary dataset name not already present:" + sourceName)
 	}
 
-	//- [ ]  snap A@clone
-
-	sourceDataset, err = sourceDataset.Snapshot(sourceName+".clone", false)
+	//- [ ]  snap A@passage
+	sourceDataset, err = sourceDataset.Snapshot("passage", false)
 	if err != nil {
 		message := "Unable to snap the source dataset"
 		_log.Error(message)
@@ -184,12 +179,11 @@ func (s *Server) SolutionCopy(ctx context.Context, in *api.CopyArgs) (*api.Outco
 		apiOutcome.Error = true
 		return apiOutcome, err
 	} else {
-		_log.Info("Source dataset snapshot made:" + copyArgs.Source + ".clone")
+		_log.Info("Source dataset snapshot made:" + copyArgs.Source + "@clone")
 	}
 
 	//- [ ]  rename A → A.ORIG
-
-	_, err = zfs.Command("rename", sourceName, destName)
+	_, err = zfs.Command("rename", sourceName, sourceName+".orig")
 	if err != nil {
 		message := "Unable to rename the source dataset"
 		_log.Error(message)
@@ -202,8 +196,20 @@ func (s *Server) SolutionCopy(ctx context.Context, in *api.CopyArgs) (*api.Outco
 	}
 
 	//- [ ]  clone A.ORIG@clone → A (a get all snapshots)
+	_, err = zfs.Command("clone", sourceName+".orig@passage", sourceName)
+	if err != nil {
+		message := "Unable to clone A.ORIG@clone → A"
+		_log.Error(message)
+		_log.Error(err)
+		apiOutcome.Message = message
+		apiOutcome.Error = true
+		return apiOutcome, err
+	} else {
+		_log.Info("Source dataset cloned")
+	}
 
-	_, err = zfs.Command("clone", sourceName, sourceName+".orig")
+	//- [ ]  promote A (a retain all snapshots)
+	_, err = zfs.Command("promote", sourceName)
 	if err != nil {
 		message := "Unable to clone A.ORIG@clone → A"
 		_log.Error(message)
@@ -216,7 +222,6 @@ func (s *Server) SolutionCopy(ctx context.Context, in *api.CopyArgs) (*api.Outco
 	}
 
 	//- [ ]  rename A.ORIG → B
-
 	_, err = zfs.Command("rename", sourceName+".orig", destName)
 	if err != nil {
 		message := "Unable to rename A.ORIG → B"
