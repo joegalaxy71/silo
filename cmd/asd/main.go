@@ -187,7 +187,7 @@ func run() error {
 		Example: "asd solution deploy [solution_unique_name] [host_unique_name]",
 		Short:   "Deploy a solution",
 		Long:    "Deploy a solution with the given name in the indicated host",
-		Args:    cobra.ExactArgs(1),
+		Args:    cobra.ExactArgs(2),
 		Run:     commands.SolutionDeploy,
 	}
 

@@ -145,7 +145,7 @@ func SolutionDeploy(cmd *cobra.Command, args []string) {
 	apiSolution.Hostname = args[1]
 	apiSolution, err = c.SolutionDeploy(context.Background(), apiSolution)
 	if err != nil {
-		_log.Error("Destroying solution failed")
+		_log.Error("Deploy failed")
 		_log.Error(err)
 		return
 	}

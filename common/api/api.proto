@@ -41,8 +41,9 @@ message Solution {
     Outcome Outcome = 1;
     string Name = 2;
     string Hostname = 3;
-    string status = 4;
-
+    string Status = 4;
+    string Ip = 5;
+    string Poolname = 6;
 }
 
 message Solutions {

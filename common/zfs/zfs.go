@@ -114,6 +114,13 @@ func Command(arg ...string) ([][]string, error) {
 	return c.Run(arg...)
 }
 
+// zfs is a helper function to wrap typical calls to zfs.
+func ShCommand(call string, arg ...string) ([][]string, error) {
+	c := command{Command: call}
+
+	return c.Run(arg...)
+}
+
 // Datasets returns a slice of ZFS datasets, regardless of type.
 // A filter argument may be passed to select a dataset with the matching name,
 // or empty string ("") may be used to select all datasets.

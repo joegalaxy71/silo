@@ -595,8 +595,8 @@ func (s *Server) SolutionDeploy(ctx context.Context, in *api.Solution) (*api.Sol
 		message := "Unable to open the main db for persisting master info"
 		_log.Error(message)
 		_log.Error(err)
-		apiOutcome.Message = message
-		return apiOutcome, err
+		apiSolution.Outcome.Message = message
+		return apiSolution, err
 	} else {
 		_log.Info("Main db opened succesfully")
 	}
@@ -611,7 +611,6 @@ func (s *Server) SolutionDeploy(ctx context.Context, in *api.Solution) (*api.Sol
 		if err != nil {
 			return fmt.Errorf("create bucket: %s", err)
 		}
-
 
 		encodedSolution := b.Get([]byte(apiSolution.Name))
 
@@ -653,18 +652,24 @@ func (s *Server) SolutionDeploy(ctx context.Context, in *api.Solution) (*api.Sol
 
 	//- [ ]  sends the deploy snapshot to the worker node via ssh command, effectively creating a new dataset on the worker node
 
-	// zfs is a helper function to wrap typical calls to zfs.
-	func Command(arg ...string) ([][]string, error) {
+	//func Command(arg ...string) ([][]string, error) {
 
-	c := zfs.Command{Command: "zfs"}
-
-		return c.Run(arg...)
+	lines, err := zfs.Command("send", sourceName+"@deploy", "| ssh root@"+apiSolution.Ip+"'zfs recv "+apiSolution.Poolname+"/asd/"+apiSolution.Name)
+	if err != nil {
+		message := ""
+		_log.Error(message)
+		_log.Error(err)
+		apiSolution.Outcome.Message = message
+		apiSolution.Outcome.Error = true
+		return apiSolution, err
+	} else {
+		for _, line := range lines {
+			fmt.Println(line)
+		}
+		_log.Info("zfs send command executed succesfully")
 	}
 
-
-
 	//- [ ]  update k/v, sets solution as "deployed"
-
 
 	return apiSolution, nil
 }

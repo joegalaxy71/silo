@@ -18,7 +18,8 @@ func (s *Server) NodeList(ctx context.Context, in *api.Void) (*api.Nodes, error)
 	_log := helpers.InitLogs(true)
 	_log.Debug("gRPC call: NodeList")
 
-	var apiNodes *api.Nodes
+	var apinodesVal api.Nodes
+	apiNodes := &apinodesVal
 
 	// get pool name from config
 	pool := viper.GetString("pool")
@@ -27,6 +28,8 @@ func (s *Server) NodeList(ctx context.Context, in *api.Void) (*api.Nodes, error)
 		_log.Error(message)
 		err := errors.New(message)
 		return apiNodes, err
+	} else {
+		_log.Info("pool info obtained from onfig")
 	}
 
 	// create default master dataset name and get it via zfs wrap
@@ -36,6 +39,8 @@ func (s *Server) NodeList(ctx context.Context, in *api.Void) (*api.Nodes, error)
 		_log.Error(message)
 		_log.Error(err)
 		return apiNodes, err
+	} else {
+		_log.Info("master dataset located")
 	}
 
 	// get the actual mountpoint
@@ -45,6 +50,8 @@ func (s *Server) NodeList(ctx context.Context, in *api.Void) (*api.Nodes, error)
 		_log.Error(message)
 		_log.Error(err)
 		return apiNodes, err
+	} else {
+		_log.Info("mountpoint obtained:" + mountpoint)
 	}
 
 	// open or create the k/v db
@@ -54,6 +61,8 @@ func (s *Server) NodeList(ctx context.Context, in *api.Void) (*api.Nodes, error)
 		_log.Error(message)
 		_log.Error(err)
 		return apiNodes, err
+	} else {
+		_log.Info("master db opened")
 	}
 	defer db.Close()
 
