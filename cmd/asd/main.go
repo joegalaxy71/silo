@@ -163,6 +163,7 @@ func run() error {
 
 	var cmdSolutionCopy = &cobra.Command{
 		Use:     "copy",
+		Aliases: []string{"cp"},
 		Example: "asd solution copy [solution_source] [solution_dest]",
 		Short:   "Copy a solution",
 		Long:    "Creates a copy of a solution",
@@ -172,6 +173,7 @@ func run() error {
 
 	var cmdSolutionDestroy = &cobra.Command{
 		Use:     "destroy",
+		Aliases: []string{"rm"},
 		Example: "asd solution destroy [solution_unique_name]",
 		Short:   "Destroy a solution",
 		Long:    "Destroy a solution with the given name",
@@ -181,6 +183,7 @@ func run() error {
 
 	var cmdSolutionDeploy = &cobra.Command{
 		Use:     "deploy",
+		Aliases: []string{"dep"},
 		Example: "asd solution deploy [solution_unique_name] [host_unique_name]",
 		Short:   "Deploy a solution",
 		Long:    "Deploy a solution with the given name in the indicated host",

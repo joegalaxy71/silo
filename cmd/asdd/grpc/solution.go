@@ -234,6 +234,19 @@ func (s *Server) SolutionCopy(ctx context.Context, in *api.CopyArgs) (*api.Outco
 		_log.Info("Source dataset renamed")
 	}
 
+	//- [ ]  promote B
+	_, err = zfs.Command("promote", destName)
+	if err != nil {
+		message := "Unable to rename A.ORIG → B"
+		_log.Error(message)
+		_log.Error(err)
+		apiOutcome.Message = message
+		apiOutcome.Error = true
+		return apiOutcome, err
+	} else {
+		_log.Info("Destination dataset promoted")
+	}
+
 	// open or create the k/v db
 	db, err := bolt.Open(dbPath, 0600, &bolt.Options{Timeout: 3 * time.Second})
 	if err != nil {
@@ -532,12 +545,128 @@ func (s *Server) SolutionDeploy(ctx context.Context, in *api.Solution) (*api.Sol
 	_log.Debug("gRPC call: Deploy")
 
 	apiSolution := in
+	var apiOutcomeVal api.Outcome
+	apiOutcome := &apiOutcomeVal
+	apiSolution.Outcome = apiOutcome
 
-	err := errors.New("not implemented")
-	// destroy a solution datased, with ALL backups, snapshots
+	var pool string
+	pool = viper.GetString("pool")
+	if pool == "" {
+		message := "The master pool is unconfigured"
+		_log.Error(message)
+		apiOutcome.Error = true
+		apiOutcome.Message = message
+		err := errors.New(message)
+		return apiSolution, err
+	}
 
-	err = errors.Wrap(err, "really not")
-	return apiSolution, err
+	var dbPath string
+	dbPath = viper.GetString("mountpoint") + "/asd.db"
+	if dbPath == "" {
+		message := "The master pool is unconfigured (dbpath)"
+		_log.Error(message)
+		apiOutcome.Error = true
+		apiOutcome.Message = message
+		err := errors.New(message)
+		return apiSolution, err
+	}
+
+	//- [ ]  check if the dataset exists
+
+	sourceName := pool + "/asd/" + apiSolution.Name
+
+	sourceDataset, err := zfs.GetDataset(sourceName)
+	if err != nil {
+		message := "Unable to locate the source dataset"
+		_log.Error(message)
+		_log.Error(err)
+		apiOutcome.Message = message
+		apiOutcome.Error = true
+		return apiSolution, err
+	} else {
+		_log.Info("Source dataset found:" + apiSolution.Name)
+	}
+
+	//- [ ]  check if the dataset in in the "available" state
+
+	// open or create the k/v db
+	db, err := bolt.Open(dbPath, 0600, &bolt.Options{Timeout: 3 * time.Second})
+	if err != nil {
+		message := "Unable to open the main db for persisting master info"
+		_log.Error(message)
+		_log.Error(err)
+		apiOutcome.Message = message
+		return apiOutcome, err
+	} else {
+		_log.Info("Main db opened succesfully")
+	}
+	defer db.Close()
+
+	var apiSolutionVal api.Solution
+	apiSolutionTmp := &apiSolutionVal
+
+	// add solution info to the k/v db
+	err = db.Update(func(tx *bolt.Tx) error {
+		b, err := tx.CreateBucketIfNotExists([]byte("solutions"))
+		if err != nil {
+			return fmt.Errorf("create bucket: %s", err)
+		}
+
+
+		encodedSolution := b.Get([]byte(apiSolution.Name))
+
+		// solution exists?
+		if encodedSolution == nil {
+			// no solution found in k/v
+			err := errors.New("solution not found")
+			return err
+		}
+
+		err = proto.Unmarshal(encodedSolution, apiSolutionTmp)
+		if err != nil {
+			// no solution found in k/v
+			err := errors.New("error unmarshaling solution from k/v")
+			return err
+		}
+
+		if apiSolutionTmp.Status != "available" {
+			// impossible to proceed, wrong status
+			err := errors.New("solution must be 'available' to be deployed")
+			return err
+		}
+
+		return nil
+	})
+
+	//- [ ]  makes a @deploy snapshot
+	sourceDataset, err = sourceDataset.Snapshot("deploy", false)
+	if err != nil {
+		message := "Unable to snap the source dataset"
+		_log.Error(message)
+		_log.Error(err)
+		apiSolution.Outcome.Message = message
+		apiSolution.Outcome.Error = true
+		return apiSolution, err
+	} else {
+		_log.Info("Source dataset snapshot made prior to deploy")
+	}
+
+	//- [ ]  sends the deploy snapshot to the worker node via ssh command, effectively creating a new dataset on the worker node
+
+	// zfs is a helper function to wrap typical calls to zfs.
+	func Command(arg ...string) ([][]string, error) {
+
+	c := zfs.Command{Command: "zfs"}
+
+		return c.Run(arg...)
+	}
+
+
+
+	//- [ ]  update k/v, sets solution as "deployed"
+
+
+	return apiSolution, nil
 }
 
 func (s *Server) SolutionRetire(ctx context.Context, in *api.Solution) (*api.Solution, error) {
