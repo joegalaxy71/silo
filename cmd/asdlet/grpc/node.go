@@ -3,9 +3,9 @@ package grpc
 import (
 	"asd/common/api"
 	"asd/common/helpers"
+	"asd/common/zfs"
 	"context"
 	"errors"
-	"github.com/joegalaxy71/go-zfs"
 	"github.com/spf13/viper"
 )
 

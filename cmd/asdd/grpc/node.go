@@ -3,11 +3,11 @@ package grpc
 import (
 	"asd/common/api"
 	"asd/common/helpers"
+	"asd/common/zfs"
 	"context"
 	"errors"
 	"fmt"
 	"github.com/boltdb/bolt"
-	"github.com/joegalaxy71/go-zfs"
 	"github.com/prometheus/common/log"
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
@@ -19,6 +19,8 @@ func (s *Server) NodeList(ctx context.Context, in *api.Void) (*api.Nodes, error)
 	_log.Debug("gRPC call: NodeList")
 
 	var apinodesVal api.Nodes
+	var apiOutcome api.Outcome
+	apinodesVal.Outcome = &apiOutcome
 	apiNodes := &apinodesVal
 
 	// get pool name from config
@@ -67,8 +69,11 @@ func (s *Server) NodeList(ctx context.Context, in *api.Void) (*api.Nodes, error)
 	defer db.Close()
 
 	// add node info to the k/v db
-	err = db.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte("nodes"))
+	err = db.Update(func(tx *bolt.Tx) error {
+		b, err := tx.CreateBucketIfNotExists([]byte("nodes"))
+		if err != nil {
+			return fmt.Errorf("create bucket: %s", err)
+		}
 		c := b.Cursor()
 
 		for k, v := c.First(); k != nil; k, v = c.Next() {
