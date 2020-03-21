@@ -8,7 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/boltdb/bolt"
-	"github.com/prometheus/common/log"
+	"github.com/golang/protobuf/proto"
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 	"time"
@@ -106,101 +106,130 @@ func (s *Server) NodeAdd(ctx context.Context, in *api.Node) (*api.Node, error) {
 	_log.Debug("gRPC call: NodeAdd")
 
 	apiNode := in
+	_log.Debugf("apiNode.ip=", apiNode.Ip)
+
+	var apiOutcomeVal api.Outcome
+	apiNode.Outcome = &apiOutcomeVal
 
 	// a gRPC method calling another gRPC method
 	conn, err := grpc.Dial(in.Ip+":9000", grpc.WithInsecure())
 	if err != nil {
 		message := "error dialing grpc server on asdlet on ip:" + apiNode.Ip
-		log.Error(message)
-		log.Error(err)
-		apiNode.Outcome.Error = true
-		apiNode.Outcome.Message = message
-		return apiNode, err
-	}
-	defer conn.Close()
-
-	c := api.NewAsdLetClient(conn)
-	asdletCtx, _ := context.WithTimeout(context.Background(), 1000*time.Millisecond)
-	apiNode, err = c.NodeAdd(asdletCtx, in)
-	if err != nil {
-		message := "error calling grpc:NodeAdd on asdlet on ip:" + apiNode.Ip
-		log.Error(message)
-		log.Error(err)
+		_log.Error(message)
+		_log.Error(err)
 		apiNode.Outcome.Error = true
 		apiNode.Outcome.Message = message
 		return apiNode, err
 	} else {
-		// node succesfully initilized
-		// proceed to add it to the k/v db
-		// It will be created if it doesn't exist
-
-		// get pool name from config
-		pool := viper.GetString("pool")
-		if pool == "" {
-			message := "Init config value is empty for master pool"
-			_log.Error(message)
-			_log.Error(err)
-			apiNode.Outcome.Message = message
-			return apiNode, err
-		}
-
-		// create default master dataset name and get it via zfs wrap
-		dataset, err := zfs.GetDataset(pool + "/asd")
-		if err != nil {
-			message := "Unable to locate the master dataset: did you run 'asd master init'?"
-			_log.Error(message)
-			_log.Error(err)
-			apiNode.Outcome.Message = message
-			return apiNode, err
-		}
-
-		// get the actual mountpoint
-		mountpoint, err := dataset.GetProperty("mountpoint")
-		if err != nil {
-			message := "Unable to locate the mountpoint of the master dataset"
-			_log.Error(message)
-			_log.Error(err)
-			apiNode.Outcome.Message = message
-			return apiNode, err
-		}
-
-		// open or create the k/v db
-		db, err := bolt.Open(mountpoint+"/asd.db", 0600, &bolt.Options{Timeout: 3 * time.Second})
-		if err != nil {
-			message := "Unable to open the master db for persisting node info"
-			_log.Error(message)
-			_log.Error(err)
-			apiNode.Outcome.Message = message
-			return apiNode, err
-		}
-		defer db.Close()
-
-		// add node info to the k/v db
-		err = db.Update(func(tx *bolt.Tx) error {
-			b, err := tx.CreateBucketIfNotExists([]byte("nodes"))
-			if err != nil {
-				return fmt.Errorf("create bucket: %s", err)
-			}
-			db.Update(func(tx *bolt.Tx) error {
-				err := b.Put([]byte(apiNode.Hostname), []byte(apiNode.Ip))
-				return err
-			})
-			return nil
-		})
-		if err != nil {
-			message := "Unable to update db to persist node info"
-			_log.Error(message)
-			_log.Error(err)
-			apiNode.Outcome.Message = message
-			return apiNode, err
-		}
-
-		message := "Succesfully added ADS node"
-		_log.Info(message)
-		apiNode.Outcome.Message = message
-		return apiNode, nil
-
+		_log.Info("dial successful")
 	}
+	defer conn.Close()
+
+	c := api.NewAsdLetClient(conn)
+	_log.Debug("1")
+	asdletCtx, _ := context.WithTimeout(context.Background(), 1000*time.Millisecond)
+	_log.Debug("2")
+	apiNodeRes, err := c.NodeAdd(asdletCtx, in)
+	_log.Debug("3")
+	if err != nil {
+		_log.Debug("err")
+		message := "error calling grpc:NodeAdd on asdlet on ip:" + apiNode.Ip
+		_log.Error(message)
+		//_log.Error(err)
+		//apiNode.Outcome.Error = true
+		//apiNode.Outcome.Message = message
+		return apiNodeRes, err
+	} else {
+		_log.Debug("no err")
+		_log.Info("node add remote gRPC on worker node successful")
+	}
+	// node succesfully initilized
+
+	// proceed to add it to the k/v db
+
+	// get pool name from config
+	pool := viper.GetString("pool")
+	if pool == "" {
+		message := "Init config value is empty for master pool"
+		_log.Error(message)
+		_log.Error(err)
+		apiNode.Outcome.Message = message
+		return apiNode, err
+	} else {
+		_log.Info("pool obtained")
+	}
+
+	// create default master dataset name and get it via zfs wrap
+	dataset, err := zfs.GetDataset(pool + "/asd")
+	if err != nil {
+		message := "Unable to locate the master dataset: did you run 'asd master init'?"
+		_log.Error(message)
+		_log.Error(err)
+		apiNode.Outcome.Message = message
+		return apiNode, err
+	} else {
+		_log.Info("master dataset located")
+	}
+
+	// get the actual mountpoint
+	mountpoint, err := dataset.GetProperty("mountpoint")
+	if err != nil {
+		message := "Unable to locate the mountpoint of the master dataset"
+		_log.Error(message)
+		_log.Error(err)
+		apiNode.Outcome.Message = message
+		return apiNode, err
+	} else {
+		_log.Info("got mountpoint")
+	}
+
+	// open or create the k/v db
+	db, err := bolt.Open(mountpoint+"/asd.db", 0600, &bolt.Options{Timeout: 3 * time.Second})
+	if err != nil {
+		message := "Unable to open the master db for persisting node info"
+		_log.Error(message)
+		_log.Error(err)
+		apiNode.Outcome.Message = message
+		return apiNode, err
+	} else {
+		_log.Info("k/v db opened")
+	}
+	defer db.Close()
+
+	// add node info to the k/v db
+	err = db.Update(func(tx *bolt.Tx) error {
+		b, err := tx.CreateBucketIfNotExists([]byte("nodes"))
+		if err != nil {
+			return fmt.Errorf("create bucket: %s", err)
+		}
+
+		var encoded []byte
+		encoded, err = proto.Marshal(apiNode)
+		if err != nil {
+			return err
+		}
+
+		err = b.Put([]byte(apiNode.Hostname), encoded)
+		if err != nil {
+			return fmt.Errorf("writing key")
+		}
+		return nil
+	})
+	if err != nil {
+		message := "Unable to update k/v db to persist node info"
+		_log.Error(message)
+		_log.Error(err)
+		apiNode.Outcome.Message = message
+		return apiNode, err
+	} else {
+		_log.Info("k/v db updated")
+	}
+
+	message := "Succesfully added ADS node"
+	_log.Info(message)
+	apiNode.Outcome.Message = message
+	return apiNode, nil
+
 }
 
 func (s *Server) NodeRemove(ctx context.Context, in *api.Node) (*api.Node, error) {

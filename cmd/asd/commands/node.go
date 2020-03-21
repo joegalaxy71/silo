@@ -60,6 +60,7 @@ func NodeAdd(cmd *cobra.Command, args []string) {
 	var apiNodeVal api.Node
 	apiNode := &apiNodeVal
 	apiNode.Ip = args[0]
+	apiNode.Poolname = args[1]
 	apiNode, err = c.NodeAdd(context.Background(), apiNode)
 	if err != nil {
 		_log.Error("Unable to add the specified node, detailed error message follows")

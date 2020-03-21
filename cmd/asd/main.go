@@ -206,6 +206,7 @@ func run() error {
 	var cmdNodeList = &cobra.Command{
 		Use:     "list",
 		Aliases: []string{"ls"},
+		Example: "asd node list",
 		Short:   "Lists all nodes",
 		Long:    "Lists all nodes with detailed info",
 		Args:    cobra.NoArgs,
@@ -213,11 +214,12 @@ func run() error {
 	}
 
 	var cmdNodeAdd = &cobra.Command{
-		Use:   "add",
-		Short: "Adds a node",
-		Long:  "Adds a new node, initializing dataset if needed",
-		Args:  cobra.ExactArgs(1),
-		Run:   commands.NodeAdd,
+		Use:     "add",
+		Short:   "Adds a node",
+		Example: "asd node add [ip] [remote_pool_name]",
+		Long:    "Adds a new node, initializing dataset if needed",
+		Args:    cobra.ExactArgs(2),
+		Run:     commands.NodeAdd,
 	}
 
 	var cmdNodeRem = &cobra.Command{
