@@ -5,6 +5,7 @@ go 1.14
 require (
 	github.com/alecthomas/kingpin v2.2.6+incompatible
 	github.com/boltdb/bolt v1.3.1
+	github.com/gogo/protobuf v1.2.1
 	github.com/golang/protobuf v1.3.2
 	github.com/gorilla/mux v1.7.4
 	github.com/lib/pq v1.3.0

@@ -7,6 +7,7 @@ import (
 	"context"
 	"errors"
 	"github.com/spf13/viper"
+	"os"
 )
 
 func (s *Server) NodeAdd(ctx context.Context, in *api.Node) (*api.Node, error) {
@@ -28,6 +29,19 @@ func (s *Server) NodeAdd(ctx context.Context, in *api.Node) (*api.Node, error) {
 		_log.Info(message)
 		apiNode.Outcome.Error = false
 		apiNode.Outcome.Message = message
+	}
+
+	// hostname
+	hostname, err := os.Hostname()
+	if err != nil {
+		message := "Unable to get master hostname"
+		_log.Error(message)
+		_log.Error(err)
+		apiNode.Outcome.Message = message
+		return apiNode, err
+	} else {
+		_log.Info("Got master hostname:" + hostname)
+		apiNode.Hostname = hostname
 	}
 
 	viper.Set("pool", apiNode.Poolname)

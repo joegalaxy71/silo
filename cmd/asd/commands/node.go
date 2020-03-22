@@ -39,8 +39,12 @@ func NodeList(cmd *cobra.Command, args []string) {
 		_log.Error(err)
 		return
 	}
-
 	_log.Info(apiNodes.Outcome.Message)
+	// list nodes
+	_log.Info("hostname,ip,pool")
+	for _, apiNode := range apiNodes.Nodes {
+		_log.Infof("%s,%s,%s", apiNode.Hostname, apiNode.Ip, apiNode.Poolname)
+	}
 }
 
 func NodeAdd(cmd *cobra.Command, args []string) {

@@ -77,10 +77,14 @@ func (s *Server) NodeList(ctx context.Context, in *api.Void) (*api.Nodes, error)
 		c := b.Cursor()
 
 		for k, v := c.First(); k != nil; k, v = c.Next() {
+			_log.Debug("entry")
 			var apiNodeVal api.Node
 			apiNode := &apiNodeVal
-			apiNode.Hostname = fmt.Sprint(k)
-			apiNode.Ip = fmt.Sprint(v)
+
+			err := proto.Unmarshal(v, apiNode)
+			if err != nil {
+				return fmt.Errorf("unmarshaling node:%s\n", err)
+			}
 
 			apiNodes.Nodes = append(apiNodes.Nodes, apiNode)
 		}
@@ -126,18 +130,15 @@ func (s *Server) NodeAdd(ctx context.Context, in *api.Node) (*api.Node, error) {
 	defer conn.Close()
 
 	c := api.NewAsdLetClient(conn)
-	_log.Debug("1")
 	asdletCtx, _ := context.WithTimeout(context.Background(), 1000*time.Millisecond)
-	_log.Debug("2")
 	apiNodeRes, err := c.NodeAdd(asdletCtx, in)
-	_log.Debug("3")
 	if err != nil {
 		_log.Debug("err")
 		message := "error calling grpc:NodeAdd on asdlet on ip:" + apiNode.Ip
 		_log.Error(message)
-		//_log.Error(err)
-		//apiNode.Outcome.Error = true
-		//apiNode.Outcome.Message = message
+		_log.Error(err)
+		apiNode.Outcome.Error = true
+		apiNode.Outcome.Message = message
 		return apiNodeRes, err
 	} else {
 		_log.Debug("no err")
@@ -153,8 +154,8 @@ func (s *Server) NodeAdd(ctx context.Context, in *api.Node) (*api.Node, error) {
 		message := "Init config value is empty for master pool"
 		_log.Error(message)
 		_log.Error(err)
-		apiNode.Outcome.Message = message
-		return apiNode, err
+		apiNodeRes.Outcome.Message = message
+		return apiNodeRes, err
 	} else {
 		_log.Info("pool obtained")
 	}
@@ -165,8 +166,8 @@ func (s *Server) NodeAdd(ctx context.Context, in *api.Node) (*api.Node, error) {
 		message := "Unable to locate the master dataset: did you run 'asd master init'?"
 		_log.Error(message)
 		_log.Error(err)
-		apiNode.Outcome.Message = message
-		return apiNode, err
+		apiNodeRes.Outcome.Message = message
+		return apiNodeRes, err
 	} else {
 		_log.Info("master dataset located")
 	}
@@ -177,8 +178,8 @@ func (s *Server) NodeAdd(ctx context.Context, in *api.Node) (*api.Node, error) {
 		message := "Unable to locate the mountpoint of the master dataset"
 		_log.Error(message)
 		_log.Error(err)
-		apiNode.Outcome.Message = message
-		return apiNode, err
+		apiNodeRes.Outcome.Message = message
+		return apiNodeRes, err
 	} else {
 		_log.Info("got mountpoint")
 	}
@@ -189,8 +190,8 @@ func (s *Server) NodeAdd(ctx context.Context, in *api.Node) (*api.Node, error) {
 		message := "Unable to open the master db for persisting node info"
 		_log.Error(message)
 		_log.Error(err)
-		apiNode.Outcome.Message = message
-		return apiNode, err
+		apiNodeRes.Outcome.Message = message
+		return apiNodeRes, err
 	} else {
 		_log.Info("k/v db opened")
 	}
@@ -204,12 +205,12 @@ func (s *Server) NodeAdd(ctx context.Context, in *api.Node) (*api.Node, error) {
 		}
 
 		var encoded []byte
-		encoded, err = proto.Marshal(apiNode)
+		encoded, err = proto.Marshal(apiNodeRes)
 		if err != nil {
 			return err
 		}
 
-		err = b.Put([]byte(apiNode.Hostname), encoded)
+		err = b.Put([]byte(apiNodeRes.Hostname), encoded)
 		if err != nil {
 			return fmt.Errorf("writing key")
 		}
@@ -219,17 +220,16 @@ func (s *Server) NodeAdd(ctx context.Context, in *api.Node) (*api.Node, error) {
 		message := "Unable to update k/v db to persist node info"
 		_log.Error(message)
 		_log.Error(err)
-		apiNode.Outcome.Message = message
-		return apiNode, err
+		apiNodeRes.Outcome.Message = message
+		return apiNodeRes, err
 	} else {
 		_log.Info("k/v db updated")
 	}
 
-	message := "Succesfully added ADS node"
+	message := "Succesfully added ASD node"
 	_log.Info(message)
-	apiNode.Outcome.Message = message
-	return apiNode, nil
-
+	apiNodeRes.Outcome.Message = message
+	return apiNodeRes, nil
 }
 
 func (s *Server) NodeRemove(ctx context.Context, in *api.Node) (*api.Node, error) {
