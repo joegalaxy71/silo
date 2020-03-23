@@ -703,13 +703,15 @@ func (s *Server) SolutionDeploy(ctx context.Context, in *api.Solution) (*api.Sol
 
 	//func Command(arg ...string) ([][]string, error) {
 
-	cmd := "zfs send " + sourceName + "@deploy | ssh root@" + "asdo.avero.it" + " 'zfs recv -F " + apiSolution.Poolname + "/asd/" + apiSolution.Name + "'"
+	cmd := "zfs send " + sourceName + "@deploy | ssh root@" + apiSolution.Ip + " 'zfs recv -F " + apiSolution.Poolname + "/asd/" + apiSolution.Name + "'"
 	//cmd := "zfs send " + sourceName + "@deploy | zfs recv " + sourceName + "@deployed"
 	//cmd := "zfs snapshot " + sourceName + "@deployed"
 	//cmd := "date"
 	_log.Infof("cmd=%s\n", cmd)
 	output, err := exec.Command("bash", "-c", cmd).CombinedOutput()
-	_log.Notice(string(output))
+	if len(output) != 0 {
+		_log.Error(string(output))
+	}
 	if err != nil {
 		message := "error executing zfs send to deploy solution"
 		_log.Error(message)
@@ -718,25 +720,8 @@ func (s *Server) SolutionDeploy(ctx context.Context, in *api.Solution) (*api.Sol
 		apiSolution.Outcome.Error = true
 		return apiSolution, err
 	} else {
-		_log.Info("zfs send command executed succesfully")
+		_log.Info("@deploy snapshot sent successfully to worker node")
 	}
-
-	//lines, err := zfs.ShCommand("/sbin/bash -c", "'zfs send", sourceName+"@deploy", "| ssh root@"+apiSolution.Ip+" 'zfs recv "+apiSolution.Poolname+"/asd/"+apiSolution.Name + "'")
-	//lines, err := zfs.ShCommand("/sbin/bash -c", "echo hello")
-	//
-	//if err != nil {
-	//	message := "error executing zfs send to deploy solution"
-	//	_log.Error(message)
-	//	_log.Error(err)
-	//	apiSolution.Outcome.Message = message
-	//	apiSolution.Outcome.Error = true
-	//	return apiSolution, err
-	//} else {
-	//	for _, line := range lines {
-	//		fmt.Println(line)
-	//	}
-	//	_log.Info("zfs send command executed succesfully")
-	//}
 
 	//- [ ]  update k/v, sets solution as "deployed"
 	// add solution info to the k/v db
@@ -766,8 +751,21 @@ func (s *Server) SolutionDeploy(ctx context.Context, in *api.Solution) (*api.Sol
 			// impossible to proceed, wrong status
 			err := errors.New("solution must be 'available' to be deployed")
 			return err
+		} else {
+			apiSolutionTmp.Status = "deployed"
+			encoded, err := proto.Marshal(apiSolutionTmp)
+			if err != nil {
+				// no solution found in k/v
+				err := errors.New("error marshaling solution from k/v")
+				return err
+			}
+			err = b.Put([]byte(apiSolutionTmp.Name), encoded)
+			if err != nil {
+				// no solution found in k/v
+				err := errors.New("error saving (put) solution into k/v")
+				return err
+			}
 		}
-
 		return nil
 	})
 
