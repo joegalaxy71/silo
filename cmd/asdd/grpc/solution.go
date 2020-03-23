@@ -11,6 +11,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 	"os"
+	"os/exec"
 	"time"
 )
 
@@ -605,6 +606,139 @@ func (s *Server) SolutionDeploy(ctx context.Context, in *api.Solution) (*api.Sol
 	var apiSolutionVal api.Solution
 	apiSolutionTmp := &apiSolutionVal
 
+	var apiNodeVal api.Node
+	apiNode := &apiNodeVal
+
+	// get node info to the k/v db
+	err = db.Update(func(tx *bolt.Tx) error {
+		b, err := tx.CreateBucketIfNotExists([]byte("nodes"))
+		if err != nil {
+			return fmt.Errorf("create bucket: %s", err)
+		}
+
+		c := b.Cursor()
+		var found bool
+
+		for k, v := c.First(); k != nil; k, v = c.Next() {
+			if string(k) == apiSolution.Hostname {
+				found = true
+				err = proto.Unmarshal(v, apiNode)
+				if err != nil {
+					return fmt.Errorf("unmarshaling node proto: %s", err)
+				}
+				apiSolution.Ip = apiNode.Ip
+				_log.Debugf("node ip=%s\n", apiSolution.Ip)
+				apiSolution.Poolname = apiNode.Poolname
+				_log.Debugf("node poolname=%s\n", apiSolution.Poolname)
+				break
+			}
+		}
+
+		if !found {
+			return fmt.Errorf("unmarshaling node proto: %s", err)
+		}
+		return nil
+	})
+	if err != nil {
+		message := "Unable to open the main db to get node info"
+		_log.Error(message)
+		_log.Error(err)
+		apiSolution.Outcome.Message = message
+		return apiSolution, err
+	} else {
+		_log.Info("node info obtained")
+	}
+
+	err = db.Update(func(tx *bolt.Tx) error {
+		b, err := tx.CreateBucketIfNotExists([]byte("solutions"))
+
+		encodedSolution := b.Get([]byte(apiSolution.Name))
+
+		// solution exists?
+		if encodedSolution == nil {
+			// no solution found in k/v
+			err := errors.New("solution not found")
+			return err
+		}
+
+		err = proto.Unmarshal(encodedSolution, apiSolutionTmp)
+		if err != nil {
+			// no solution found in k/v
+			err := errors.New("error unmarshaling solution from k/v")
+			return err
+		}
+
+		if apiSolutionTmp.Status != "available" {
+			// impossible to proceed, wrong status
+			err := errors.New("solution must be 'available' to be deployed")
+			return err
+		}
+
+		return nil
+	})
+	if err != nil {
+		message := "unable to get solution info or solution not in 'available' state"
+		_log.Error(message)
+		_log.Error(err)
+		apiSolution.Outcome.Message = message
+		return apiSolution, err
+	} else {
+		_log.Info("got solution info")
+	}
+
+	//- [ ]  makes a @deploy snapshot
+	sourceDataset, err = sourceDataset.Snapshot("deploy", false)
+	if err != nil {
+		message := "Unable to snap the source dataset"
+		_log.Error(message)
+		_log.Error(err)
+		apiSolution.Outcome.Message = message
+		apiSolution.Outcome.Error = true
+		return apiSolution, err
+	} else {
+		_log.Info("Source dataset snapshot made prior to deploy")
+	}
+
+	//- [ ]  sends the deploy snapshot to the worker node via ssh command, effectively creating a new dataset on the worker node
+
+	//func Command(arg ...string) ([][]string, error) {
+
+	cmd := "zfs send " + sourceName + "@deploy | ssh root@" + "asdo.avero.it" + " 'zfs recv -F " + apiSolution.Poolname + "/asd/" + apiSolution.Name + "'"
+	//cmd := "zfs send " + sourceName + "@deploy | zfs recv " + sourceName + "@deployed"
+	//cmd := "zfs snapshot " + sourceName + "@deployed"
+	//cmd := "date"
+	_log.Infof("cmd=%s\n", cmd)
+	output, err := exec.Command("bash", "-c", cmd).CombinedOutput()
+	_log.Notice(string(output))
+	if err != nil {
+		message := "error executing zfs send to deploy solution"
+		_log.Error(message)
+		_log.Error(err)
+		apiSolution.Outcome.Message = message
+		apiSolution.Outcome.Error = true
+		return apiSolution, err
+	} else {
+		_log.Info("zfs send command executed succesfully")
+	}
+
+	//lines, err := zfs.ShCommand("/sbin/bash -c", "'zfs send", sourceName+"@deploy", "| ssh root@"+apiSolution.Ip+" 'zfs recv "+apiSolution.Poolname+"/asd/"+apiSolution.Name + "'")
+	//lines, err := zfs.ShCommand("/sbin/bash -c", "echo hello")
+	//
+	//if err != nil {
+	//	message := "error executing zfs send to deploy solution"
+	//	_log.Error(message)
+	//	_log.Error(err)
+	//	apiSolution.Outcome.Message = message
+	//	apiSolution.Outcome.Error = true
+	//	return apiSolution, err
+	//} else {
+	//	for _, line := range lines {
+	//		fmt.Println(line)
+	//	}
+	//	_log.Info("zfs send command executed succesfully")
+	//}
+
+	//- [ ]  update k/v, sets solution as "deployed"
 	// add solution info to the k/v db
 	err = db.Update(func(tx *bolt.Tx) error {
 		b, err := tx.CreateBucketIfNotExists([]byte("solutions"))
@@ -636,40 +770,6 @@ func (s *Server) SolutionDeploy(ctx context.Context, in *api.Solution) (*api.Sol
 
 		return nil
 	})
-
-	//- [ ]  makes a @deploy snapshot
-	sourceDataset, err = sourceDataset.Snapshot("deploy", false)
-	if err != nil {
-		message := "Unable to snap the source dataset"
-		_log.Error(message)
-		_log.Error(err)
-		apiSolution.Outcome.Message = message
-		apiSolution.Outcome.Error = true
-		return apiSolution, err
-	} else {
-		_log.Info("Source dataset snapshot made prior to deploy")
-	}
-
-	//- [ ]  sends the deploy snapshot to the worker node via ssh command, effectively creating a new dataset on the worker node
-
-	//func Command(arg ...string) ([][]string, error) {
-
-	lines, err := zfs.Command("send", sourceName+"@deploy", "| ssh root@"+apiSolution.Ip+"'zfs recv "+apiSolution.Poolname+"/asd/"+apiSolution.Name)
-	if err != nil {
-		message := ""
-		_log.Error(message)
-		_log.Error(err)
-		apiSolution.Outcome.Message = message
-		apiSolution.Outcome.Error = true
-		return apiSolution, err
-	} else {
-		for _, line := range lines {
-			fmt.Println(line)
-		}
-		_log.Info("zfs send command executed succesfully")
-	}
-
-	//- [ ]  update k/v, sets solution as "deployed"
 
 	return apiSolution, nil
 }
