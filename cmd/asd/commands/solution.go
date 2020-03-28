@@ -4,9 +4,12 @@ import (
 	"asd/common/api"
 	"asd/common/helpers"
 	"context"
+	"fmt"
 	"github.com/prometheus/common/log"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
+	"os"
+	"text/tabwriter"
 )
 
 func Solution(cmd *cobra.Command, args []string) {
@@ -41,10 +44,15 @@ func SolutionList(cmd *cobra.Command, args []string) {
 	}
 
 	_log.Info(apiSolutions.Outcome.Message)
-	_log.Infof("Solution, host, status")
+	//_log.Infof("Solution, host, status")
+	const padding = 3
+	w := tabwriter.NewWriter(os.Stdout, 0, 0, padding, ' ', tabwriter.AlignRight|tabwriter.Debug)
+	fmt.Fprintln(w, "NAME\tHOSTNAME\tSTATUS\t")
 	for _, apiSolution := range apiSolutions.Solutions {
-		_log.Infof("%s, %s, %s\n", apiSolution.Name, apiSolution.Hostname, apiSolution.Status)
+		fmt.Fprintln(w, apiSolution.Name+"\t"+apiSolution.Hostname+"\t"+apiSolution.Status+"\t")
+		//_log.Infof("%s, %s, %s\n", apiSolution.Name, apiSolution.Hostname, apiSolution.Status)
 	}
+	w.Flush()
 }
 
 func SolutionCreate(cmd *cobra.Command, args []string) {
