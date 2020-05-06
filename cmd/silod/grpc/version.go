@@ -1,10 +1,10 @@
 package grpc
 
 import (
-	"asd/common/api"
-	"asd/common/helpers"
-	"asd/common/version"
 	"context"
+	"silo/common/api"
+	"silo/common/helpers"
+	"silo/common/version"
 )
 
 func (s *Server) Version(ctx context.Context, in *api.Void) (*api.Outcome, error) {

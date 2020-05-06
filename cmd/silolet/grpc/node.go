@@ -1,13 +1,13 @@
 package grpc
 
 import (
-	"asd/common/api"
-	"asd/common/helpers"
-	"asd/common/zfs"
 	"context"
 	"errors"
 	"github.com/spf13/viper"
 	"os"
+	"silo/common/api"
+	"silo/common/helpers"
+	"silo/common/zfs"
 )
 
 func (s *Server) NodeAdd(ctx context.Context, in *api.Node) (*api.Node, error) {
@@ -17,9 +17,9 @@ func (s *Server) NodeAdd(ctx context.Context, in *api.Node) (*api.Node, error) {
 	_log := helpers.InitLogs(true)
 	_log.Debugf("gRPC call: NodeAdd(pool:%s)\n", apiNode.Poolname)
 
-	_, err := zfs.CreateFilesystem(in.Poolname+"/asd", nil)
+	_, err := zfs.CreateFilesystem(in.Poolname+"/silo", nil)
 	if err != nil {
-		message := "Error creating initial dataset " + apiNode.Poolname + "/asd"
+		message := "Error creating initial dataset " + apiNode.Poolname + "/silo"
 		_log.Error(message)
 		apiNode.Outcome.Error = true
 		apiNode.Outcome.Message = message

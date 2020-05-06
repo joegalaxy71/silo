@@ -1,9 +1,6 @@
 package grpc
 
 import (
-	"asd/common/api"
-	"asd/common/helpers"
-	"asd/common/zfs"
 	"context"
 	"fmt"
 	"github.com/boltdb/bolt"
@@ -12,6 +9,9 @@ import (
 	"github.com/spf13/viper"
 	"os"
 	"os/exec"
+	"silo/common/api"
+	"silo/common/helpers"
+	"silo/common/zfs"
 	"time"
 )
 
@@ -36,9 +36,9 @@ func (s *Server) SolutionList(ctx context.Context, in *api.Void) (*api.Solutions
 	}
 
 	// create default master dataset name and get it via zfs wrap
-	dataset, err := zfs.GetDataset(pool + "/asd")
+	dataset, err := zfs.GetDataset(pool + "/silo")
 	if err != nil {
-		message := "Unable to locate the master dataset: did you run 'asd master init'?"
+		message := "Unable to locate the master dataset: did you run 'silo master init'?"
 		_log.Error(message)
 		_log.Error(err)
 		return apiSolutions, err
@@ -58,7 +58,7 @@ func (s *Server) SolutionList(ctx context.Context, in *api.Void) (*api.Solutions
 	}
 
 	// open or create the k/v db
-	db, err := bolt.Open(mountpoint+"/asd.db", 0600, &bolt.Options{Timeout: 3 * time.Second})
+	db, err := bolt.Open(mountpoint+"/silo.db", 0600, &bolt.Options{Timeout: 3 * time.Second})
 	if err != nil {
 		message := "Unable to open the main db for persisting node info"
 		_log.Error(message)
@@ -122,7 +122,7 @@ func (s *Server) SolutionCopy(ctx context.Context, in *api.CopyArgs) (*api.Outco
 	}
 
 	var dbPath string
-	dbPath = viper.GetString("mountpoint") + "/asd.db"
+	dbPath = viper.GetString("mountpoint") + "/silo.db"
 	if dbPath == "" {
 		message := "The master pool is unconfigured (dbpath)"
 		_log.Error(message)
@@ -132,8 +132,8 @@ func (s *Server) SolutionCopy(ctx context.Context, in *api.CopyArgs) (*api.Outco
 		return apiOutcome, err
 	}
 
-	sourceName := pool + "/asd/" + copyArgs.Source
-	destName := pool + "/asd/" + copyArgs.Destination
+	sourceName := pool + "/silo/" + copyArgs.Source
+	destName := pool + "/silo/" + copyArgs.Destination
 
 	//- [ ]  check if A exists and A.ORIG and B names are available
 	sourceDataset, err := zfs.GetDataset(sourceName)
@@ -328,7 +328,7 @@ func (s *Server) SolutionCreate(ctx context.Context, in *api.Solution) (*api.Sol
 	}
 
 	var dbPath string
-	dbPath = viper.GetString("mountpoint") + "/asd.db"
+	dbPath = viper.GetString("mountpoint") + "/silo.db"
 	if dbPath == "" {
 		message := "The master pool is unconfigured (dbpath)"
 		_log.Error(message)
@@ -338,7 +338,7 @@ func (s *Server) SolutionCreate(ctx context.Context, in *api.Solution) (*api.Sol
 		return apiSolution, err
 	}
 
-	datasetName := pool + "/asd/" + apiSolution.Name
+	datasetName := pool + "/silo/" + apiSolution.Name
 
 	dataset, err := zfs.CreateFilesystem(datasetName, nil)
 	if err != nil {
@@ -453,7 +453,7 @@ func (s *Server) SolutionDestroy(ctx context.Context, in *api.Solution) (*api.So
 	}
 
 	var dbPath string
-	dbPath = viper.GetString("mountpoint") + "/asd.db"
+	dbPath = viper.GetString("mountpoint") + "/silo.db"
 	if dbPath == "" {
 		message := "The master pool is unconfigured (dbpath)"
 		_log.Error(message)
@@ -463,7 +463,7 @@ func (s *Server) SolutionDestroy(ctx context.Context, in *api.Solution) (*api.So
 		return apiSolution, err
 	}
 
-	datasetName := pool + "/asd/" + apiSolution.Name
+	datasetName := pool + "/silo/" + apiSolution.Name
 
 	dataset, err := zfs.GetDataset(datasetName)
 	if err != nil {
@@ -562,7 +562,7 @@ func (s *Server) SolutionDeploy(ctx context.Context, in *api.Solution) (*api.Sol
 	}
 
 	var dbPath string
-	dbPath = viper.GetString("mountpoint") + "/asd.db"
+	dbPath = viper.GetString("mountpoint") + "/silo.db"
 	if dbPath == "" {
 		message := "The master pool is unconfigured (dbpath)"
 		_log.Error(message)
@@ -574,7 +574,7 @@ func (s *Server) SolutionDeploy(ctx context.Context, in *api.Solution) (*api.Sol
 
 	//- [ ]  check if the dataset exists
 
-	sourceName := pool + "/asd/" + apiSolution.Name
+	sourceName := pool + "/silo/" + apiSolution.Name
 
 	sourceDataset, err := zfs.GetDataset(sourceName)
 	if err != nil {

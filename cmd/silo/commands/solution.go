@@ -1,14 +1,14 @@
 package commands
 
 import (
-	"asd/common/api"
-	"asd/common/helpers"
 	"context"
 	"fmt"
 	"github.com/prometheus/common/log"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
 	"os"
+	"silo/common/api"
+	"silo/common/helpers"
 	"text/tabwriter"
 )
 
@@ -33,7 +33,7 @@ func SolutionList(cmd *cobra.Command, args []string) {
 	}
 	defer conn.Close()
 
-	c := api.NewAsddClient(conn)
+	c := api.NewSilodClient(conn)
 	var apiVoidVal api.Void
 	apiVoid := &apiVoidVal
 	apiSolutions, err := c.SolutionList(context.Background(), apiVoid)
@@ -67,7 +67,7 @@ func SolutionCreate(cmd *cobra.Command, args []string) {
 		return
 	}
 	defer conn.Close()
-	c := api.NewAsddClient(conn)
+	c := api.NewSilodClient(conn)
 	var apiSolutionVal api.Solution
 	apiSolution := &apiSolutionVal
 	apiSolution.Name = args[0]
@@ -93,7 +93,7 @@ func SolutionCopy(cmd *cobra.Command, args []string) {
 		return
 	}
 	defer conn.Close()
-	c := api.NewAsddClient(conn)
+	c := api.NewSilodClient(conn)
 	var apiCopyArgsVal api.CopyArgs
 	apiCopyArgs := &apiCopyArgsVal
 	apiCopyArgs.Source = args[0]
@@ -120,7 +120,7 @@ func SolutionDestroy(cmd *cobra.Command, args []string) {
 		return
 	}
 	defer conn.Close()
-	c := api.NewAsddClient(conn)
+	c := api.NewSilodClient(conn)
 	var apiSolutionVal api.Solution
 	apiSolution := &apiSolutionVal
 	apiSolution.Name = args[0]
@@ -146,7 +146,7 @@ func SolutionDeploy(cmd *cobra.Command, args []string) {
 		return
 	}
 	defer conn.Close()
-	c := api.NewAsddClient(conn)
+	c := api.NewSilodClient(conn)
 	var apiSolutionVal api.Solution
 	apiSolution := &apiSolutionVal
 	apiSolution.Name = args[0]

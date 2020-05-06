@@ -1,12 +1,12 @@
 package grpc
 
 import (
-	"asd/common/api"
-	"asd/common/helpers"
 	"fmt"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
 	"net"
+	"silo/common/api"
+	"silo/common/helpers"
 )
 
 type Server struct {
@@ -27,7 +27,7 @@ func Init(errGrpc chan<- error) {
 	// create a gRPC server object
 	grpcServer := grpc.NewServer()
 	// attach the Ping service to the server
-	api.RegisterAsdLetServer(grpcServer, &s)
+	api.RegisterSiloLetServer(grpcServer, &s)
 	// start the server
 	_log.Debugf("listening for grpc connections on port: 7777")
 	if err := grpcServer.Serve(lis); err != nil {

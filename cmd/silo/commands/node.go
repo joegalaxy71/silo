@@ -1,12 +1,12 @@
 package commands
 
 import (
-	"asd/common/api"
-	"asd/common/helpers"
 	"context"
 	"github.com/prometheus/common/log"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
+	"silo/common/api"
+	"silo/common/helpers"
 )
 
 func Node(cmd *cobra.Command, args []string) {
@@ -24,13 +24,13 @@ func NodeList(cmd *cobra.Command, args []string) {
 
 	conn, err := grpc.Dial("0.0.0.0:9000", grpc.WithInsecure())
 	if err != nil {
-		log.Error("error dialing grpc server on asdd")
+		log.Error("error dialing grpc server on silod")
 		log.Error(err)
 		return
 	}
 	defer conn.Close()
 
-	c := api.NewAsddClient(conn)
+	c := api.NewSilodClient(conn)
 	var apiVoidVal api.Void
 	apiVoid := &apiVoidVal
 	apiNodes, err := c.NodeList(context.Background(), apiVoid)
@@ -54,13 +54,13 @@ func NodeAdd(cmd *cobra.Command, args []string) {
 
 	conn, err := grpc.Dial("0.0.0.0:9000", grpc.WithInsecure())
 	if err != nil {
-		log.Error("error dialing grpc server on asdd")
+		log.Error("error dialing grpc server on silod")
 		log.Error(err)
 		return
 	}
 	defer conn.Close()
 
-	c := api.NewAsddClient(conn)
+	c := api.NewSilodClient(conn)
 	var apiNodeVal api.Node
 	apiNode := &apiNodeVal
 	apiNode.Ip = args[0]
@@ -81,13 +81,13 @@ func NodeRemove(cmd *cobra.Command, args []string) {
 
 	conn, err := grpc.Dial("0.0.0.0:9000", grpc.WithInsecure())
 	if err != nil {
-		log.Error("error dialing grpc server on asdd")
+		log.Error("error dialing grpc server on silod")
 		log.Error(err)
 		return
 	}
 	defer conn.Close()
 
-	c := api.NewAsddClient(conn)
+	c := api.NewSilodClient(conn)
 	var apiNodeVal api.Node
 	apiNode := &apiNodeVal
 	apiNode.Ip = args[0]
@@ -108,13 +108,13 @@ func NodePurge(cmd *cobra.Command, args []string) {
 
 	conn, err := grpc.Dial("0.0.0.0:9000", grpc.WithInsecure())
 	if err != nil {
-		log.Error("error dialing grpc server on asdd")
+		log.Error("error dialing grpc server on silod")
 		log.Error(err)
 		return
 	}
 	defer conn.Close()
 
-	c := api.NewAsddClient(conn)
+	c := api.NewSilodClient(conn)
 	var apiNodeVal api.Node
 	apiNode := &apiNodeVal
 	apiNode.Ip = args[0]

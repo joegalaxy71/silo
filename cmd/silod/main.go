@@ -1,9 +1,6 @@
 package main
 
 import (
-	asddGrpc "asd/cmd/asdd/grpc"
-	"asd/common/helpers"
-	"asd/common/version"
 	_ "expvar"
 	"fmt"
 	"github.com/gorilla/mux"
@@ -20,6 +17,9 @@ import (
 	"net/http"
 	_ "net/http/pprof"
 	"os"
+	silodGrpc "silo/cmd/silod/grpc"
+	"silo/common/helpers"
+	"silo/common/version"
 )
 
 // =====================================================================================================================
@@ -42,13 +42,13 @@ var _verbose bool
 // metrics globals
 var (
 	_workerOps = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "asd_worker_ops_total",
+		Name: "silo_worker_ops_total",
 		Help: "The total number worker was spawned by internal cron subsys",
 	})
 )
 
-const CONFIGDIR = "/etc/asd/"
-const CONFIGFILE = "/etc/asd/config.yaml"
+const CONFIGDIR = "/etc/silo/"
+const CONFIGFILE = "/etc/silo/config.yaml"
 
 // =====================================================================================================================
 // main
@@ -161,7 +161,7 @@ func run() error {
 	//╚██████╔╝██║ ╚████║██║╚██████╔╝╚██████╔╝███████╗
 	//╚═════╝ ╚═╝  ╚═══╝╚═╝ ╚══▀▀═╝  ╚═════╝ ╚══════╝
 
-	s := single.New("asdd")
+	s := single.New("silod")
 	if err := s.CheckLock(); err != nil && err == single.ErrAlreadyRunning {
 		_log.Errorf("another instance of the app is already running, exiting")
 		return err
@@ -245,7 +245,7 @@ func run() error {
 	// goroutine for the standard grpc server
 	chanErrGrpc := make(chan error, 1)
 
-	go asddGrpc.InitGrpc(chanErrGrpc)
+	go silodGrpc.InitGrpc(chanErrGrpc)
 
 	//go func(errGrpc chan<- error) {
 	//	// create a listener on TCP port 7777
@@ -260,7 +260,7 @@ func run() error {
 	//	// create a gRPC server object
 	//	grpcServer := grpc.NewServer()
 	//	// attach the Ping service to the server
-	//	api.RegisterAsdServer(grpcServer, &s)
+	//	api.RegistersiloServer(grpcServer, &s)
 	//	// start the server
 	//	_log.Debugf("listening for grpc connections on port: 7777")
 	//	if err := grpcServer.Serve(lis); err != nil {
@@ -306,7 +306,7 @@ func run() error {
 	//╚████╔╝ ███████╗██║  ██║███████║██║╚██████╔╝██║ ╚████║
 	//╚═══╝  ╚══════╝╚═╝  ╚═╝╚══════╝╚═╝ ╚═════╝ ╚═╝  ╚═══╝
 
-	_log.Debugf("asd: Version %s started", Version)
+	_log.Debugf("silo: Version %s started", Version)
 
 	//--------------------------------------------------------------------------------------
 	// vait for channels and return eventual errors

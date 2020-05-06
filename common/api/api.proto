@@ -64,7 +64,7 @@ message CopyArgs {
 
 // services
 
-service Asdd {
+service Silod {
     rpc Version(Void) returns (Outcome) {}
     rpc MasterInit(Master) returns (Master) {}
 
@@ -95,7 +95,7 @@ service Asdd {
 
 }
 
-service AsdLet {
+service SiloLet {
     rpc Version(Void) returns (Outcome) {}
     rpc NodeAdd(Node) returns (Node) {}
     rpc NodeRemove(Node) returns (Node) {}

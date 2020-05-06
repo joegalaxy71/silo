@@ -1,8 +1,6 @@
 package main
 
 import (
-	asdletGrpc "asd/cmd/asdlet/grpc"
-	"asd/common/helpers"
 	_ "expvar"
 	_ "github.com/lib/pq"
 	"github.com/marcsauter/single"
@@ -17,6 +15,8 @@ import (
 	"net/http"
 	_ "net/http/pprof"
 	"os"
+	siloletGrpc "silo/cmd/silolet/grpc"
+	"silo/common/helpers"
 )
 
 // =====================================================================================================================
@@ -39,13 +39,13 @@ var _verbose bool
 // metrics globals
 var (
 	_workerOps = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "asd_worker_ops_total",
+		Name: "silo_worker_ops_total",
 		Help: "The total number worker was spawned by internal cron subsys",
 	})
 )
 
-const CONFIGDIR = "/etc/asdlet/"
-const CONFIGFILE = "/etc/asdlet/config.yaml"
+const CONFIGDIR = "/etc/silolet/"
+const CONFIGFILE = "/etc/silolet/config.yaml"
 
 // =====================================================================================================================
 // main
@@ -241,7 +241,7 @@ func run() error {
 	// goroutine for the standard grpc server
 	chanErrGrpc := make(chan error, 1)
 
-	go asdletGrpc.Init(chanErrGrpc)
+	go siloletGrpc.Init(chanErrGrpc)
 
 	//██╗   ██╗███████╗██████╗ ███████╗██╗ ██████╗ ███╗   ██╗
 	//██║   ██║██╔════╝██╔══██╗██╔════╝██║██╔═══██╗████╗  ██║

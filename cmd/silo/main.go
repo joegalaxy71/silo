@@ -1,8 +1,6 @@
 package main
 
 import (
-	"asd/cmd/asd/commands"
-	"asd/common/helpers"
 	_ "database/sql"
 	_ "expvar" // Register the expvar handlers
 	_ "github.com/lib/pq"
@@ -10,6 +8,8 @@ import (
 	"github.com/op/go-logging"
 	"github.com/spf13/cobra"
 	"log"
+	"silo/cmd/silo/commands"
+	"silo/common/helpers"
 	"sync"
 )
 
@@ -68,7 +68,7 @@ func run() error {
 	//╚██████╔╝██║ ╚████║██║╚██████╔╝╚██████╔╝███████╗
 	//╚═════╝ ╚═╝  ╚═══╝╚═╝ ╚══▀▀═╝  ╚═════╝ ╚══════╝
 
-	s := single.New("asd")
+	s := single.New("silo")
 	if err := s.CheckLock(); err != nil && err == single.ErrAlreadyRunning {
 		log.Println("another instance of the app is already running, exiting")
 		return err

@@ -1,9 +1,9 @@
 package grpc
 
 import (
-	"asd/common/api"
 	"context"
 	"errors"
+	"silo/common/api"
 )
 
 func (s *Server) SolutionDeploy(ctx context.Context, in *api.Solution) (*api.Solution, error) {

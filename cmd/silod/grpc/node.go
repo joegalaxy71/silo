@@ -1,9 +1,6 @@
 package grpc
 
 import (
-	"asd/common/api"
-	"asd/common/helpers"
-	"asd/common/zfs"
 	"context"
 	"errors"
 	"fmt"
@@ -11,6 +8,9 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
+	"silo/common/api"
+	"silo/common/helpers"
+	"silo/common/zfs"
 	"time"
 )
 
@@ -35,9 +35,9 @@ func (s *Server) NodeList(ctx context.Context, in *api.Void) (*api.Nodes, error)
 	}
 
 	// create default master dataset name and get it via zfs wrap
-	dataset, err := zfs.GetDataset(pool + "/asd")
+	dataset, err := zfs.GetDataset(pool + "/silo")
 	if err != nil {
-		message := "Unable to locate the master dataset: did you run 'asd master init'?"
+		message := "Unable to locate the master dataset: did you run 'silo master init'?"
 		_log.Error(message)
 		_log.Error(err)
 		return apiNodes, err
@@ -57,7 +57,7 @@ func (s *Server) NodeList(ctx context.Context, in *api.Void) (*api.Nodes, error)
 	}
 
 	// open or create the k/v db
-	db, err := bolt.Open(mountpoint+"/asd.db", 0600, &bolt.Options{Timeout: 3 * time.Second})
+	db, err := bolt.Open(mountpoint+"/silo.db", 0600, &bolt.Options{Timeout: 3 * time.Second})
 	if err != nil {
 		message := "Unable to open the master db for persisting node info"
 		_log.Error(message)
@@ -118,7 +118,7 @@ func (s *Server) NodeAdd(ctx context.Context, in *api.Node) (*api.Node, error) {
 	// a gRPC method calling another gRPC method
 	conn, err := grpc.Dial(in.Ip+":9000", grpc.WithInsecure())
 	if err != nil {
-		message := "error dialing grpc server on asdlet on ip:" + apiNode.Ip
+		message := "error dialing grpc server on silolet on ip:" + apiNode.Ip
 		_log.Error(message)
 		_log.Error(err)
 		apiNode.Outcome.Error = true
@@ -129,12 +129,12 @@ func (s *Server) NodeAdd(ctx context.Context, in *api.Node) (*api.Node, error) {
 	}
 	defer conn.Close()
 
-	c := api.NewAsdLetClient(conn)
-	asdletCtx, _ := context.WithTimeout(context.Background(), 1000*time.Millisecond)
-	apiNodeRes, err := c.NodeAdd(asdletCtx, in)
+	c := api.NewSiloLetClient(conn)
+	siloletCtx, _ := context.WithTimeout(context.Background(), 1000*time.Millisecond)
+	apiNodeRes, err := c.NodeAdd(siloletCtx, in)
 	if err != nil {
 		_log.Debug("err")
-		message := "error calling grpc:NodeAdd on asdlet on ip:" + apiNode.Ip
+		message := "error calling grpc:NodeAdd on silolet on ip:" + apiNode.Ip
 		_log.Error(message)
 		_log.Error(err)
 		apiNode.Outcome.Error = true
@@ -161,9 +161,9 @@ func (s *Server) NodeAdd(ctx context.Context, in *api.Node) (*api.Node, error) {
 	}
 
 	// create default master dataset name and get it via zfs wrap
-	dataset, err := zfs.GetDataset(pool + "/asd")
+	dataset, err := zfs.GetDataset(pool + "/silo")
 	if err != nil {
-		message := "Unable to locate the master dataset: did you run 'asd master init'?"
+		message := "Unable to locate the master dataset: did you run 'silo master init'?"
 		_log.Error(message)
 		_log.Error(err)
 		apiNodeRes.Outcome.Message = message
@@ -185,7 +185,7 @@ func (s *Server) NodeAdd(ctx context.Context, in *api.Node) (*api.Node, error) {
 	}
 
 	// open or create the k/v db
-	db, err := bolt.Open(mountpoint+"/asd.db", 0600, &bolt.Options{Timeout: 3 * time.Second})
+	db, err := bolt.Open(mountpoint+"/silo.db", 0600, &bolt.Options{Timeout: 3 * time.Second})
 	if err != nil {
 		message := "Unable to open the master db for persisting node info"
 		_log.Error(message)
@@ -226,7 +226,7 @@ func (s *Server) NodeAdd(ctx context.Context, in *api.Node) (*api.Node, error) {
 		_log.Info("k/v db updated")
 	}
 
-	message := "Succesfully added ASD node"
+	message := "Succesfully added silo node"
 	_log.Info(message)
 	apiNodeRes.Outcome.Message = message
 	return apiNodeRes, nil
@@ -251,7 +251,7 @@ func (s *Server) NodeRemove(ctx context.Context, in *api.Node) (*api.Node, error
 		return apiNode, err
 	}
 
-	dataset, err := zfs.GetDataset(pool + "/asd")
+	dataset, err := zfs.GetDataset(pool + "/silo")
 	if err != nil {
 		message := "Unable to locate the master dataset: did you run init?"
 		_log.Error(message)
@@ -271,7 +271,7 @@ func (s *Server) NodeRemove(ctx context.Context, in *api.Node) (*api.Node, error
 	}
 
 	// open or create the k/v db
-	db, err := bolt.Open(mountpoint+"/asd.db", 0600, &bolt.Options{Timeout: 3 * time.Second})
+	db, err := bolt.Open(mountpoint+"/silo.db", 0600, &bolt.Options{Timeout: 3 * time.Second})
 	if err != nil {
 		message := "Unable to open the master db to remove node"
 		_log.Error(message)
@@ -340,7 +340,7 @@ func (s *Server) NodePurge(ctx context.Context, in *api.Node) (*api.Node, error)
 		return apiNode, err
 	}
 
-	dataset, err := zfs.GetDataset(pool + "/asd")
+	dataset, err := zfs.GetDataset(pool + "/silo")
 	if err != nil {
 		message := "Unable to locate the master dataset: did you run init?"
 		_log.Error(message)
@@ -360,7 +360,7 @@ func (s *Server) NodePurge(ctx context.Context, in *api.Node) (*api.Node, error)
 	}
 
 	// open or create the k/v db
-	db, err := bolt.Open(mountpoint+"/asd.db", 0600, &bolt.Options{Timeout: 3 * time.Second})
+	db, err := bolt.Open(mountpoint+"/silo.db", 0600, &bolt.Options{Timeout: 3 * time.Second})
 	if err != nil {
 		message := "Unable to open the master db to purge node"
 		_log.Error(message)

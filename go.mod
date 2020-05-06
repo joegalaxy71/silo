@@ -1,4 +1,4 @@
-module asd
+module silo
 
 go 1.14
 

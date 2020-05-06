@@ -1,15 +1,15 @@
 package grpc
 
 import (
-	"asd/common/api"
-	"asd/common/helpers"
-	"asd/common/zfs"
 	"context"
 	"fmt"
 	"github.com/boltdb/bolt"
 	"github.com/golang/protobuf/proto"
 	"github.com/spf13/viper"
 	"os"
+	"silo/common/api"
+	"silo/common/helpers"
+	"silo/common/zfs"
 	"time"
 )
 
@@ -21,16 +21,16 @@ func (s *Server) MasterInit(ctx context.Context, in *api.Master) (*api.Master, e
 	_log := helpers.InitLogs(true)
 	_log.Debugf("gRPC call: MasterInit(%s)\n", apiMaster.Poolname)
 
-	dataset, err := zfs.CreateFilesystem(apiMaster.Poolname+"/asd", nil)
-	//.CreateFilesystem(apiMaster.Poolname+"/asd", nil)
+	dataset, err := zfs.CreateFilesystem(apiMaster.Poolname+"/silo", nil)
+	//.CreateFilesystem(apiMaster.Poolname+"/silo", nil)
 	if err != nil {
-		message := "Error creating initial dataset " + apiMaster.Poolname + "/asd"
+		message := "Error creating initial dataset " + apiMaster.Poolname + "/silo"
 		_log.Error(message)
 		apiMaster.Outcome.Error = true
 		apiMaster.Outcome.Message = message
 		return apiMaster, err
 	} else {
-		_log.Info("Created root dataset " + apiMaster.Poolname + "/asd")
+		_log.Info("Created root dataset " + apiMaster.Poolname + "/silo")
 	}
 
 	//get the actual mountpoint
@@ -69,7 +69,7 @@ func (s *Server) MasterInit(ctx context.Context, in *api.Master) (*api.Master, e
 	}
 
 	// open or create the k/v db
-	db, err := bolt.Open(mountpoint+"/asd.db", 0600, &bolt.Options{Timeout: 3 * time.Second})
+	db, err := bolt.Open(mountpoint+"/silo.db", 0600, &bolt.Options{Timeout: 3 * time.Second})
 	if err != nil {
 		message := "Unable to open the main db for persisting master info"
 		_log.Error(message)
@@ -123,7 +123,7 @@ func (s *Server) MasterInit(ctx context.Context, in *api.Master) (*api.Master, e
 		_log.Info("Main db updated with master info")
 	}
 
-	message := "Succesfully initialized ASD master"
+	message := "Succesfully initialized silo master"
 	_log.Info(message)
 	apiMaster.Outcome.Message = message
 	return apiMaster, nil
